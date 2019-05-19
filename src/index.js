@@ -48,7 +48,7 @@ export const getVersionStr = versionId => {
     : versionId.toUpperCase()
 }
 
-export const getPassageStr = ({ refs, skipBookName }) => {
+export const getPassageStr = ({ refs, skipBookName, abbreviated }) => {
   let info = {}
 
   refs.forEach(ref => {
@@ -56,7 +56,13 @@ export const getPassageStr = ({ refs, skipBookName }) => {
     const { bookId, chapter, verse } = ref.loc ? getRefFromLoc(ref.loc) : ref
 
     if(info.book === undefined) {
-      info.book = skipBookName ? "" : getBibleBookName(bookId)
+      info.book = skipBookName
+        ? ""
+        : (
+          abbreviated
+            ? getBibleBookAbbreviatedName(bookId)
+            : getBibleBookName(bookId)
+        )
     }
       
     if(chapter != null) {
