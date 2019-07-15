@@ -1,4 +1,5 @@
 import usfmJS from 'usfm-js'
+import i18n from './i18n.js'
 // import rewritePattern  from 'regexpu-core'
 
 export const blockUsfmMarkers = [
@@ -229,17 +230,22 @@ const getFilteredVerseObjects = ({ unitObjs, inlineMarkersOnly }) => unitObjs.fi
   // It seems that usfmMarkersWithContentToDiscard is not needed, since usfm-js distinguishes between content and text,
   // and so if something is not in usfmMarkers and has no text, we just get rid of it.
   
-  // convert all unsupported markers which DO have content to keep into type=text
+  // deal with blocks when getting inline markers only and filter out unsupported tags without content
+  const isBlock = tagInList({ tag, list: blockUsfmMarkers })
   if(
     !tagInList({ tag, list: inlineUsfmMarkers })
     && !tagInList({ tag, list: specialUsfmMarkers })
-    && (
-      inlineMarkersOnly
-      || !tagInList({ tag, list: blockUsfmMarkers })
-    )
+    && !text
+    && !children
   ) {
-    if(!text && !children) return false
-    // unitObj.type = "text"
+
+    if(inlineMarkersOnly && isBlock) {
+      unitObj.text = i18n(" ", {}, "word separator")
+
+    } else if(inlineMarkersOnly || !isBlock) {
+      return false
+    }
+
   }
 
   // change all .text to .children
