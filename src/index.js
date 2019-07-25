@@ -1,5 +1,5 @@
 import md5 from 'md5'
-import i18n from './i18n.js'
+import i18n, { i18nNumber } from './i18n.js'
 import { getHebrewPOSTerm, getHebrewMorphPartDisplayInfo } from './hebrewMorph.js'
 import { getGreekPOSTerm, getGreekMorphPartDisplayInfo } from './greekMorph.js'
 import { getRefFromLoc } from 'bibletags-versification/src/versification'
@@ -93,6 +93,26 @@ export const getPassageStr = ({ refs, skipBookName, abbreviated }) => {
       }
     }
   })
+
+  // modify chapter and verse numeric representation
+  if(info.chapter) {
+    info.chapter = i18nNumber({ num: info.chapter, type: 'chapter' })
+  }
+  if(info.start_chapter) {
+    info.start_chapter = i18nNumber({ num: info.start_chapter, type: 'chapter' })
+  }
+  if(info.end_chapter) {
+    info.end_chapter = i18nNumber({ num: info.end_chapter, type: 'chapter' })
+  }
+  if(info.verse) {
+    info.verse = i18nNumber({ num: info.verse, type: 'verse' })
+  }
+  if(info.start_verse) {
+    info.start_verse = i18nNumber({ num: info.start_verse, type: 'verse' })
+  }
+  if(info.end_verse) {
+    info.end_verse = i18nNumber({ num: info.end_verse, type: 'verse' })
+  }
 
   if(info.start_chapter && info.start_verse) {
     return i18n("{{book}} {{start_chapter}}:{{start_verse}}–{{end_chapter}}:{{end_verse}}", info).trim()
