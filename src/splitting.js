@@ -68,7 +68,7 @@ export const blockUsfmMarkers = [
   // "b",
 
   // Poetry
-  // "q#",
+  "q#",
   // "qr",
   // "qc",
   // "qa",
