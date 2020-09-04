@@ -277,15 +277,21 @@ const getFilteredVerseObjects = ({ unitObjs, inlineMarkersOnly }) => unitObjs.fi
 
 const wrapVerseObjects = verseObjects => {
 
-  let currentBlockMarkerObj
+  let currentBlockMarkerObj, currentVerseContainerObj, chapter, verse
 
   return verseObjects.filter(verseObj => {
 
     const { tag, text, content, children } = verseObj
 
-    if(tagInList({ tag, list: blockUsfmMarkers })) {
+
+    if(tag === "c") {
+      chapter = parseInt(content)
+      return false
+
+    } else if(tagInList({ tag, list: blockUsfmMarkers })) {
 
       currentBlockMarkerObj = verseObj
+      currentVerseContainerObj = undefined
       return true
       
     } else {
@@ -293,26 +299,57 @@ const wrapVerseObjects = verseObjects => {
       if(!currentBlockMarkerObj) {
         if(tagInList({ tag, list: specialUsfmMarkers })) return true
         console.log(`Missing block USFM marker.`, currentBlockMarkerObj)
-        return
+        return false
       }
 
       if(currentBlockMarkerObj.text) {
         if(tagInList({ tag, list: specialUsfmMarkers })) return true
         console.log(`Unexpected block USFM marker with text.`, currentBlockMarkerObj)
-        return
+        return false
       }
 
       if(currentBlockMarkerObj.content) {
         if(tagInList({ tag, list: specialUsfmMarkers })) return true
         console.log(`Unexpected block USFM marker with content.`, currentBlockMarkerObj)
-        return
+        return false
       }
 
       if(!currentBlockMarkerObj.children) {
         currentBlockMarkerObj.children = []
       }
 
-      currentBlockMarkerObj.children.push(verseObj)
+      if(tag === "c") {
+        currentBlockMarkerObj.children.push(verseObj)
+        chapter = parseInt(content)
+        return false
+      }
+
+      if(tag === "v" || !currentVerseContainerObj) {
+        if(tag === "v") {
+          verse = parseInt(content)
+        }
+
+        if([ undefined, NaN ].includes(verse)) {
+          console.log(`Unexpected USFM without verse.`, verseObj)
+          return false
+        }
+
+        if([ undefined, NaN ].includes(chapter)) {
+          console.log(`Unexpected USFM without chapter.`, verseObj)
+          return false
+        }
+
+        currentVerseContainerObj = {
+          type: "text",
+          children: [],
+          chapter,
+          verse,
+        }
+
+        currentBlockMarkerObj.children.push(currentVerseContainerObj)
+      }
+
+      currentVerseContainerObj.children.push(verseObj)
       return false
 
     }
@@ -598,13 +635,11 @@ const removeInvalidNewlines = unitObjs => {
   })
 }
 
-export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex, isOrigLangOrLXXVersion, splitIntoWords }) => {
+export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex, splitIntoWords }) => {
 
   const verseObjects = getFlattenedJsUsfm( usfmJS.toJSON(usfm) )
 
   removeInvalidNewlines(verseObjects)
-
-  if(isOrigLangOrLXXVersion) return verseObjects  // as it is already divided into words
 
   let filteredVerseObjects = getFilteredVerseObjects({
     unitObjs: verseObjects,
