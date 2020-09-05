@@ -128,6 +128,5 @@ export const getGreekMorphPartDisplayInfo = ({ morphPart }) => {
 
   return {
     str: parsingDisplayPieces.filter(piece => !!piece).join(i18n(" ", "word separator")),
-    color: "black",
   }
 }

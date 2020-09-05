@@ -166,7 +166,7 @@ const grammarColors = {
 }
 
 export const getGrammarColor = ({ isPrefixOrSuffix, morphPart="" }) => (
-  (isPrefixOrSuffix && (grammarColors[morphPart.substr(0,2)] || grammarColors[morphPart.substr(0,1)])) || ""  
+  (isPrefixOrSuffix && (grammarColors[morphPart.substr(0,2)] || grammarColors[morphPart.substr(0,1)])) || undefined
 )
 
 const pushTerm = ({ morphStrs, term }) => term && morphStrs.push(term)
