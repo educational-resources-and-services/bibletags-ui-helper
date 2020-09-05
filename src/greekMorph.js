@@ -1,60 +1,64 @@
 import i18n from './i18n.js'
 
 // pos matches posMapping in bibletags-data/scripts/importUGNTFromUsfm.js
-const posTerms = {
-  N: i18n("noun", "", "grammar"),
-  A: i18n("adjective", "", "grammar"),
-  NS: i18n("adjective", "", "grammar"),  // better categorized as an adjective
-  NP: i18n("adjective", "", "grammar"),  // better categorized as an adjective
-  E: i18n("determiner", "", "grammar"),
-  R: i18n("pronoun", "", "grammar"),
-  V: i18n("verb", "", "grammar"),
-  I: i18n("interjection", "", "grammar"),
-  P: i18n("preposition", "", "grammar"),
-  D: i18n("adverb", "", "grammar"),
-  PI: i18n("adverb", "", "grammar"),  // better categorized as an adverb
-  C: i18n("conjunction", "", "grammar"),
-  T: i18n("particle", "", "grammar"),
-  TF: i18n("foreign", "", "grammar"),  // better in its own category
+const getPosTerm = code => {
+  switch(code) {
+    case 'N': return i18n("noun", "", "grammar")
+    case 'A': return i18n("adjective", "", "grammar")
+    case 'NS': return i18n("adjective", "", "grammar")  // better categorized as an adjective
+    case 'NP': return i18n("adjective", "", "grammar")  // better categorized as an adjective
+    case 'E': return i18n("determiner", "", "grammar")
+    case 'R': return i18n("pronoun", "", "grammar")
+    case 'V': return i18n("verb", "", "grammar")
+    case 'I': return i18n("interjection", "", "grammar")
+    case 'P': return i18n("preposition", "", "grammar")
+    case 'D': return i18n("adverb", "", "grammar")
+    case 'PI': return i18n("adverb", "", "grammar")  // better categorized as an adverb
+    case 'C': return i18n("conjunction", "", "grammar")
+    case 'T': return i18n("particle", "", "grammar")
+    case 'TF': return i18n("foreign", "", "grammar")  // better in its own category
+  }
 }
 
-const posTypeTerms = {
-  NS: i18n("substantive", "", "grammar"),
-  NP: i18n("predicate", "", "grammar"),
-  AA: i18n("ascriptive", "", "grammar"),
-  AR: i18n("restrictive", "", "grammar"),
-  EA: i18n("article", "", "grammar"),
-  ED: i18n("demonstrative", "", "grammar"),
-  EF: i18n("differential", "", "grammar"),
-  EP: i18n("possessive", "", "grammar"),
-  EQ: i18n("quantifier", "", "grammar"),
-  EN: i18n("number", "", "grammar"),
-  EO: i18n("ordinal", "", "grammar"),
-  ER: i18n("relative", "", "grammar"),
-  ET: i18n("interrogative", "", "grammar"),
-  RD: i18n("demonstrative", "", "grammar"),
-  RP: i18n("personal", "", "grammar"),
-  RE: i18n("reflexive", "", "grammar"),
-  RC: i18n("reciprocal", "", "grammar"),
-  RI: i18n("indefinite", "", "grammar"),
-  RR: i18n("relative", "", "grammar"),
-  RT: i18n("interrogative", "", "grammar"),
-  VT: i18n("transitive", "", "grammar"),
-  VI: i18n("intransitive", "", "grammar"),
-  VL: i18n("linking", "", "grammar"),
-  VM: i18n("modal", "", "grammar"),
-  VP: i18n("periphrastic", "", "grammar"),
-  IE: i18n("exclamation", "", "grammar"),
-  ID: i18n("directive", "", "grammar"),
-  IR: i18n("response", "", "grammar"),
-  PI: i18n("improper-preposition", "", "grammar"),
-  DO: i18n("correlative", "", "grammar"),
-  CC: i18n("coordinating", "", "grammar"),
-  CS: i18n("subordinating", "", "grammar"),
-  CO: i18n("correlative", "", "grammar"),
+const getPosTypeTerm = code => {
+  switch(code) {
+    case 'NS': return i18n("substantive", "", "grammar")
+    case 'NP': return i18n("predicate", "", "grammar")
+    case 'AA': return i18n("ascriptive", "", "grammar")
+    case 'AR': return i18n("restrictive", "", "grammar")
+    case 'EA': return i18n("article", "", "grammar")
+    case 'ED': return i18n("demonstrative", "", "grammar")
+    case 'EF': return i18n("differential", "", "grammar")
+    case 'EP': return i18n("possessive", "", "grammar")
+    case 'EQ': return i18n("quantifier", "", "grammar")
+    case 'EN': return i18n("number", "", "grammar")
+    case 'EO': return i18n("ordinal", "", "grammar")
+    case 'ER': return i18n("relative", "", "grammar")
+    case 'ET': return i18n("interrogative", "", "grammar")
+    case 'RD': return i18n("demonstrative", "", "grammar")
+    case 'RP': return i18n("personal", "", "grammar")
+    case 'RE': return i18n("reflexive", "", "grammar")
+    case 'RC': return i18n("reciprocal", "", "grammar")
+    case 'RI': return i18n("indefinite", "", "grammar")
+    case 'RR': return i18n("relative", "", "grammar")
+    case 'RT': return i18n("interrogative", "", "grammar")
+    case 'VT': return i18n("transitive", "", "grammar")
+    case 'VI': return i18n("intransitive", "", "grammar")
+    case 'VL': return i18n("linking", "", "grammar")
+    case 'VM': return i18n("modal", "", "grammar")
+    case 'VP': return i18n("periphrastic", "", "grammar")
+    case 'IE': return i18n("exclamation", "", "grammar")
+    case 'ID': return i18n("directive", "", "grammar")
+    case 'IR': return i18n("response", "", "grammar")
+    case 'PI': return i18n("improper-preposition", "", "grammar")
+    case 'DO': return i18n("correlative", "", "grammar")
+    case 'CC': return i18n("coordinating", "", "grammar")
+    case 'CS': return i18n("subordinating", "", "grammar")
+    case 'CO': return i18n("correlative", "", "grammar")
+  }
 }
 
-const morphTerms = [
+const getMorphTerms = () => ([
   { // mood
     I: i18n("indicative", "", "grammar"),
     M: i18n("imperative", "", "grammar"),
@@ -103,14 +107,14 @@ const morphTerms = [
     D: i18n("diminutive", "", "grammar"),
     I: i18n("indeclinable", "", "grammar"),
   },
-]
+])
 
 
-export const getNormalizedGreekPOSCode = posCode => (posTerms[posCode] !== undefined ? posCode : posCode.substr(0,1))
+export const getNormalizedGreekPOSCode = posCode => (getPosTerm(posCode) !== undefined ? posCode : posCode.substr(0,1))
 
-export const getGreekPOSTerm = posCode => (posTerms[getNormalizedGreekPOSCode(posCode)] || "")
+export const getGreekPOSTerm = posCode => (getPosTerm(getNormalizedGreekPOSCode(posCode)) || "")
 
-export const getGreekPOSTypeTerm = posCode => (posTypeTerms[posCode] || "")
+export const getGreekPOSTypeTerm = posCode => (getPosTypeTerm(posCode) || "")
 
 export const getGreekMorphPartDisplayInfo = ({ morphPart }) => {
   const posCode = morphPart.substr(0,2)
@@ -119,7 +123,7 @@ export const getGreekMorphPartDisplayInfo = ({ morphPart }) => {
   const parsingDisplayPieces = [
     // getGreekPOSTerm(posCode),  // Shown in the POS list; TODO: make present POS stand out in list
     getGreekPOSTypeTerm(posCode),
-    ...morphTerms.map((category, index) => (category[morphCodes[index]] || "")),
+    ...getMorphTerms().map((category, index) => (category[morphCodes[index]] || "")),
   ]
 
   return {

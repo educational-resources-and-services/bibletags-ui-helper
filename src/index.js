@@ -1,7 +1,7 @@
 import md5 from 'md5'
 import i18n, { i18nNumber } from './i18n.js'
 import { getHebrewPOSTerm, getHebrewMorphPartDisplayInfo } from './hebrewMorph.js'
-import { getGreekPOSTerm, getGreekMorphPartDisplayInfo } from './greekMorph.js'
+import { getGreekPOSTerm, getGreekMorphPartDisplayInfo, getNormalizedGreekPOSCode } from './greekMorph.js'
 import { getRefFromLoc } from 'bibletags-versification/src/versification'
 import { splitVerseIntoWords } from './splitting.js'
 
@@ -285,13 +285,17 @@ export const getBibleBookAbbreviatedName = bookid => {
 
 }
 
+export const getNormalizedPOSCode = ({ morphLang, morphPos }) => (
+  ['He','Ar'].includes(morphLang) ? morphPos : getNormalizedGreekPOSCode(morphPos)
+)
+
 export const getPOSTerm = ({ languageId, posCode }) => (
   languageId === 'heb' ? getHebrewPOSTerm(posCode) : getGreekPOSTerm(posCode)
 )
 
-export const getMorphPartDisplayInfo = ({ morphLang, morphPart, isPrefixOrSuffix, wordIsMultiPart }) => {
-  return ['He','Ar'].includes(morphLang) ? getHebrewMorphPartDisplayInfo({ morphLang, morphPart, isPrefixOrSuffix, wordIsMultiPart }) : getGreekMorphPartDisplayInfo({ morphPart })
-}
+export const getMorphPartDisplayInfo = ({ morphLang, morphPart, isPrefixOrSuffix, wordIsMultiPart }) => (
+  ['He','Ar'].includes(morphLang) ? getHebrewMorphPartDisplayInfo({ morphLang, morphPart, isPrefixOrSuffix, wordIsMultiPart }) : getGreekMorphPartDisplayInfo({ morphPart })
+)
 
 // same as in bibletags-data/scripts/importUHBFromOsis.js
 export const getMainWordPartIndex = wordParts => {
