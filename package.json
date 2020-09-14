@@ -16,6 +16,6 @@
     "bibletags-versification": "github:educational-resources-and-services/bibletags-versification#b91312ea9551b83740d17db2e61a35a102052359",
     "md5": "2.2.1",
     "regexpu-core": "4.2.0",
-    "usfm-js": "github:translationCoreApps/usfm-js#b7ed16cd03423a6132ebbe21b450d096c96e07de"
+    "usfm-js": "github:unfoldingWord/usfm-js#abe6833688b10b202e4b848715eca883fce7b89a"
   }
 }
