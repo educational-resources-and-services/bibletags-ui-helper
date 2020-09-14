@@ -17,8 +17,5 @@
     "md5": "2.2.1",
     "regexpu-core": "4.2.0",
     "usfm-js": "github:unfoldingWord/usfm-js#abe6833688b10b202e4b848715eca883fce7b89a"
-  },
-  "devDependencies": {
-    "usfm-js": "github:unfoldingWord/usfm-js#abe6833688b10b202e4b848715eca883fce7b89a"
   }
 }
