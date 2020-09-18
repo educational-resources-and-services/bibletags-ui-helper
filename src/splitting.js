@@ -277,6 +277,26 @@ const getFilteredVerseObjects = ({ unitObjs, inlineMarkersOnly }) => unitObjs.fi
 
 const wrapVerseObjects = verseObjects => {
 
+  // If there is content prior to a block marker, add in a paragraph marker just before the content.
+  verseObjects.some((verseObj, idx) => {
+    const { tag } = verseObj
+    if(tagInList({ tag, list: blockUsfmMarkers })) {
+      return true  // all is well - a block marker was found; exit the loop
+    } else if(tagInList({ tag, list: specialUsfmMarkers })) {
+      // still okay, though we need to keep looking
+    } else {
+      // hitting content before a block marker; add a simple paragraph in here
+      verseObjects = [
+        ...verseObjects.slice(0, idx),
+        {
+          tag: 'p',
+        },
+        ...verseObjects.slice(idx),
+      ]
+      return true
+    }
+  })
+
   let currentBlockMarkerObj, currentVerseContainerObj, chapter, verse
 
   return verseObjects.filter(verseObj => {
@@ -298,6 +318,7 @@ const wrapVerseObjects = verseObjects => {
 
       if(!currentBlockMarkerObj) {
         if(tagInList({ tag, list: specialUsfmMarkers })) return true
+        // Should no longer get here, given the pre-loop at the start of this function.
         console.log(`Missing block USFM marker.`, currentBlockMarkerObj)
         return false
       }
@@ -316,12 +337,6 @@ const wrapVerseObjects = verseObjects => {
 
       if(!currentBlockMarkerObj.children) {
         currentBlockMarkerObj.children = []
-      }
-
-      if(tag === "c") {
-        currentBlockMarkerObj.children.push(verseObj)
-        chapter = parseInt(content)
-        return false
       }
 
       if(tag === "v" || !currentVerseContainerObj) {
