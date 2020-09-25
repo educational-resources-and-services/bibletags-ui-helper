@@ -94,7 +94,7 @@ const getGrammarTerms = code => {
       M: i18n("poal", "", "grammar"),
       k: i18n("palel", "", "grammar"),
       K: i18n("pulal", "", "grammar"),
-      Q: i18n("qal passive", "", "grammar"),
+      Q: i18n("qal-passive", "", "grammar"),
       l: i18n("pilpel", "", "grammar"),
       L: i18n("polpal", "", "grammar"),
       f: i18n("hithpalpel", "", "grammar"),
