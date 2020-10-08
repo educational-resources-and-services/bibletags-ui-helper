@@ -48,7 +48,7 @@ export const getVersionStr = versionId => {
     : versionId.toUpperCase()
 }
 
-export const getPassageStr = ({ refs, skipBookName, abbreviated }) => {
+export const getRefsInfo = ({ refs, skipBookName, abbreviated, usfmBookAbbr }) => {
   let info = {}
 
   refs.forEach(ref => {
@@ -59,9 +59,13 @@ export const getPassageStr = ({ refs, skipBookName, abbreviated }) => {
       info.book = skipBookName
         ? ""
         : (
-          abbreviated
-            ? getBibleBookAbbreviatedName(bookId)
-            : getBibleBookName(bookId)
+          usfmBookAbbr
+            ? getUsfmBibleBookAbbr(bookId)
+            : (
+              abbreviated
+                ? getBibleBookAbbreviatedName(bookId)
+                : getBibleBookName(bookId)
+            )
         )
     }
       
@@ -93,6 +97,11 @@ export const getPassageStr = ({ refs, skipBookName, abbreviated }) => {
       }
     }
   })
+
+}
+
+export const getPassageStr = params => {
+  const info = getRefsInfo(params)
 
   // modify chapter and verse numeric representation
   if(info.chapter) {
@@ -137,7 +146,7 @@ export const getPassageStr = ({ refs, skipBookName, abbreviated }) => {
   return info.book || ""
 }
 
-export const getBibleBookName = bookid => {
+export const getBibleBookName = bookId => {
 
   return [
     "",
@@ -207,11 +216,111 @@ export const getBibleBookName = bookid => {
     i18n("3 John", "", "book"),
     i18n("Jude", "", "book"),
     i18n("Revelation", "", "book"),
-  ][bookid]
+  ][bookId]
 
 }
 
-export const getBibleBookAbbreviatedName = bookid => {
+const usfmBookAbbr = [
+  "",
+  "GEN",
+  "EXO",
+  "LEV",
+  "NUM",
+  "DEU",
+  "JOS",
+  "JDG",
+  "RUT",
+  "1SA",
+  "2SA",
+  "1KI",
+  "2KI",
+  "1CH",
+  "2CH",
+  "EZR",
+  "NEH",
+  "EST",
+  "JOB",
+  "PSA",
+  "PRO",
+  "ECC",
+  "SNG",
+  "ISA",
+  "JER",
+  "LAM",
+  "EZK",
+  "DAN",
+  "HOS",
+  "JOL",
+  "AMO",
+  "OBA",
+  "JON",
+  "MIC",
+  "NAM",
+  "HAB",
+  "ZEP",
+  "HAG",
+  "ZEC",
+  "MAL",
+  "MAT",
+  "MRK",
+  "LUK",
+  "JHN",
+  "ACT",
+  "ROM",
+  "1CO",
+  "2CO",
+  "GAL",
+  "EPH",
+  "PHP",
+  "COL",
+  "1TH",
+  "2TH",
+  "1TI",
+  "2TI",
+  "TIT",
+  "PHM",
+  "HEB",
+  "JAS",
+  "1PE",
+  "2PE",
+  "1JN",
+  "2JN",
+  "3JN",
+  "JUD",
+  "REV",
+]
+
+export const getUsfmBibleBookAbbr = bookId => usfmBookAbbr[bookId]
+export const getBookIdFromUsfmBibleBookAbbr = abbr => usfmBookAbbr.indexOf(abbr)
+
+export const getUsfmRefStrFromLoc = loc => {
+
+  const refs = loc.split('-').map(l => getRefFromLoc(loc1))
+
+  const { book, chapter, verse, start_chapter, start_verse, end_chapter, end_verse } = getRefsInfo({
+    refs,
+    usfmBookAbbr: true,
+  })
+
+  if(info.start_chapter && info.start_verse) {
+    return `${book} ${start_chapter}:${start_verse}–${end_chapter}:${end_verse}`
+  }
+
+  if(info.chapter && info.start_verse) {
+    return `${book} ${chapter}:${start_verse}–${end_verse}`
+  }
+
+  if(info.start_chapter) {
+    return `${book} ${start_chapter}–${end_chapter}`
+  }
+
+  if(info.verse) {
+    return `${book} ${chapter}:${verse}`
+  }
+
+}
+
+export const getBibleBookAbbreviatedName = bookId => {
 
   return [
     "",
@@ -281,7 +390,7 @@ export const getBibleBookAbbreviatedName = bookid => {
     i18n("3Jn", "Abbreviation for 3 John", "book"),
     i18n("Jud", "Abbreviation for Jude", "book"),
     i18n("Rev", "Abbreviation for Revelation", "book"),
-  ][bookid]
+  ][bookId]
 
 }
 
