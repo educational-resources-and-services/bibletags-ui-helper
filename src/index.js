@@ -49,7 +49,7 @@ export const getVersionStr = versionId => {
 }
 
 export const getRefsInfo = ({ refs, skipBookName, abbreviated, usfmBookAbbr }) => {
-  let info = {}
+  const info = {}
 
   refs.forEach(ref => {
     const { wordRanges } = ref
@@ -98,6 +98,7 @@ export const getRefsInfo = ({ refs, skipBookName, abbreviated, usfmBookAbbr }) =
     }
   })
 
+  return info
 }
 
 export const getPassageStr = params => {
@@ -295,26 +296,26 @@ export const getBookIdFromUsfmBibleBookAbbr = abbr => usfmBookAbbr.indexOf(abbr)
 
 export const getUsfmRefStrFromLoc = loc => {
 
-  const refs = loc.split('-').map(l => getRefFromLoc(loc1))
+  const refs = loc.split('-').map(l => getRefFromLoc(l))
 
   const { book, chapter, verse, start_chapter, start_verse, end_chapter, end_verse } = getRefsInfo({
     refs,
     usfmBookAbbr: true,
   })
 
-  if(info.start_chapter && info.start_verse) {
+  if(start_chapter && start_verse) {
     return `${book} ${start_chapter}:${start_verse}–${end_chapter}:${end_verse}`
   }
 
-  if(info.chapter && info.start_verse) {
+  if(chapter && start_verse) {
     return `${book} ${chapter}:${start_verse}–${end_verse}`
   }
 
-  if(info.start_chapter) {
+  if(start_chapter) {
     return `${book} ${start_chapter}–${end_chapter}`
   }
 
-  if(info.verse) {
+  if(verse) {
     return `${book} ${chapter}:${verse}`
   }
 
