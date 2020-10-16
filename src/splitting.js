@@ -65,16 +65,15 @@ export const blockUsfmMarkers = [
   // "nb",
   // "pc",
   // "ph#",
-  // "b",
+  "b",
 
   // Poetry
   "q#",
-  // "qr",
+  "qr",
   // "qc",
-  // "qa",
+  "qa",
   // "qm#",
   // "qd",
-  // "b",
 
   // Lists
   // "lh",
@@ -175,7 +174,7 @@ export const inlineUsfmMarkers = [
   // "sig",
   // "sls",
   // "tl",
-  // "wj",
+  "wj",
 
   // Character Styling
   "em",
