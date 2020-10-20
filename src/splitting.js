@@ -73,7 +73,7 @@ export const blockUsfmMarkers = [
   "qc",
   "qa",
   // "qm#",
-  // "qd",
+  "qd",
 
   // Lists
   // "lh",
