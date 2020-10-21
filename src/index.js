@@ -294,6 +294,51 @@ const usfmBookAbbr = [
 export const getUsfmBibleBookAbbr = bookId => usfmBookAbbr[bookId]
 export const getBookIdFromUsfmBibleBookAbbr = abbr => usfmBookAbbr.indexOf(abbr)
 
+export const getRefsFromUsfmRefStr = usfmRefStr => {
+  const [ usfmBibleBookAbbr, chaptersAndVerses ] = usfmRefStr.split(' ')
+  const [ startChapterAndVerse, endChapterAndVerse ] = chaptersAndVerses.split('-')
+  const [ startChapter, startVerse ] = startChapterAndVerse.split(':')
+
+  const refs = [
+    getRefFromLoc(
+      `${(`0${getBookIdFromUsfmBibleBookAbbr(usfmBibleBookAbbr)}`).substr(-2)}${(`00${startChapter}`).substr(-3)}${(`00${startVerse === undefined ? 1 : startVerse}`).substr(-3)}`
+    )
+  ]
+
+  let endChapter, endVerse
+
+  if(endChapterAndVerse) {
+    const endChapterAndVerseSplit = endChapterAndVerse.split(':')
+
+    if(startVerse === undefined) {
+      endChapter = endChapterAndVerseSplit[0]
+      endVerse = 999
+    } else if(endChapterAndVerseSplit.length > 1) {
+      endChapter = endChapterAndVerseSplit[0]
+      endVerse = endChapterAndVerseSplit[1]
+    } else {
+      endChapter = startChapter
+      endVerse = endChapterAndVerseSplit[0]
+    }
+
+  } else if(startVerse === undefined) {
+
+    endChapter = startChapter
+    endVerse = 999
+  
+  }
+
+  if(endChapter) {
+    refs.push(
+      getRefFromLoc(
+        `${(`0${getBookIdFromUsfmBibleBookAbbr(usfmBibleBookAbbr)}`).substr(-2)}${(`00${endChapter}`).substr(-3)}${(`00${endVerse}`).substr(-3)}`
+      )  
+    )
+  }
+
+  return refs
+}  
+
 export const getUsfmRefStrFromLoc = loc => {
 
   const refs = loc.split('-').map(l => getRefFromLoc(l))
