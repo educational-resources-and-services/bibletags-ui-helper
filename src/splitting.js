@@ -102,6 +102,21 @@ export const blockUsfmMarkers = [
 
 ]
 
+export const headingBlockUsfmMarkers = [
+
+  "mt#",
+  "mte#",
+  "ms#",
+  "mr",
+  "s#",
+  "sr",
+  "r",
+  // "d",  - since this is actual translated content, it is not a heading block
+  "sp",
+  "sd#",
+
+]
+
 export const inlineUsfmMarkers = [
   // see http://ubsicap.github.io/usfm/index.html
 
@@ -296,7 +311,7 @@ const wrapVerseObjects = verseObjects => {
     }
   })
 
-  let currentBlockMarkerObj, currentVerseContainerObj, chapter, verse
+  let currentBlockMarkerObj, currentVerseContainerObj, inHeadingBlock, chapter, verse
 
   return verseObjects.filter(verseObj => {
 
@@ -311,8 +326,32 @@ const wrapVerseObjects = verseObjects => {
 
       currentBlockMarkerObj = verseObj
       currentVerseContainerObj = undefined
+      inHeadingBlock = tagInList({ tag, list: headingBlockUsfmMarkers })
+
+      if(tag === "d") {
+        verse = 0
+
+        if([ undefined, NaN ].includes(chapter)) {
+          console.log(`Unexpected \\d tag without chapter.`, verseObj)
+          return false
+        }
+
+        currentVerseContainerObj = {
+          type: "text",
+          children: [],
+          chapter,
+          verse,
+        }
+
+        if(!currentBlockMarkerObj.children) {
+          currentBlockMarkerObj.children = []
+        }
+  
+        currentBlockMarkerObj.children.push(currentVerseContainerObj)
+      }
+
       return true
-      
+
     } else {
 
       if(!currentBlockMarkerObj) {
@@ -324,18 +363,25 @@ const wrapVerseObjects = verseObjects => {
 
       if(currentBlockMarkerObj.text) {
         if(tagInList({ tag, list: specialUsfmMarkers })) return true
+        // Should no longer get here, given the loop near modifiedVerseObjects
         console.log(`Unexpected block USFM marker with text.`, currentBlockMarkerObj)
         return false
       }
 
       if(currentBlockMarkerObj.content) {
         if(tagInList({ tag, list: specialUsfmMarkers })) return true
+        // Should no longer get here, given the loop near modifiedVerseObjects
         console.log(`Unexpected block USFM marker with content.`, currentBlockMarkerObj)
         return false
       }
 
       if(!currentBlockMarkerObj.children) {
         currentBlockMarkerObj.children = []
+      }
+
+      if(inHeadingBlock) {
+        currentBlockMarkerObj.children.push(verseObj)
+        return false
       }
 
       if(tag === "v" || !currentVerseContainerObj) {
@@ -651,6 +697,17 @@ const removeInvalidNewlines = unitObjs => {
 
 export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex, splitIntoWords }) => {
 
+  // Put the chapter tag before everything, or assume chapter 1 if there is not one
+  const chapterTagSwapRegex = /^((?:[^\\]|\\[^v])+?)(\\c [0-9]+\n)/
+  if(chapterTagSwapRegex.test(usfm)) {
+    usfm = usfm.replace(
+      /^((?:[^\\]|\\[^v])*?)(\\c [0-9]+ *\n)/,
+      '$2$1'
+    )
+  } else {
+    usfm = `\\c 1\n${usfm}`
+  }
+
   const verseObjects = getFlattenedJsUsfm( usfmJS.toJSON(usfm) )
 
   removeInvalidNewlines(verseObjects)
@@ -660,12 +717,29 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     inlineMarkersOnly,
   })
 
+  // For block markers which have content (like \s1 and \d), separate out that content
+  modifiedVerseObjects = []
+  filteredVerseObjects.forEach(verseObj => {
+    const { text, content, ...verseObjWithoutTextAndContent } = verseObj
+    const { tag } = verseObjWithoutTextAndContent
+
+    if(tagInList({ tag, list: blockUsfmMarkers }) && (text || content)) {
+      modifiedVerseObjects.push(verseObjWithoutTextAndContent)
+      const newVerseObj = {}
+      text && (newVerseObj.text = text)
+      content && (newVerseObj.content = content)
+      modifiedVerseObjects.push(newVerseObj)
+    } else {
+      modifiedVerseObjects.push(verseObj)
+    }
+  })
+
   if(!inlineMarkersOnly) {
-    filteredVerseObjects = wrapVerseObjects(filteredVerseObjects)
+    modifiedVerseObjects = wrapVerseObjects(modifiedVerseObjects)
   }
 
   if(!splitIntoWords) {
-    return filteredVerseObjects
+    return modifiedVerseObjects
   }
 
   const regexes = {
@@ -691,7 +765,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
   // }
 
   return getGroupedVerseObjects({
-    verseObjects: filteredVerseObjects,
+    verseObjects: modifiedVerseObjects,
     regexes,
   })
 
