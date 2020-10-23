@@ -239,57 +239,69 @@ export const tagInList = ({ tag, list }) => (
   )
 )
 
-const getFilteredVerseObjects = ({ unitObjs, inlineMarkersOnly }) => unitObjs.filter(unitObj => {
-  const { tag, text, type, children } = unitObj
+const getFilteredVerseObjects = ({ unitObjs, inlineMarkersOnly }) => {
+  let inHeadingBlock = false
 
-  // It seems that usfmMarkersWithContentToDiscard is not needed, since usfm-js distinguishes between content and text,
-  // and so if something is not in usfmMarkers and has no text, we just get rid of it.
-  
-  // deal with blocks when getting inline markers only and filter out unsupported tags without content
-  const isBlock = tagInList({ tag, list: blockUsfmMarkers })
-  if(
-    !tagInList({ tag, list: inlineUsfmMarkers })
-    && !tagInList({ tag, list: specialUsfmMarkers })
-    && !text
-    && !children
-  ) {
+  return unitObjs.filter(unitObj => {
+    const { tag, text, type, children } = unitObj
 
-    if(inlineMarkersOnly && isBlock) {
-      unitObj.text = i18n(" ", "word separator")
+    // It seems that usfmMarkersWithContentToDiscard is not needed, since usfm-js distinguishes between content and text,
+    // and so if something is not in usfmMarkers and has no text, we just get rid of it.
+    
+    const isBlock = tagInList({ tag, list: blockUsfmMarkers })
 
-    } else if(inlineMarkersOnly || !isBlock) {
-      return false
+    if(isBlock) {
+      inHeadingBlock = tagInList({ tag, list: headingBlockUsfmMarkers })
     }
 
-  }
+    // get rid of tags in heading block if inline markers only
+    if(inlineMarkersOnly && inHeadingBlock) return false
 
-  // change all .text to .children
-  if(text && children) {
-    children.unshift({
-      // type: "text",
-      text,
-    })
-    delete unitObj.text
+    // deal with blocks when getting inline markers only and filter out unsupported tags without content
+    if(
+      !tagInList({ tag, list: inlineUsfmMarkers })
+      && !tagInList({ tag, list: specialUsfmMarkers })
+      && !text
+      && !children
+    ) {
 
-  // swap out special spacing strings
-  } else if(text) {
-    unitObj.text = text
-      .replace(/~/g, "\u00A0")
-      .replace(/ \/\/ /g, " ")
-      .replace(/\/\//g, "")
-  }
+      if(inlineMarkersOnly && isBlock) {
+        unitObj.text = i18n(" ", "word separator")
 
-  // make consistent with marker objects to be created
-  if(type === 'text') {
-    delete unitObj.type
-  }
+      } else if(inlineMarkersOnly || !isBlock) {
+        return false
+      }
 
-  if(children) {
-    unitObj.children = getFilteredVerseObjects({ unitObjs: children, inlineMarkersOnly })
-  }
+    }
 
-  return true
-})
+    // change all .text to .children
+    if(text && children) {
+      children.unshift({
+        // type: "text",
+        text,
+      })
+      delete unitObj.text
+
+    // swap out special spacing strings
+    } else if(text) {
+      unitObj.text = text
+        .replace(/~/g, "\u00A0")
+        .replace(/ \/\/ /g, " ")
+        .replace(/\/\//g, "")
+    }
+
+    // make consistent with marker objects to be created
+    if(type === 'text') {
+      delete unitObj.type
+    }
+
+    if(children) {
+      unitObj.children = getFilteredVerseObjects({ unitObjs: children, inlineMarkersOnly })
+    }
+
+    return true
+  })
+}
 
 const wrapVerseObjects = verseObjects => {
 
