@@ -88,10 +88,10 @@ export const getRefsInfo = ({ refs, skipBookName, abbreviated, usfmBookAbbr }) =
       } else {
         verseText = verse
       }
-      if(!info.verse && !info.start_verse) {
+      if(info.verse == null && info.start_verse == null) {
         info.verse = verseText
       } else {
-        info.start_verse = info.start_verse || info.verse
+        info.start_verse = info.start_verse != null ? info.start_verse : info.verse
         info.end_verse = verseText
         delete info.verse
       }
@@ -114,21 +114,21 @@ export const getPassageStr = params => {
   if(info.end_chapter) {
     info.end_chapter = i18nNumber({ num: info.end_chapter, type: 'chapter' })
   }
-  if(info.verse) {
+  if(info.verse != null) {
     info.verse = i18nNumber({ num: info.verse, type: 'verse' })
   }
-  if(info.start_verse) {
+  if(info.start_verse != null) {
     info.start_verse = i18nNumber({ num: info.start_verse, type: 'verse' })
   }
-  if(info.end_verse) {
+  if(info.end_verse != null) {
     info.end_verse = i18nNumber({ num: info.end_verse, type: 'verse' })
   }
 
-  if(info.start_chapter && info.start_verse) {
+  if(info.start_chapter && info.start_verse != null) {
     return i18n("{{book}} {{start_chapter}}:{{start_verse}}–{{end_chapter}}:{{end_verse}}", info).trim()
   }
 
-  if(info.chapter && info.start_verse) {
+  if(info.chapter && info.start_verse != null) {
     return i18n("{{book}} {{chapter}}:{{start_verse}}–{{end_verse}}", info).trim()
   }
 
@@ -136,7 +136,7 @@ export const getPassageStr = params => {
     return i18n("{{book}} {{start_chapter}}–{{end_chapter}}", info).trim()
   }
 
-  if(info.verse) {
+  if(info.verse != null) {
     return i18n("{{book}} {{chapter}}:{{verse}}", info).trim()
   }
 
