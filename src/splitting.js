@@ -115,6 +115,8 @@ export const headingBlockUsfmMarkers = [
   "sp",
   "sd#",
 
+  "qa",
+
 ]
 
 export const inlineUsfmMarkers = [
