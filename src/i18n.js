@@ -1,4 +1,4 @@
-let passedOverI18n = () => `You must call passedOverI18n before using this bibletags-ui-helper.`
+let passedOverI18n = () => `You must call passOverI18n before using this bibletags-ui-helper.`
 let passedOverI18nNumber = () => `You must call passOverI18nNumber before using i18nNumber.`
 
 export const passOverI18n = i18nFunc => passedOverI18n = i18nFunc

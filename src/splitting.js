@@ -732,7 +732,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
   })
 
   // For block markers which have content (like \s1 and \d), separate out that content
-  modifiedVerseObjects = []
+  let modifiedVerseObjects = []
   filteredVerseObjects.forEach(verseObj => {
     const { text, content, ...verseObjWithoutTextAndContent } = verseObj
     const { tag } = verseObjWithoutTextAndContent
