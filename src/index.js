@@ -118,7 +118,11 @@ export const getPassageStr = params => {
     info.verse = i18nNumber({ num: info.verse, type: 'verse' })
   }
   if(info.start_verse != null) {
-    info.start_verse = i18nNumber({ num: info.start_verse, type: 'verse' })
+    info.start_verse = (
+      info.start_verse === 0
+        ? i18n("[title]", "", "represents a psalm title")
+        : i18nNumber({ num: info.start_verse, type: 'verse' })
+    )
   }
   if(info.end_verse != null) {
     info.end_verse = i18nNumber({ num: info.end_verse, type: 'verse' })
