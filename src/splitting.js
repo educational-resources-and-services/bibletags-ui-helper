@@ -501,21 +501,27 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
 
   const includesEmptyWordDividers = regexes.wordDividerStartToEnd.test("")
   const splitWordFixesInfo = []
+  let wordNumberInVerse = 1
 
   const getGroupedVerseObjectsRecursive = ({ unitObjs, ancestorLine: passedInAncestorLine, splitWordInfo }) => {
 
     unitObjs.forEach((unitObj, unitObjIndex) => {
-      const { text, children } = unitObj
+      const { text, children, tag } = unitObj
       const ancestorLine = [ ...(passedInAncestorLine || []), unitObjs, unitObj ]
+
+      if(tag === "v") {
+        wordNumberInVerse = 1
+      }
 
       if(text) {
         const textSplitOnWords = splitOnWords({ text, regexes })
 
-        unitObj.children = textSplitOnWords.map(wordOrWordDivider => {
+        unitObj.children = textSplitOnWords.map((wordOrWordDivider, idx) => {
           const doesNotHaveWord = regexes.wordDividerStartToEnd.test(wordOrWordDivider)
           return {
             text: wordOrWordDivider,
             ...(doesNotHaveWord ? {} : { type: "word" }),
+            ...((doesNotHaveWord || (splitWordInfo && idx > 0)) ? {} : { wordNumberInVerse: wordNumberInVerse++ }),
           }
         })
 
@@ -613,6 +619,10 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
             indexOfChildOfCommonAncestor: unitObjIndex,
           }
           : null
+
+      } else if(tag) {
+        splitWordInfo = null
+
       }
     })
 
@@ -627,6 +637,8 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
   splitWordFixesInfo.forEach(splitWordFixInfo => {
     const { wordPartsInfo, ancestorList, commonAncestorArray } = splitWordFixInfo
 
+    const { wordNumberInVerse } = wordPartsInfo[0].obj
+    delete wordPartsInfo[0].obj.wordNumberInVerse
     wordPartsInfo.forEach(wordPartInfo => delete wordPartInfo.obj.type)
 
     const newWordObj = {
@@ -644,6 +656,7 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
         return newChild
       }),
       type: "word",
+      wordNumberInVerse,
     }
 
     const insertIndex = commonAncestorArray.indexOf(wordPartsInfo[0].childOfCommonAncestor) + 1
@@ -723,6 +736,21 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
   }
 
   const verseObjects = getFlattenedJsUsfm( usfmJS.toJSON(usfm) )
+
+  // This is a fix due to a bug in usfm-js reported here: https://github.com/unfoldingWord/usfm-js/issues/103
+  // The fix is not perfect as it breaks in the situation where the nextChar is supposed to be
+  // repeated twice in the verseObject to follow, but only is presented once. If this turns out
+  // to be a significant issue, I will need to fix usfm-js.
+  verseObjects.forEach((verseObject, idx) => {
+    const nextVerseObject = verseObjects[idx + 1] || {}
+    if(
+      verseObject.nextChar
+      && nextVerseObject.text
+      && nextVerseObject.text.substring(0,1) !== verseObject.nextChar
+    ) {
+      nextVerseObject.text = `${verseObject.nextChar}${nextVerseObject.text}`
+    }
+  })
 
   removeInvalidNewlines(verseObjects)
 
