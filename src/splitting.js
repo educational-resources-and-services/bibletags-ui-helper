@@ -726,6 +726,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
 
   // Put the chapter tag before everything, or assume chapter 1 if there is not one
   const chapterTagSwapRegex = /^((?:[^\\]|\\[^v])+?)(\\c [0-9]+\n)/
+  let addedPseudoChapter = false
   if(chapterTagSwapRegex.test(usfm)) {
     usfm = usfm.replace(
       /^((?:[^\\]|\\[^v])*?)(\\c [0-9]+ *\n)/,
@@ -733,9 +734,14 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     )
   } else {
     usfm = `\\c 1\n${usfm}`
+    addedPseudoChapter = true
   }
 
   const verseObjects = getFlattenedJsUsfm( usfmJS.toJSON(usfm) )
+
+  if(addedPseudoChapter && verseObjects[0].tag === 'c') {
+    verseObjects.shift()
+  }
 
   // This is a fix due to a bug in usfm-js reported here: https://github.com/unfoldingWord/usfm-js/issues/103
   // The fix is not perfect as it breaks in the situation where the nextChar is supposed to be
