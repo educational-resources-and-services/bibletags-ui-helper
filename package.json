@@ -1,5 +1,5 @@
 {
-  "name": "bibletags-ui-helper",
+  "name": "@bibletags/bibletags-ui-helper",
   "version": "0.1.0",
   "scripts": {},
   "repository": {
@@ -12,8 +12,13 @@
     "url": "https://github.com/educational-resources-and-services/bibletags-ui-helper/issues"
   },
   "homepage": "https://bibletags.org",
+  "author": "Andy Hubert",
+  "funding": {
+    "type" : "individual",
+    "url" : "https://gofundme.com/f/yarn4-bible-tags"
+  },
   "dependencies": {
-    "bibletags-versification": "github:educational-resources-and-services/bibletags-versification#2fe0b9073a7df502fb459a80bcc9ed1160eef4ee",
+    "@bibletags/bibletags-versification": "0.1.0",
     "md5": "2.2.1",
     "regexpu-core": "4.2.0",
     "usfm-js": "github:unfoldingWord/usfm-js#abe6833688b10b202e4b848715eca883fce7b89a"
