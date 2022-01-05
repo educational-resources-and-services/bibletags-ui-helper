@@ -1,7 +1,15 @@
 {
   "name": "@bibletags/bibletags-ui-helper",
   "version": "0.1.0",
-  "scripts": {},
+  "scripts": {
+    "update-patch": "npm run go-update-patch -s",
+    "update-major": "npm run go-update-major -s",
+    "update-minor": "npm run go-update-minor -s",
+    "go-update-patch": "echo '-------------------------------------------\nUpdate version (PATCH) and deploy to npm...\n-------------------------------------------\n' && npm run confirm && npm version patch && npm run publish-to-npm",
+    "go-update-minor": "echo '-------------------------------------------\nUpdate version (MINOR) and deploy to npm...\n-------------------------------------------\n' && npm run confirm && npm version minor && npm run publish-to-npm",
+    "go-update-major": "echo '-------------------------------------------\nUpdate version (MAJOR) and deploy to npm...\n-------------------------------------------\n' && npm run confirm && npm version major && npm run publish-to-npm",
+    "publish-to-npm": "npm i && npm run test && npm publish --access public && echo '\nSUCCESS!\n'"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/educational-resources-and-services/bibletags-ui-helper.git"
@@ -18,7 +26,7 @@
     "url" : "https://gofundme.com/f/yarn4-bible-tags"
   },
   "dependencies": {
-    "@bibletags/bibletags-versification": "0.1.0",
+    "@bibletags/bibletags-versification": "^0.1.6",
     "md5": "2.2.1",
     "regexpu-core": "4.2.0",
     "usfm-js": "github:unfoldingWord/usfm-js#abe6833688b10b202e4b848715eca883fce7b89a"
