@@ -116,3 +116,67 @@ getWordHashes({ usfm, wordDividerRegex }): [ { wordNumberInVerse: Int, hash: Str
 ```js
 isValidEmail(email): Boolean
 ```
+
+```js
+passOverI18n(i18nFunc): null
+```
+
+```js
+passOverI18nNumber(i18nNumberFunc): null
+```
+
+```js
+blockUsfmMarkers: Array
+```
+
+```js
+headingBlockUsfmMarkers: Array
+```
+
+```js
+inlineUsfmMarkers: Array
+```
+
+```js
+specialUsfmMarkers: Array
+```
+
+```js
+tagInList({ tag, list }): Boolean
+```
+
+```js
+getPiecesFromUSFM({ usfm='', inlineMarkersOnly, wordDividerRegex, splitIntoWords }): Array
+```
+
+```js
+splitVerseIntoWords({ usfm, wordDividerRegex }): Array
+```
+
+```js
+getNormalizedGreekPOSCode(posCode): String
+```
+
+```js
+getGreekPOSTerm(posCode): String
+```
+
+```js
+getGreekPOSTypeTerm(posCode): String
+```
+
+```js
+getGreekMorphPartDisplayInfo({ morphPart }): Object
+```
+
+```js
+getHebrewPOSTerm(posCode): String
+```
+
+```js
+getGrammarColor({ isPrefixOrSuffix, morphPart="" }): String | undefined
+```
+
+```js
+getHebrewMorphPartDisplayInfo({ morphLang, morphPart, isPrefixOrSuffix, wordIsMultiPart }): Object
+```

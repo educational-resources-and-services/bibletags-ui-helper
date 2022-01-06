@@ -6,6 +6,11 @@ import { getHebrewPOSTerm, getHebrewMorphPartDisplayInfo } from './hebrewMorph.j
 import { getGreekPOSTerm, getGreekMorphPartDisplayInfo, getNormalizedGreekPOSCode } from './greekMorph.js'
 import { splitVerseIntoWords } from './splitting.js'
 
+export * from './greekMorph.js'
+export * from './hebrewMorph.js'
+export * from './splitting.js'
+export * from './i18n.js'
+
 export const getOrigLangVersionIdFromRef = ref => ref.bookId <= 39 ? 'uhb' : 'ugnt'
 
 export const getOrigLangAndLXXVersionInfo = () => ({
