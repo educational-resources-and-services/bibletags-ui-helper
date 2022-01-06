@@ -1,8 +1,9 @@
 import md5 from 'md5'
+import { getRefFromLoc } from "@bibletags/bibletags-versification"
+
 import i18n, { i18nNumber } from './i18n.js'
 import { getHebrewPOSTerm, getHebrewMorphPartDisplayInfo } from './hebrewMorph.js'
 import { getGreekPOSTerm, getGreekMorphPartDisplayInfo, getNormalizedGreekPOSCode } from './greekMorph.js'
-import { getRefFromLoc } from "bibletags-versification/src/versification"
 import { splitVerseIntoWords } from './splitting.js'
 
 export const getOrigLangVersionIdFromRef = ref => ref.bookId <= 39 ? 'uhb' : 'ugnt'
