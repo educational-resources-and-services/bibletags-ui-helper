@@ -27,6 +27,30 @@ For more information on this project, see the [Bible Tags website](https://bible
 
 This repo provides functions used in both [bibletags-react-native-app](https://github.com/educational-resources-and-services/bibletags-react-native-app) and [bibletags-widget](https://github.com/educational-resources-and-services/bibletags-widget).
 
+## Special notes on word divisions
+
+Most modern languages separate words with spaces or other punctuation, but there are some exceptions. See [here](https://en.wikipedia.org/wiki/Word_divider) and [here](https://linguistics.stackexchange.com/questions/6131/is-there-a-long-list-of-languages-whose-writing-systems-dont-use-spaces).
+
+To address this, a `word divider regex` will need to be provided for any text where the default `/[\\P{L}]+/gu` is not the valid regex for the split function.
+
+This will leave some languages without precise word dividers, resulting, at times, in smaller divisions than words (eg. syllables). While this is not ideal for these languages, it should nonetheless allow all aspects of the app and widget to function properly, and only require a bit more clicking/tapping when tagging these texts to the original languages.
+
+Programmatic exceptions to this approach will be few. To date, the following exception(s) exist:
+
+* Possession and contractions in English using an apostraphe. Eg. `Balaam’s`, `shouldn’t`. Such apostraphes will be escaped before the `word divider regex` is used to split the verse.
+
+*Please contact us to suggest any programmatic exceptions for other languages.*
+
+Known examples of languages without precise word dividers:
+
+* Vietnamese and Tai Lü use spaces to divide by syllable.
+* Tibetan and Dzongkha use other marks to divide by syllable.
+* While most Chinese characters are a single word, some words are made up of more than one.
+* Japanese characters are each a single syllable.
+* Lao translation may or may not use spaces.
+
+Note: While embedding sites/apps providing USFM for verse content could distinguish between words, this information cannot be relied upon since other embedding sites/apps may only provide plain text.
+
 ## Functions exposed
 
 ```js
