@@ -462,7 +462,7 @@ export const getMorphPartDisplayInfo = ({ morphLang, morphPart, isPrefixOrSuffix
   ['He','Ar'].includes(morphLang) ? getHebrewMorphPartDisplayInfo({ morphLang, morphPart, isPrefixOrSuffix, wordIsMultiPart }) : getGreekMorphPartDisplayInfo({ morphPart })
 )
 
-// same as in bibletags-data/scripts/importUHBFromOsis.js
+// same as in bibletags-data/scripts/importUHBFromUsfm.js
 export const getMainWordPartIndex = wordParts => {
   if(!wordParts) return null
 
