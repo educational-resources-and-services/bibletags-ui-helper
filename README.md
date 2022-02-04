@@ -205,3 +205,7 @@ getGrammarColor({ isPrefixOrSuffix, morphPart="" }): String | undefined
 ```js
 getHebrewMorphPartDisplayInfo({ morphLang, morphPart, isPrefixOrSuffix, wordIsMultiPart }): Object
 ```
+
+```js
+defaultWordDividerRegex: String
+```
