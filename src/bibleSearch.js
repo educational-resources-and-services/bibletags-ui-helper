@@ -1,9 +1,10 @@
-const { getOriginalLocsFromRange, getCorrespondingRefs, getRefFromLoc, getLocFromRef } = require('@bibletags/bibletags-versification')
+import "regenerator-runtime/runtime.js"
+import { getOriginalLocsFromRange, getCorrespondingRefs, getRefFromLoc, getLocFromRef } from '@bibletags/bibletags-versification'
 
-const { bibleSearchScopes } = require('./constants.js')
-const { getQueryAndFlagInfo, mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock } = require('./utils')
+import { bibleSearchScopes } from './constants.js'
+import { getQueryAndFlagInfo, mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock } from './utils'
 
-const FLAG_MAP = {
+export const BIBLE_SEARCH_FLAG_MAP = {
   in: {
     multiValue: true,
   },
@@ -45,7 +46,7 @@ export const bibleSearch = async ({
   doClocking=false,
 }) => {
 
-  const { query, flags } = getQueryAndFlagInfo({ query: queryWithFlags, FLAG_MAP })
+  const { query, flags } = getQueryAndFlagInfo({ query: queryWithFlags, FLAG_MAP: BIBLE_SEARCH_FLAG_MAP })
 
   const isOriginalLanguageSearch = /^\(?"?[#=]/.test(query)
 
@@ -56,7 +57,7 @@ export const bibleSearch = async ({
   // get versionIds, bookIds, and includeVariants
   let versionIds = []
   const bookIds = {}
-  flags.in.forEach(val => {
+  ;(flags.in || []).forEach(val => {
     if(bibleSearchScopes[val]) {
       bibleSearchScopes[val].forEach(bookId => {
         bookIds[bookId] = true
@@ -66,9 +67,9 @@ export const bibleSearch = async ({
     }
   })
   if(isOriginalLanguageSearch) {
-    versionIds = flags.include.map(versionId => versionId !== 'variants')
+    versionIds = (flags.include || []).map(versionId => versionId !== 'variants')
   }
-  const includeVariants = flags.include.includes('variants')
+  const includeVariants = (flags.include || []).includes('variants')
 
   if(versionIds.length > maxNumVersion) throw `exceeded maximum number of versions`
 

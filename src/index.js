@@ -12,6 +12,7 @@ export * from './splitting.js'
 export * from './i18n.js'
 export * from './constants.js'
 export * from './bibleSearch.js'
+export * from './utils.js'
 
 export const getOrigLangVersionIdFromRef = ref => ref.bookId <= 39 ? 'uhb' : 'ugnt'
 
