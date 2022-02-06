@@ -10,6 +10,8 @@ export * from './greekMorph.js'
 export * from './hebrewMorph.js'
 export * from './splitting.js'
 export * from './i18n.js'
+export * from './constants.js'
+export * from './bibleSearch.js'
 
 export const getOrigLangVersionIdFromRef = ref => ref.bookId <= 39 ? 'uhb' : 'ugnt'
 
@@ -516,96 +518,4 @@ export const getWordHashes = ({ usfm, wordDividerRegex }) => {
 export const isValidEmail = email => {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   return re.test(email)
-}
-
-export const bibleSearchScopes = {
-
-  // multi-book scopes
-  ot: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39],
-  law: [1,2,3,4,5],
-  prophets: [6,7,9,10,11,12,23,24,26,28,29,30,31,32,33,34,35,36,37,38,39],
-  writings: [19,20,18,22,8,25,21,17,27,15,16,13,14],
-  "former-prophets": [6,7,9,10,11,12],
-  "latter-prophets": [23,24,26,28,29,30,31,32,33,34,35,36,37,38,39],
-  history: [6,7,8,9,10,11,12,13,14,15,16,17],
-  wisdom: [18,19,20,21,22],
-  "major-prophets": [23,24,25,26,27],
-  "minor-prophets": [28,29,30,31,32,33,34,35,36,37,38,39],
-  nt: [40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66],
-  gospels: [40,41,42,43],
-  epistles: [45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65],
-  "pauls-writings": [45,46,47,48,49,50,51,52,53,54,55,56,57,58],
-  "pastoral-epistles": [54,55,56],
-  "lukes-writings": [42,44],
-  "johns-writings": [43,62,63,64,66],
-  "peters-writings": [60,61],
-
-  // single books
-  "Gen": [1],
-  "Ex": [2],
-  "Lev": [3],
-  "Num": [4],
-  "Dt": [5],
-  "Jsh": [6],
-  "Jdg": [7],
-  "Rth": [8],
-  "1Sa": [9],
-  "2Sa": [10],
-  "1Ki": [11],
-  "2Ki": [12],
-  "1Ch": [13],
-  "2Ch": [14],
-  "Ezr": [15],
-  "Neh": [16],
-  "Est": [17],
-  "Job": [18],
-  "Ps": [19],
-  "Prv": [20],
-  "Ecc": [21],
-  "Sng": [22],
-  "Is": [23],
-  "Jer": [24],
-  "Lam": [25],
-  "Ezk": [26],
-  "Dan": [27],
-  "Hos": [28],
-  "Jl": [29],
-  "Amo": [30],
-  "Ob": [31],
-  "Jon": [32],
-  "Mic": [33],
-  "Nah": [34],
-  "Hab": [35],
-  "Zph": [36],
-  "Hag": [37],
-  "Zch": [38],
-  "Mal": [39],
-  "Mt": [40],
-  "Mrk": [41],
-  "Lk": [42],
-  "Jhn": [43],
-  "Act": [44],
-  "Rom": [45],
-  "1Co": [46],
-  "2Co": [47],
-  "Gal": [48],
-  "Eph": [49],
-  "Php": [50],
-  "Col": [51],
-  "1Th": [52],
-  "2Th": [53],
-  "1Ti": [54],
-  "2Ti": [55],
-  "Tts": [56],
-  "Phm": [57],
-  "Heb": [58],
-  "Jam": [59],
-  "1Pe": [60],
-  "2Pe": [61],
-  "1Jn": [62],
-  "2Jn": [63],
-  "3Jn": [64],
-  "Jud": [65],
-  "Rev": [66],
-
 }
