@@ -60,13 +60,13 @@ var getLengthOfAllScopeMaps = function getLengthOfAllScopeMaps(wordAlts) {
 
 var bibleSearch = /*#__PURE__*/function () {
   var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(_ref2) {
-    var queryWithFlags, hebrewOrdering, offset, limit, getVersions, getWords, getUnitRanges, getVerses, _ref2$maxNumVersion, maxNumVersion, _ref2$doClocking, doClocking, _getQueryAndFlagInfo, query, flags, isOriginalLanguageSearch, versionIds, bookIds, includeVariants, versions, _flags$same, same, _getQueryArrayAndWord, queryArray, queryWords, stackedResultsByBookId, stackedResultsIdxByScopeKey, versionById, resultCountByVersionId, wordResultsByVersionId, totalHits, allRows, countByBookId, resultCountForSort, bookIdsInReturnRange, results, ids, resultNeedingOriginalLocById, unitRanges, resultsByVersionIdNeedingUsfm;
+    var queryWithFlags, hebrewOrdering, offset, limit, getVersions, getUnitWords, getUnitRanges, getVerses, _ref2$maxNumVersion, maxNumVersion, _ref2$doClocking, doClocking, _getQueryAndFlagInfo, query, flags, isOriginalLanguageSearch, versionIds, bookIds, includeVariants, versions, _flags$same, same, _getQueryArrayAndWord, queryArray, queryWords, stackedResultsByBookId, stackedResultsIdxByScopeKey, versionById, resultCountByVersionId, wordResultsByVersionId, totalHits, allRows, countByBookId, resultCountForSort, bookIdsInReturnRange, results, ids, resultNeedingOriginalLocById, unitRanges, resultsByVersionIdNeedingUsfm;
 
     return regeneratorRuntime.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
-            queryWithFlags = _ref2.query, hebrewOrdering = _ref2.hebrewOrdering, offset = _ref2.offset, limit = _ref2.limit, getVersions = _ref2.getVersions, getWords = _ref2.getWords, getUnitRanges = _ref2.getUnitRanges, getVerses = _ref2.getVerses, _ref2$maxNumVersion = _ref2.maxNumVersion, maxNumVersion = _ref2$maxNumVersion === void 0 ? 5 : _ref2$maxNumVersion, _ref2$doClocking = _ref2.doClocking, doClocking = _ref2$doClocking === void 0 ? false : _ref2$doClocking;
+            queryWithFlags = _ref2.query, hebrewOrdering = _ref2.hebrewOrdering, offset = _ref2.offset, limit = _ref2.limit, getVersions = _ref2.getVersions, getUnitWords = _ref2.getUnitWords, getUnitRanges = _ref2.getUnitRanges, getVerses = _ref2.getVerses, _ref2$maxNumVersion = _ref2.maxNumVersion, maxNumVersion = _ref2$maxNumVersion === void 0 ? 5 : _ref2$maxNumVersion, _ref2$doClocking = _ref2.doClocking, doClocking = _ref2$doClocking === void 0 ? false : _ref2$doClocking;
             _getQueryAndFlagInfo = (0, _utils.getQueryAndFlagInfo)({
               query: queryWithFlags,
               FLAG_MAP: BIBLE_SEARCH_FLAG_MAP
@@ -153,22 +153,22 @@ var bibleSearch = /*#__PURE__*/function () {
                         _context2.next = 5;
                         return Promise.all(queryWords.map( /*#__PURE__*/function () {
                           var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(word) {
-                            var wordRows;
+                            var unitWordRows;
                             return regeneratorRuntime.wrap(function _callee$(_context) {
                               while (1) {
                                 switch (_context.prev = _context.next) {
                                   case 0:
                                     _context.next = 2;
-                                    return getWords({
+                                    return getUnitWords({
                                       versionId: version.id,
                                       id: "".concat(same, ":").concat(word),
                                       limit: WILD_CARD_LIMIT
                                     });
 
                                   case 2:
-                                    wordRows = _context.sent;
+                                    unitWordRows = _context.sent;
 
-                                    if (!(wordRows.length === WILD_CARD_LIMIT)) {
+                                    if (!(unitWordRows.length === WILD_CARD_LIMIT)) {
                                       _context.next = 5;
                                       break;
                                     }
@@ -176,7 +176,7 @@ var bibleSearch = /*#__PURE__*/function () {
                                     throw "Word with wildcard character (*) matches too many different words";
 
                                   case 5:
-                                    wordRows.forEach(function (row) {
+                                    unitWordRows.forEach(function (row) {
                                       row.scopeMap = JSON.parse(row.scopeMap);
 
                                       if (Object.values(bookIds).length > 0) {
@@ -187,8 +187,8 @@ var bibleSearch = /*#__PURE__*/function () {
                                         }
                                       }
                                     });
-                                    wordResultsByVersionId[version.id][word] = wordRows;
-                                    allRows.push.apply(allRows, _toConsumableArray(wordRows));
+                                    wordResultsByVersionId[version.id][word] = unitWordRows;
+                                    allRows.push.apply(allRows, _toConsumableArray(unitWordRows));
 
                                   case 8:
                                   case "end":

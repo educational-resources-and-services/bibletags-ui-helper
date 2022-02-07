@@ -39,7 +39,7 @@ export const bibleSearch = async ({
   offset,
   limit,
   getVersions,
-  getWords,
+  getUnitWords,
   getUnitRanges,
   getVerses,
   maxNumVersion=5,
@@ -101,13 +101,13 @@ export const bibleSearch = async ({
     // get a row with scope map for each word
     wordResultsByVersionId[version.id] = {}
     await Promise.all(queryWords.map(async word => {
-      const wordRows = await getWords({
+      const unitWordRows = await getUnitWords({
         versionId: version.id,
         id: `${same}:${word}`,
         limit: WILD_CARD_LIMIT,
       })
-      if(wordRows.length === WILD_CARD_LIMIT) throw `Word with wildcard character (*) matches too many different words`
-      wordRows.forEach(row => {
+      if(unitWordRows.length === WILD_CARD_LIMIT) throw `Word with wildcard character (*) matches too many different words`
+      unitWordRows.forEach(row => {
         row.scopeMap = JSON.parse(row.scopeMap)
         if(Object.values(bookIds).length > 0) {
           for(let scopeKey in row.scopeMap) {
@@ -126,8 +126,8 @@ export const bibleSearch = async ({
           }
         }
       })
-      wordResultsByVersionId[version.id][word] = wordRows
-      allRows.push(...wordRows)
+      wordResultsByVersionId[version.id][word] = unitWordRows
+      allRows.push(...unitWordRows)
     }))
 
   }))
