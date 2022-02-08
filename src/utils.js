@@ -7,7 +7,7 @@ module.exports = {
 
     // extract special query flags
     const flags = {}
-    const flagRegex = /(\s|^)([-a-z]+:(?:[-\w,/]+))(?=\s|$)/i
+    const flagRegex = /(\s|^)([-a-z]+:(?:[:-\w,/]+))(?=\s|$)/i
 
     query = (query || "")
       .split(flagRegex)
@@ -23,7 +23,11 @@ module.exports = {
 
             if(
               !possibleValues
-              || flagValues.every(val => possibleValues.includes(val))
+              || flagValues.every(val => (
+                val instanceof RegExp
+                  ? val.test(val)
+                  : val.includes(val)
+              ))
             ) {
               if(flags[flag] && multiValue) {
                 flags[flag].push(...flagValues)
@@ -169,7 +173,8 @@ module.exports = {
           }
           if(
             typeof item === 'string'
-            && /^(?:[^/".+*]+|[^/".+*]+\*)$/.test(item)
+            && /^[^".+*]+[*+~]?$/.test(item)
+            && item !== '/'
             && !queryWords.includes(item)
           ) {
             queryWords.push(item)
@@ -211,10 +216,9 @@ module.exports = {
         // check 2+ syntax
         if(array.some((item, idx) => (
           typeof item === 'string'
-          && /\+/.test(item)
+          && /^[0-9]+\+$/.test(item)
           && !(
             idx === 0
-            && /^[0-9]+\+$/.test(item)
             && parseInt(item.slice(0, -1), 10) < array.length - 1
           )
         ))) throw `misuse of 2+`
@@ -260,6 +264,84 @@ module.exports = {
     }
     lastClockTime = newClockTime
     descriptionOfCurrentClockTimeSection = descriptionOfNextSection
+  },
+
+  getWordDetails: ({ queryWords, isOriginalLanguageSearch }) => {
+
+    let wordDetailsArray = []
+    let getWordNumbersMatchingAllWordDetails
+
+    if(isOriginalLanguageSearch) {
+
+      queryWords.forEach(word => {
+
+        if(word[0] === '#') {
+
+          const wordDetails = (
+            word.slice(1).split('#')
+              .map(wordDetail => {
+                // convert form of details
+
+                if(/^[GH][0-9]{5}$/.test(wordDetail)) {
+                  return `definitionId:${wordDetail}`
+                }
+
+                // TODO: all the parsing values need to be converted (eg. #noun => #pos:N)
+
+                // TODO: This is wrong due to the reality of the / operator
+                // if(/^suffix:/.test(wordDetail)) {
+                //   return (
+                //     wordDetail
+                //       .split(':')[1]
+                //       .split("/")
+                //       .map(suffixOption => (
+                //         suffixOption
+                //           .split("")
+                //           .map(suffixDetail => {
+                //             let suffixType = "Person"
+                //             if(/[msbc]/.test(suffixDetail)) {
+                //               suffixType = "Gender"
+                //             }
+                //             if(/[spd]/.test(suffixDetail)) {
+                //               suffixType = "Number"
+                //             }
+                //             return `suffix${suffixType}:${suffixDetail}`
+                //           })
+                //       ))
+                //   )
+                // }
+
+                return wordDetail
+
+              })
+              // .flat(2)
+          )
+          
+          // TODO: extract the wordDetail with the fewest likely hits; the rest should go into addlWordDetails
+          // wordDetails.slice(1)
+          wordDetailsArray.push({ word, primaryDetail: wordDetails[0] })
+
+        } else if(word[0] === '=') {
+          // TODO
+          throw `"Words translated to..." search not yet available`
+
+        } else {
+          throw `Invalid search word: ${word}`
+        }
+
+      })
+
+      getWordNumbersMatchingAllWordDetails = ({ word, infoObjOrWordNumbers }) => infoObjOrWordNumbers.map(wordInfo => wordInfo[0])
+
+    } else {  // translation search
+
+      wordDetailsArray = queryWords.map(word => ({ word, primaryDetail: word }))
+      getWordNumbersMatchingAllWordDetails = ({ infoObjOrWordNumbers }) => infoObjOrWordNumbers
+
+    }
+
+    return { wordDetailsArray, getWordNumbersMatchingAllWordDetails }
+
   },
 
 }

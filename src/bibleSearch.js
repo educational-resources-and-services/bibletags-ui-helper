@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime.js"
 import { getOriginalLocsFromRange, getCorrespondingRefs, getRefFromLoc, getLocFromRef } from '@bibletags/bibletags-versification'
 
 import { bibleSearchScopes } from './constants.js'
-import { getQueryAndFlagInfo, mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock } from './utils'
+import { mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock, getWordDetails } from './utils'
 
 export const BIBLE_SEARCH_FLAG_MAP = {
   in: {
@@ -14,6 +14,7 @@ export const BIBLE_SEARCH_FLAG_MAP = {
   same: {
     possibleValues: [
       'verse',
+      /verses:[0-9]+/,
       'phrase',
       'sentence',
       'paragraph',
@@ -34,7 +35,8 @@ const getLengthOfAllScopeMaps = wordAlts => (
 )
 
 export const bibleSearch = async ({
-  query: queryWithFlags,
+  query,
+  flags,
   hebrewOrdering,
   offset,
   limit,
@@ -45,10 +47,6 @@ export const bibleSearch = async ({
   maxNumVersion=5,
   doClocking=false,
 }) => {
-
-  const { query, flags } = getQueryAndFlagInfo({ query: queryWithFlags, FLAG_MAP: BIBLE_SEARCH_FLAG_MAP })
-
-  const isOriginalLanguageSearch = /^\(?"?[#=]/.test(query)
 
   doClocking && clock(`Query prep`)
 
@@ -66,10 +64,13 @@ export const bibleSearch = async ({
       versionIds.push(val)
     }
   })
-  if(isOriginalLanguageSearch) {
-    versionIds = (flags.include || []).map(versionId => versionId !== 'variants')
-  }
+
   const includeVariants = (flags.include || []).includes('variants')
+
+  const originalVersionIds = [ 'uhb', 'ugnt', 'lxx' ]
+  const isOriginalLanguageSearch = versionIds.some(versionId => originalVersionIds.includes(versionId))
+
+  if(isOriginalLanguageSearch && !versionIds.every(versionId => originalVersionIds.includes(versionId))) throw `in flag contains mixed original and translation versionIds`
 
   if(versionIds.length > maxNumVersion) throw `exceeded maximum number of versions`
 
@@ -77,7 +78,10 @@ export const bibleSearch = async ({
 
   if(versionIds.length !== versions.length) throw `one or more invalid versions`
 
-  const { same="verse" } = flags
+  let { same="verse" } = flags
+  if(isOriginalLanguageSearch && same === "verse") {
+    same = "verseNumber"
+  }
 
   if(!isOriginalLanguageSearch && versionIds.length > 1 && same !== "verse") throw `forbidden to search multiple versions when not using same:verse for the range`
 
@@ -88,9 +92,11 @@ export const bibleSearch = async ({
   const versionById = {}
   const resultCountByVersionId = {}
   const wordResultsByVersionId = {}
-  let totalHits = null
+  let totalHits = 0
 
   doClocking && clock(`Get words for all versions`)
+
+  const { wordDetailsArray, getWordNumbersMatchingAllWordDetails } = getWordDetails({ queryWords, isOriginalLanguageSearch })
 
   const allRows = []
   await Promise.all(versions.map(async version => {
@@ -100,15 +106,19 @@ export const bibleSearch = async ({
 
     // get a row with scope map for each word
     wordResultsByVersionId[version.id] = {}
-    await Promise.all(queryWords.map(async word => {
+    await Promise.all(wordDetailsArray.map(async ({ word, primaryDetail }) => {
+
       const unitWordRows = await getUnitWords({
         versionId: version.id,
-        id: `${same}:${word}`,
+        id: `${same}:${primaryDetail}`,
         limit: WILD_CARD_LIMIT,
       })
+
       if(unitWordRows.length === WILD_CARD_LIMIT) throw `Word with wildcard character (*) matches too many different words`
+
       unitWordRows.forEach(row => {
         row.scopeMap = JSON.parse(row.scopeMap)
+        row.word = word
         if(Object.values(bookIds).length > 0) {
           for(let scopeKey in row.scopeMap) {
             if(
@@ -126,8 +136,10 @@ export const bibleSearch = async ({
           }
         }
       })
+
       wordResultsByVersionId[version.id][word] = unitWordRows
       allRows.push(...unitWordRows)
+
     }))
 
   }))
@@ -264,18 +276,20 @@ export const bibleSearch = async ({
             }
 
           } else {
-            subqueryOrWordResult.forEach(({ scopeMap }) => {
+            subqueryOrWordResult.forEach(({ scopeMap, word }) => {
 
               if(scopeMap[scopeKey]) {
+                const wordNumbersMatchingAllWordDetails = getWordNumbersMatchingAllWordDetails({ word, infoObjOrWordNumbers: scopeMap[scopeKey] })
+
                 if(isFirstItemInGroup) {
                   if(isOr) {
-                    updatedHits.push(...scopeMap[scopeKey].map(wordNumber => [ wordNumber ]))
+                    updatedHits.push(...wordNumbersMatchingAllWordDetails.map(wordNumber => [ wordNumber ]))
                   } else {
-                    updatedHits.push(...scopeMap[scopeKey].map(wordNumber => [ wordNumber, wordNumber ]))
-                    numPossibleHitsForThisWord += scopeMap[scopeKey].length
+                    updatedHits.push(...wordNumbersMatchingAllWordDetails.map(wordNumber => [ wordNumber, wordNumber ]))
+                    numPossibleHitsForThisWord += wordNumbersMatchingAllWordDetails.length
                   }
                 } else {
-                  scopeMap[scopeKey].forEach(wordNumber => {
+                  wordNumbersMatchingAllWordDetails.forEach(wordNumber => {
                     let thisWordNumberIsPossibleHit = false
                     if(isOr) {
                       updatedHits.push(...hits.filter(hit => hit.length < minimumNumHits).map(hit => [ ...hit, wordNumber ]))
@@ -376,13 +390,18 @@ export const bibleSearch = async ({
     })
 
     if(
-      versionIds.length === 1  // not stacked
+      (
+        versionIds.length === 1  // not stacked
+        || isOriginalLanguageSearch
+      )
       && (
         queryArray[0] === '"'  // exact phrase at base level
         || queryArray.length === 1  // only one unit at base level
       )
     ) {
-      totalHits = Object.values(numHitsByScopeKey).reduce((a, b) => a + b, 0)
+      totalHits += Object.values(numHitsByScopeKey).reduce((a, b) => a + b, 0)
+    } else {
+      totalHits = null
     }
 
   })
@@ -411,18 +430,20 @@ export const bibleSearch = async ({
       .filter(Boolean)
   )
 
-  bookIdsInReturnRange.forEach(bookId => {
-    if(same === 'verse') {
-      // scopeKey is originalLoc
-      stackedResultsByBookId[bookId].sort((a, b) => (a.originalLoc || 'x') > (b.originalLoc || 'x') ? 1 : -1)  // the 'x' is greater than all originalLoc
-    } else {
-      stackedResultsByBookId[bookId].sort((a, b) => {
-        const unitNumberA = parseInt((a.scopeKey || "").split(':')[1], 10) || Infinity
-        const unitNumberB = parseInt((b.scopeKey || "").split(':')[1], 10) || Infinity
-        return unitNumberA > unitNumberB ? 1 : -1
-      })
-    }
-  })
+  if(!isOriginalLanguageSearch && versionIds.length > 1) {
+    bookIdsInReturnRange.forEach(bookId => {
+      if(same === 'verse') {
+        // scopeKey is originalLoc
+        stackedResultsByBookId[bookId].sort((a, b) => (a.originalLoc || 'x') > (b.originalLoc || 'x') ? 1 : -1)  // the 'x' is greater than all originalLoc
+      } else {
+        stackedResultsByBookId[bookId].sort((a, b) => {
+          const unitNumberA = parseInt((a.scopeKey || "").split(':')[1], 10) || Infinity
+          const unitNumberB = parseInt((b.scopeKey || "").split(':')[1], 10) || Infinity
+          return unitNumberA > unitNumberB ? 1 : -1
+        })
+      }
+    })
+  }
 
   doClocking && clock(`Get result subset to return`)
 

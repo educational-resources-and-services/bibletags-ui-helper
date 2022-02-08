@@ -45,7 +45,7 @@ var BIBLE_SEARCH_FLAG_MAP = {
     multiValue: true
   },
   same: {
-    possibleValues: ['verse', 'phrase', 'sentence', 'paragraph']
+    possibleValues: ['verse', /verses:[0-9]+/, 'phrase', 'sentence', 'paragraph']
   }
 };
 exports.BIBLE_SEARCH_FLAG_MAP = BIBLE_SEARCH_FLAG_MAP;
@@ -60,18 +60,13 @@ var getLengthOfAllScopeMaps = function getLengthOfAllScopeMaps(wordAlts) {
 
 var bibleSearch = /*#__PURE__*/function () {
   var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(_ref2) {
-    var queryWithFlags, hebrewOrdering, offset, limit, getVersions, getUnitWords, getUnitRanges, getVerses, _ref2$maxNumVersion, maxNumVersion, _ref2$doClocking, doClocking, _getQueryAndFlagInfo, query, flags, isOriginalLanguageSearch, versionIds, bookIds, includeVariants, versions, _flags$same, same, _getQueryArrayAndWord, queryArray, queryWords, stackedResultsByBookId, stackedResultsIdxByScopeKey, versionById, resultCountByVersionId, wordResultsByVersionId, totalHits, allRows, countByBookId, resultCountForSort, bookIdsInReturnRange, results, ids, resultNeedingOriginalLocById, unitRanges, resultsByVersionIdNeedingUsfm;
+    var query, flags, hebrewOrdering, offset, limit, getVersions, getUnitWords, getUnitRanges, getVerses, _ref2$maxNumVersion, maxNumVersion, _ref2$doClocking, doClocking, versionIds, bookIds, includeVariants, originalVersionIds, isOriginalLanguageSearch, versions, _flags$same, same, _getQueryArrayAndWord, queryArray, queryWords, stackedResultsByBookId, stackedResultsIdxByScopeKey, versionById, resultCountByVersionId, wordResultsByVersionId, totalHits, _getWordDetails, wordDetailsArray, getWordNumbersMatchingAllWordDetails, allRows, countByBookId, resultCountForSort, bookIdsInReturnRange, results, ids, resultNeedingOriginalLocById, unitRanges, resultsByVersionIdNeedingUsfm;
 
     return regeneratorRuntime.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
-            queryWithFlags = _ref2.query, hebrewOrdering = _ref2.hebrewOrdering, offset = _ref2.offset, limit = _ref2.limit, getVersions = _ref2.getVersions, getUnitWords = _ref2.getUnitWords, getUnitRanges = _ref2.getUnitRanges, getVerses = _ref2.getVerses, _ref2$maxNumVersion = _ref2.maxNumVersion, maxNumVersion = _ref2$maxNumVersion === void 0 ? 5 : _ref2$maxNumVersion, _ref2$doClocking = _ref2.doClocking, doClocking = _ref2$doClocking === void 0 ? false : _ref2$doClocking;
-            _getQueryAndFlagInfo = (0, _utils.getQueryAndFlagInfo)({
-              query: queryWithFlags,
-              FLAG_MAP: BIBLE_SEARCH_FLAG_MAP
-            }), query = _getQueryAndFlagInfo.query, flags = _getQueryAndFlagInfo.flags;
-            isOriginalLanguageSearch = /^\(?"?[#=]/.test(query);
+            query = _ref2.query, flags = _ref2.flags, hebrewOrdering = _ref2.hebrewOrdering, offset = _ref2.offset, limit = _ref2.limit, getVersions = _ref2.getVersions, getUnitWords = _ref2.getUnitWords, getUnitRanges = _ref2.getUnitRanges, getVerses = _ref2.getVerses, _ref2$maxNumVersion = _ref2.maxNumVersion, maxNumVersion = _ref2$maxNumVersion === void 0 ? 5 : _ref2$maxNumVersion, _ref2$doClocking = _ref2.doClocking, doClocking = _ref2$doClocking === void 0 ? false : _ref2$doClocking;
             doClocking && (0, _utils.clock)("Query prep"); // TODO: make sure the query does not exceed maximum complexity
             // get versionIds, bookIds, and includeVariants
 
@@ -86,47 +81,58 @@ var bibleSearch = /*#__PURE__*/function () {
                 versionIds.push(val);
               }
             });
+            includeVariants = (flags.include || []).includes('variants');
+            originalVersionIds = ['uhb', 'ugnt', 'lxx'];
+            isOriginalLanguageSearch = versionIds.some(function (versionId) {
+              return originalVersionIds.includes(versionId);
+            });
 
-            if (isOriginalLanguageSearch) {
-              versionIds = (flags.include || []).map(function (versionId) {
-                return versionId !== 'variants';
-              });
+            if (!(isOriginalLanguageSearch && !versionIds.every(function (versionId) {
+              return originalVersionIds.includes(versionId);
+            }))) {
+              _context4.next = 10;
+              break;
             }
 
-            includeVariants = (flags.include || []).includes('variants');
+            throw "in flag contains mixed original and translation versionIds";
 
+          case 10:
             if (!(versionIds.length > maxNumVersion)) {
-              _context4.next = 11;
+              _context4.next = 12;
               break;
             }
 
             throw "exceeded maximum number of versions";
 
-          case 11:
-            _context4.next = 13;
+          case 12:
+            _context4.next = 14;
             return getVersions(versionIds);
 
-          case 13:
+          case 14:
             versions = _context4.sent;
 
             if (!(versionIds.length !== versions.length)) {
-              _context4.next = 16;
+              _context4.next = 17;
               break;
             }
 
             throw "one or more invalid versions";
 
-          case 16:
+          case 17:
             _flags$same = flags.same, same = _flags$same === void 0 ? "verse" : _flags$same;
 
+            if (isOriginalLanguageSearch && same === "verse") {
+              same = "verseNumber";
+            }
+
             if (!(!isOriginalLanguageSearch && versionIds.length > 1 && same !== "verse")) {
-              _context4.next = 19;
+              _context4.next = 21;
               break;
             }
 
             throw "forbidden to search multiple versions when not using same:verse for the range";
 
-          case 19:
+          case 21:
             _getQueryArrayAndWord = (0, _utils.getQueryArrayAndWords)(query), queryArray = _getQueryArrayAndWord.queryArray, queryWords = _getQueryArrayAndWord.queryWords;
             stackedResultsByBookId = Array(1 + 66).fill().map(function () {
               return [];
@@ -135,10 +141,14 @@ var bibleSearch = /*#__PURE__*/function () {
             versionById = {};
             resultCountByVersionId = {};
             wordResultsByVersionId = {};
-            totalHits = null;
+            totalHits = 0;
             doClocking && (0, _utils.clock)("Get words for all versions");
+            _getWordDetails = (0, _utils.getWordDetails)({
+              queryWords: queryWords,
+              isOriginalLanguageSearch: isOriginalLanguageSearch
+            }), wordDetailsArray = _getWordDetails.wordDetailsArray, getWordNumbersMatchingAllWordDetails = _getWordDetails.getWordNumbersMatchingAllWordDetails;
             allRows = [];
-            _context4.next = 30;
+            _context4.next = 33;
             return Promise.all(versions.map( /*#__PURE__*/function () {
               var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(version) {
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
@@ -151,33 +161,35 @@ var bibleSearch = /*#__PURE__*/function () {
                         // get a row with scope map for each word
                         wordResultsByVersionId[version.id] = {};
                         _context2.next = 5;
-                        return Promise.all(queryWords.map( /*#__PURE__*/function () {
-                          var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(word) {
-                            var unitWordRows;
+                        return Promise.all(wordDetailsArray.map( /*#__PURE__*/function () {
+                          var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(_ref5) {
+                            var word, primaryDetail, unitWordRows;
                             return regeneratorRuntime.wrap(function _callee$(_context) {
                               while (1) {
                                 switch (_context.prev = _context.next) {
                                   case 0:
-                                    _context.next = 2;
+                                    word = _ref5.word, primaryDetail = _ref5.primaryDetail;
+                                    _context.next = 3;
                                     return getUnitWords({
                                       versionId: version.id,
-                                      id: "".concat(same, ":").concat(word),
+                                      id: "".concat(same, ":").concat(primaryDetail),
                                       limit: WILD_CARD_LIMIT
                                     });
 
-                                  case 2:
+                                  case 3:
                                     unitWordRows = _context.sent;
 
                                     if (!(unitWordRows.length === WILD_CARD_LIMIT)) {
-                                      _context.next = 5;
+                                      _context.next = 6;
                                       break;
                                     }
 
                                     throw "Word with wildcard character (*) matches too many different words";
 
-                                  case 5:
+                                  case 6:
                                     unitWordRows.forEach(function (row) {
                                       row.scopeMap = JSON.parse(row.scopeMap);
+                                      row.word = word;
 
                                       if (Object.values(bookIds).length > 0) {
                                         for (var scopeKey in row.scopeMap) {
@@ -190,7 +202,7 @@ var bibleSearch = /*#__PURE__*/function () {
                                     wordResultsByVersionId[version.id][word] = unitWordRows;
                                     allRows.push.apply(allRows, _toConsumableArray(unitWordRows));
 
-                                  case 8:
+                                  case 9:
                                   case "end":
                                     return _context.stop();
                                 }
@@ -199,7 +211,7 @@ var bibleSearch = /*#__PURE__*/function () {
                           }));
 
                           return function (_x3) {
-                            return _ref5.apply(this, arguments);
+                            return _ref6.apply(this, arguments);
                           };
                         }()));
 
@@ -216,15 +228,15 @@ var bibleSearch = /*#__PURE__*/function () {
               };
             }()));
 
-          case 30:
+          case 33:
             if (!(getLengthOfAllScopeMaps(allRows) > 100000)) {
-              _context4.next = 32;
+              _context4.next = 35;
               break;
             }
 
             throw "Search exceeds maximum complexity";
 
-          case 32:
+          case 35:
             // for each version, in order
             versionIds.forEach(function (versionId) {
               var evaluateGroup = function evaluateGroup(group) {
@@ -242,8 +254,8 @@ var bibleSearch = /*#__PURE__*/function () {
 
                 if (isOr) {
                   scopeKeysToExamine = _utils.mergeAndUniquifyArraysOfScopeKeys.apply(void 0, _toConsumableArray(subqueryAndWordResults.map(function (rowsOrResultObj) {
-                    return rowsOrResultObj.scopeKeys ? [rowsOrResultObj.scopeKeys] : rowsOrResultObj.map(function (_ref6) {
-                      var scopeMap = _ref6.scopeMap;
+                    return rowsOrResultObj.scopeKeys ? [rowsOrResultObj.scopeKeys] : rowsOrResultObj.map(function (_ref7) {
+                      var scopeMap = _ref7.scopeMap;
                       return Object.keys(scopeMap);
                     });
                   }).flat()));
@@ -252,8 +264,8 @@ var bibleSearch = /*#__PURE__*/function () {
                   var shortestSubqueryAndWordResult = subqueryAndWordResults.slice(1).reduce(function (a, b) {
                     return getLengthOfAllScopeMaps(a) < getLengthOfAllScopeMaps(b) ? a : b;
                   }, subqueryAndWordResults[0]);
-                  scopeKeysToExamine = shortestSubqueryAndWordResult.scopeKeys || (shortestSubqueryAndWordResult.length <= 1 ? Object.keys((shortestSubqueryAndWordResult[0] || {}).scopeMap || []) : _utils.mergeAndUniquifyArraysOfScopeKeys.apply(void 0, _toConsumableArray(shortestSubqueryAndWordResult.map(function (_ref7) {
-                    var scopeMap = _ref7.scopeMap;
+                  scopeKeysToExamine = shortestSubqueryAndWordResult.scopeKeys || (shortestSubqueryAndWordResult.length <= 1 ? Object.keys((shortestSubqueryAndWordResult[0] || {}).scopeMap || []) : _utils.mergeAndUniquifyArraysOfScopeKeys.apply(void 0, _toConsumableArray(shortestSubqueryAndWordResult.map(function (_ref8) {
+                    var scopeMap = _ref8.scopeMap;
                     return Object.keys(scopeMap);
                   }))));
                 }
@@ -341,28 +353,34 @@ var bibleSearch = /*#__PURE__*/function () {
                         }
                       }
                     } else {
-                      subqueryOrWordResult.forEach(function (_ref8) {
-                        var scopeMap = _ref8.scopeMap;
+                      subqueryOrWordResult.forEach(function (_ref9) {
+                        var scopeMap = _ref9.scopeMap,
+                            word = _ref9.word;
 
                         if (scopeMap[scopeKey]) {
+                          var wordNumbersMatchingAllWordDetails = getWordNumbersMatchingAllWordDetails({
+                            word: word,
+                            infoObjOrWordNumbers: scopeMap[scopeKey]
+                          });
+
                           if (isFirstItemInGroup) {
                             if (isOr) {
                               var _updatedHits3;
 
-                              (_updatedHits3 = updatedHits).push.apply(_updatedHits3, _toConsumableArray(scopeMap[scopeKey].map(function (wordNumber) {
+                              (_updatedHits3 = updatedHits).push.apply(_updatedHits3, _toConsumableArray(wordNumbersMatchingAllWordDetails.map(function (wordNumber) {
                                 return [wordNumber];
                               })));
                             } else {
                               var _updatedHits4;
 
-                              (_updatedHits4 = updatedHits).push.apply(_updatedHits4, _toConsumableArray(scopeMap[scopeKey].map(function (wordNumber) {
+                              (_updatedHits4 = updatedHits).push.apply(_updatedHits4, _toConsumableArray(wordNumbersMatchingAllWordDetails.map(function (wordNumber) {
                                 return [wordNumber, wordNumber];
                               })));
 
-                              numPossibleHitsForThisWord += scopeMap[scopeKey].length;
+                              numPossibleHitsForThisWord += wordNumbersMatchingAllWordDetails.length;
                             }
                           } else {
-                            scopeMap[scopeKey].forEach(function (wordNumber) {
+                            wordNumbersMatchingAllWordDetails.forEach(function (wordNumber) {
                               var thisWordNumberIsPossibleHit = false;
 
                               if (isOr) {
@@ -463,13 +481,15 @@ var bibleSearch = /*#__PURE__*/function () {
                 }
               });
 
-              if (versionIds.length === 1 // not stacked
-              && (queryArray[0] === '"' // exact phrase at base level
+              if ((versionIds.length === 1 // not stacked
+              || isOriginalLanguageSearch) && (queryArray[0] === '"' // exact phrase at base level
               || queryArray.length === 1 // only one unit at base level
               )) {
-                totalHits = Object.values(numHitsByScopeKey).reduce(function (a, b) {
+                totalHits += Object.values(numHitsByScopeKey).reduce(function (a, b) {
                   return a + b;
                 }, 0);
+              } else {
+                totalHits = null;
               }
             });
             doClocking && (0, _utils.clock)("Get count and arrange ordering");
@@ -486,25 +506,29 @@ var bibleSearch = /*#__PURE__*/function () {
               resultCountForSort += stackedResults.length;
               if (resultCountForSort > offset && resultCountForSort - stackedResults.length < offset + limit && stackedResults.length > 0) return bookId;
             }).filter(Boolean);
-            bookIdsInReturnRange.forEach(function (bookId) {
-              if (same === 'verse') {
-                // scopeKey is originalLoc
-                stackedResultsByBookId[bookId].sort(function (a, b) {
-                  return (a.originalLoc || 'x') > (b.originalLoc || 'x') ? 1 : -1;
-                }); // the 'x' is greater than all originalLoc
-              } else {
-                stackedResultsByBookId[bookId].sort(function (a, b) {
-                  var unitNumberA = parseInt((a.scopeKey || "").split(':')[1], 10) || Infinity;
-                  var unitNumberB = parseInt((b.scopeKey || "").split(':')[1], 10) || Infinity;
-                  return unitNumberA > unitNumberB ? 1 : -1;
-                });
-              }
-            });
+
+            if (!isOriginalLanguageSearch && versionIds.length > 1) {
+              bookIdsInReturnRange.forEach(function (bookId) {
+                if (same === 'verse') {
+                  // scopeKey is originalLoc
+                  stackedResultsByBookId[bookId].sort(function (a, b) {
+                    return (a.originalLoc || 'x') > (b.originalLoc || 'x') ? 1 : -1;
+                  }); // the 'x' is greater than all originalLoc
+                } else {
+                  stackedResultsByBookId[bookId].sort(function (a, b) {
+                    var unitNumberA = parseInt((a.scopeKey || "").split(':')[1], 10) || Infinity;
+                    var unitNumberB = parseInt((b.scopeKey || "").split(':')[1], 10) || Infinity;
+                    return unitNumberA > unitNumberB ? 1 : -1;
+                  });
+                }
+              });
+            }
+
             doClocking && (0, _utils.clock)("Get result subset to return");
             results = stackedResultsByBookId.flat().slice(offset, offset + limit);
 
             if (!(same !== 'verse')) {
-              _context4.next = 51;
+              _context4.next = 54;
               break;
             }
 
@@ -516,21 +540,21 @@ var bibleSearch = /*#__PURE__*/function () {
               ids.push(id);
               resultNeedingOriginalLocById[id] = result;
             });
-            _context4.next = 49;
+            _context4.next = 52;
             return getUnitRanges({
               versionId: versionIds[0],
               ids: ids
             });
 
-          case 49:
+          case 52:
             unitRanges = _context4.sent;
-            unitRanges.forEach(function (_ref9) {
-              var id = _ref9.id,
-                  originalLoc = _ref9.originalLoc;
+            unitRanges.forEach(function (_ref10) {
+              var id = _ref10.id,
+                  originalLoc = _ref10.originalLoc;
               resultNeedingOriginalLocById[id].originalLoc = originalLoc;
             });
 
-          case 51:
+          case 54:
             doClocking && (0, _utils.clock)("Get usfm for result being returned");
             resultsByVersionIdNeedingUsfm = [];
             results.forEach(function (result) {
@@ -538,9 +562,9 @@ var bibleSearch = /*#__PURE__*/function () {
               resultsByVersionIdNeedingUsfm[versionId] = resultsByVersionIdNeedingUsfm[versionId] || [];
               resultsByVersionIdNeedingUsfm[versionId].push(result);
             });
-            _context4.next = 56;
+            _context4.next = 59;
             return Promise.all(Object.keys(resultsByVersionIdNeedingUsfm).map( /*#__PURE__*/function () {
-              var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(versionId) {
+              var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(versionId) {
                 var resultsNeedingUsfm, versionResultNeedingUsfmByLoc, locs, verses;
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                   while (1) {
@@ -548,9 +572,9 @@ var bibleSearch = /*#__PURE__*/function () {
                       case 0:
                         resultsNeedingUsfm = resultsByVersionIdNeedingUsfm[versionId];
                         versionResultNeedingUsfmByLoc = {};
-                        locs = resultsNeedingUsfm.map(function (_ref11) {
-                          var originalLoc = _ref11.originalLoc,
-                              versionResults = _ref11.versionResults;
+                        locs = resultsNeedingUsfm.map(function (_ref12) {
+                          var originalLoc = _ref12.originalLoc,
+                              versionResults = _ref12.versionResults;
 
                           var _originalLoc$split = originalLoc.split('-'),
                               _originalLoc$split2 = _slicedToArray(_originalLoc$split, 2),
@@ -586,9 +610,9 @@ var bibleSearch = /*#__PURE__*/function () {
 
                       case 5:
                         verses = _context3.sent;
-                        verses.forEach(function (_ref12) {
-                          var loc = _ref12.loc,
-                              usfm = _ref12.usfm;
+                        verses.forEach(function (_ref13) {
+                          var loc = _ref13.loc,
+                              usfm = _ref13.usfm;
                           versionResultNeedingUsfmByLoc[loc].usfm.push(usfm);
                         });
 
@@ -601,11 +625,11 @@ var bibleSearch = /*#__PURE__*/function () {
               }));
 
               return function (_x4) {
-                return _ref10.apply(this, arguments);
+                return _ref11.apply(this, arguments);
               };
             }()));
 
-          case 56:
+          case 59:
             results.forEach(function (result) {
               result.versionResults[0].usfm = result.versionResults[0].usfm.join("\n");
             });
@@ -624,7 +648,7 @@ var bibleSearch = /*#__PURE__*/function () {
               otherSuggestedQueries: []
             });
 
-          case 59:
+          case 62:
           case "end":
             return _context4.stop();
         }

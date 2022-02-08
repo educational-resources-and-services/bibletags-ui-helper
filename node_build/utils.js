@@ -31,7 +31,7 @@ module.exports = {
         FLAG_MAP = _ref$FLAG_MAP === void 0 ? {} : _ref$FLAG_MAP;
     // extract special query flags
     var flags = {};
-    var flagRegex = /(\s|^)([-a-z]+:(?:[-\w,/]+))(?=\s|$)/i;
+    var flagRegex = /(\s|^)([-a-z]+:(?:[:-\w,/]+))(?=\s|$)/i;
     query = (query || "").split(flagRegex).filter(function (piece) {
       if (flagRegex.test(piece)) {
         var _piece$split = piece.split(':'),
@@ -48,7 +48,7 @@ module.exports = {
           var flagValues = flagValue.split(/[\/,]/g);
 
           if (!possibleValues || flagValues.every(function (val) {
-            return possibleValues.includes(val);
+            return val instanceof RegExp ? val.test(val) : val.includes(val);
           })) {
             if (flags[flag] && multiValue) {
               var _flags$flag;
@@ -187,7 +187,7 @@ module.exports = {
             furtherParseQueryArray(item);
           }
 
-          if (typeof item === 'string' && /^(?:[^/".+*]+|[^/".+*]+\*)$/.test(item) && !queryWords.includes(item)) {
+          if (typeof item === 'string' && /^[^".+*]+[*+~]?$/.test(item) && item !== '/' && !queryWords.includes(item)) {
             queryWords.push(item);
           }
         }); // handle quotes
@@ -228,7 +228,7 @@ module.exports = {
 
 
         if (array.some(function (item, idx) {
-          return typeof item === 'string' && /\+/.test(item) && !(idx === 0 && /^[0-9]+\+$/.test(item) && parseInt(item.slice(0, -1), 10) < array.length - 1);
+          return typeof item === 'string' && /^[0-9]+\+$/.test(item) && !(idx === 0 && parseInt(item.slice(0, -1), 10) < array.length - 1);
         })) throw "misuse of 2+"; // check * syntax
 
         if (array.some(function (item) {
@@ -266,5 +266,87 @@ module.exports = {
 
     lastClockTime = newClockTime;
     descriptionOfCurrentClockTimeSection = descriptionOfNextSection;
+  },
+  getWordDetails: function getWordDetails(_ref2) {
+    var queryWords = _ref2.queryWords,
+        isOriginalLanguageSearch = _ref2.isOriginalLanguageSearch;
+    var wordDetailsArray = [];
+    var getWordNumbersMatchingAllWordDetails;
+
+    if (isOriginalLanguageSearch) {
+      queryWords.forEach(function (word) {
+        if (word[0] === '#') {
+          var wordDetails = word.slice(1).split('#').map(function (wordDetail) {
+            // convert form of details
+            if (/^[GH][0-9]{5}$/.test(wordDetail)) {
+              return "definitionId:".concat(wordDetail);
+            } // TODO: all the parsing values need to be converted (eg. #noun => #pos:N)
+            // TODO: This is wrong due to the reality of the / operator
+            // if(/^suffix:/.test(wordDetail)) {
+            //   return (
+            //     wordDetail
+            //       .split(':')[1]
+            //       .split("/")
+            //       .map(suffixOption => (
+            //         suffixOption
+            //           .split("")
+            //           .map(suffixDetail => {
+            //             let suffixType = "Person"
+            //             if(/[msbc]/.test(suffixDetail)) {
+            //               suffixType = "Gender"
+            //             }
+            //             if(/[spd]/.test(suffixDetail)) {
+            //               suffixType = "Number"
+            //             }
+            //             return `suffix${suffixType}:${suffixDetail}`
+            //           })
+            //       ))
+            //   )
+            // }
+
+
+            return wordDetail;
+          }) // .flat(2)
+          ; // TODO: extract the wordDetail with the fewest likely hits; the rest should go into addlWordDetails
+          // wordDetails.slice(1)
+
+          wordDetailsArray.push({
+            word: word,
+            primaryDetail: wordDetails[0]
+          });
+        } else if (word[0] === '=') {
+          // TODO
+          throw "\"Words translated to...\" search not yet available";
+        } else {
+          throw "Invalid search word: ".concat(word);
+        }
+      });
+
+      getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref3) {
+        var word = _ref3.word,
+            infoObjOrWordNumbers = _ref3.infoObjOrWordNumbers;
+        return infoObjOrWordNumbers.map(function (wordInfo) {
+          return wordInfo[0];
+        });
+      };
+    } else {
+      // translation search
+      wordDetailsArray = queryWords.map(function (word) {
+        return {
+          word: word,
+          primaryDetail: word
+        };
+      });
+
+      getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref4) {
+        var infoObjOrWordNumbers = _ref4.infoObjOrWordNumbers;
+        return infoObjOrWordNumbers;
+      };
+    }
+
+    return {
+      wordDetailsArray: wordDetailsArray,
+      getWordNumbersMatchingAllWordDetails: getWordNumbersMatchingAllWordDetails
+    };
   }
 };
