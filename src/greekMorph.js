@@ -1,6 +1,5 @@
 import i18n from './i18n.js'
 
-// pos matches posMapping in bibletags-data/scripts/importUGNTFromUsfm.js
 const getPosTerm = code => {
   switch(code) {
     case 'N': return i18n("noun", "", "grammar")

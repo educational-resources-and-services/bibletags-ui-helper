@@ -206,6 +206,14 @@ getGrammarColor({ isPrefixOrSuffix, morphPart="" }): String | undefined
 getHebrewMorphPartDisplayInfo({ morphLang, morphPart, isPrefixOrSuffix, wordIsMultiPart }): Object
 ```
 
+```js
+bibleSearch({ query, flags, hebrewOrdering, offset, limit, getVersions, getUnitWords, getUnitRanges, getVerses, maxNumVersion=5, doClocking=false }): Object
+```
+
+```js
+getQueryAndFlagInfo({ query, FLAG_MAP={} }): Object
+```
+
 ## Constants exposed
 
 ```js

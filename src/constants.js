@@ -1,3 +1,21 @@
+export const bibleSearchFlagMap = {
+  in: {
+    multiValue: true,
+  },
+  include: {
+    multiValue: true,
+  },
+  same: {
+    possibleValues: [
+      'verse',
+      /verses:[0-9]+/,
+      'phrase',
+      'sentence',
+      'paragraph',
+    ],
+  },
+}
+
 export const bibleSearchScopes = {
 
   // multi-book scopes
@@ -87,6 +105,274 @@ export const bibleSearchScopes = {
   "3Jn": [64],
   "Jud": [65],
   "Rev": [66],
+
+}
+
+const getHebrewPrefixSuffixMapValue = (dataTerm, avgRowSizeInKB) => {
+  const wordInfoChar = dataTerm.slice(-1)
+  return {
+    detail: `${dataTerm}:1`,
+    matches: wordInfo => wordInfo[5] && wordInfo[5].includes(wordInfoChar),
+    avgRowSizeInKB,
+  }
+}
+
+export const hebrewPrefixSuffixMap = {
+  b: getHebrewPrefixSuffixMapValue('b', 1034),
+  l: getHebrewPrefixSuffixMapValue('l', 1293),
+  k: getHebrewPrefixSuffixMapValue('k', 197),
+  m: getHebrewPrefixSuffixMapValue('m', 426),
+  sh: getHebrewPrefixSuffixMapValue('sh', 9),
+  v: getHebrewPrefixSuffixMapValue('v', 3174),
+  h: {  // definite article, whether an explicit ה or indicated by the vowel of a #b or #l
+    detail: [ `h1:1`, `h2:1` ],
+    matches: wordInfo => wordInfo[5] && /[12]/.test(wordInfo[5]),
+    avgRowSizeInKB: 1,
+  },
+  "h!": getHebrewPrefixSuffixMapValue("h1", 1555),  // explicit ה definite articles only
+  "h'": getHebrewPrefixSuffixMapValue("h2", 429),  // definite articles that are indicated by the vowel of a #b or #l only
+  "h?": getHebrewPrefixSuffixMapValue("h3", 85),  // interrogative ה
+  "h->": getHebrewPrefixSuffixMapValue("h4", 73),  // directional ה
+  "h^": getHebrewPrefixSuffixMapValue("h5", 30),  // paragogic ה
+  "n^": getHebrewPrefixSuffixMapValue("n", 21),  // paragogic ן or נה
+}
+
+const getGrammaticalDetailMapValue = (type, typeIndex, requiredLanguageChar, value, avgRowSizeInKB) => {
+  const values = value instanceof Array ? value : [ value ]
+  const valueLength = values[0].length
+  const hasVaryingValueLengths = values.some(val => val.length !== valueLength)
+
+  return {
+    detail: values.map(val => `${type[val] || type}:${val}`),
+    avgRowSizeInKB,
+    matches: wordInfo => {
+
+      const typeIdx = typeIndex[wordInfo[4][0]] || typeIndex
+      const languageMatches = detailVal => (
+        requiredLanguageChar === ''
+        || wordInfo[4][0] == (requiredLanguageChar[detailVal] || requiredLanguageChar)
+      )
+
+      if(hasVaryingValueLengths) {
+        return (
+          values.some(val => {
+            const detailValue = wordInfo[4].slice(typeIdx, typeIdx + val.length)
+            return (
+              val === detailValue
+              && languageMatches(detailValue)
+            )
+          })
+        )
+      }
+
+      const detailValue = wordInfo[4].slice(typeIdx, typeIdx + valueLength)
+      return (
+        values.includes(detailValue)
+        && languageMatches(detailValue)
+      )
+
+    },
+  }
+}
+
+const getPosMapValue = (...params) => getGrammaticalDetailMapValue('pos', 1, '', ...params)
+const getHebrewStemMapValue = (...params) => getGrammaticalDetailMapValue('stem', 3, 'H', ...params)
+const getAspectMapValue = (...params) => getGrammaticalDetailMapValue('aspect', 5, '', ...params)
+const getTypeMapValue = (...params) => getGrammaticalDetailMapValue('type', 1, '', ...params)
+const getGreekMoodMapValue = (...params) => getGrammaticalDetailMapValue('mood', 3, 'G', ...params)
+const getGreekVoiceMapValue = (...params) => getGrammaticalDetailMapValue('voice', 4, 'G', ...params)
+const getPersonMapValue = (...params) => getGrammaticalDetailMapValue('person', 6, '', ...params)
+const getGenderMapValue = (...params) => getGrammaticalDetailMapValue('gender', 7, '', ...params)
+const getNumberMapValue = (...params) => getGrammaticalDetailMapValue('number', 8, '', ...params)
+const getHebrewStateMapValue = (...params) => getGrammaticalDetailMapValue('state', 9, 'H', ...params)
+const getGreekCaseMapValue = (...params) => getGrammaticalDetailMapValue('case', 9, 'G', ...params)
+const getGreekAttributeMapValue = (...params) => getGrammaticalDetailMapValue('attribute', 10, 'G', ...params)
+
+export const grammaticalDetailMap = {
+
+  // pos - greek
+  "determiner": getPosMapValue('E', 0),
+  "foreign": getPosMapValue('F', 0),
+
+  // pos - both
+  "adjective": getPosMapValue('A', 0),
+  "noun": getPosMapValue('N', 0),
+  "conjunction": getPosMapValue('C', 0),
+  "adverb": getPosMapValue('D', 0),
+  "preposition": getPosMapValue('R', 0),
+  "pronoun": getPosMapValue('P', 0),
+  "particle": getPosMapValue('T', 0),
+  "verb": getPosMapValue('V', 0),
+
+  // stem - hebrew
+  "qal": getHebrewStemMapValue('Hq', 0),
+  "niphal": getHebrewStemMapValue([ 'HN', 'AN' ], 0),
+  "piel": getHebrewStemMapValue('Hp', 0),
+  "pual": getHebrewStemMapValue('HP', 0),
+  "hiphil": getHebrewStemMapValue('Hh', 0),
+  "hophal": getHebrewStemMapValue([ 'HH', 'AH' ], 0),
+  "hithpael": getHebrewStemMapValue('Ht', 0),
+  "polel": getHebrewStemMapValue([ 'Ho', 'Ao' ], 0),
+  "polal": getHebrewStemMapValue('HO', 0),
+  "hithpolel": getHebrewStemMapValue([ 'Hr', 'Ar' ], 0),
+  "poel": getHebrewStemMapValue([ 'Hm', 'Am' ], 0),
+  "poal": getHebrewStemMapValue('HM', 0),
+  "palel": getHebrewStemMapValue('Hk', 0),
+  "pulal": getHebrewStemMapValue('HK', 0),
+  "qal-passive": getHebrewStemMapValue('HQ', 0),
+  "pilpel": getHebrewStemMapValue('Hl', 0),
+  "polpal": getHebrewStemMapValue('HL', 0),
+  "hithpalpel": getHebrewStemMapValue([ 'Hf', 'Af' ], 0),
+  "nithpael": getHebrewStemMapValue('HD', 0),
+  "pealal": getHebrewStemMapValue('Hj', 0),
+  "pilel": getHebrewStemMapValue('Hi', 0),
+  "hothpaal": getHebrewStemMapValue('Hu', 0),
+  "tiphil": getHebrewStemMapValue('Hc', 0),
+  "hishtaphel": getHebrewStemMapValue([ 'Hv', 'At' ], 0),
+  "nithpalel": getHebrewStemMapValue('Hw', 0),
+  "nithpoel": getHebrewStemMapValue('Hy', 0),
+  "hithpoel": getHebrewStemMapValue('Hz', 0),
+  "peal": getHebrewStemMapValue('Aq', 0),
+  "peil": getHebrewStemMapValue('AQ', 0),
+  "hithpeel": getHebrewStemMapValue('Au', 0),
+  "pael": getHebrewStemMapValue('Ap', 0),
+  "ithpaal": getHebrewStemMapValue('AP', 0),
+  "hithpaal": getHebrewStemMapValue('AM', 0),
+  "aphel": getHebrewStemMapValue('Aa', 0),
+  "haphel": getHebrewStemMapValue('Ah', 0),
+  "saphel": getHebrewStemMapValue('As', 0),
+  "shaphel": getHebrewStemMapValue('Ae', 0),
+  "ithpeel": getHebrewStemMapValue('Ai', 0),
+  "ishtaphel": getHebrewStemMapValue('Av', 0),
+  "hithaphel": getHebrewStemMapValue('Aw', 0),
+  "ithpoel": getHebrewStemMapValue('Az', 0),
+  "hephal": getHebrewStemMapValue('Ab', 0),
+  "tiphel": getHebrewStemMapValue('Ac', 0),
+  "palpel": getHebrewStemMapValue('Al', 0),
+  "ithpalpel": getHebrewStemMapValue('AL', 0),
+  "ithpolel": getHebrewStemMapValue('AO', 0),
+  "ittaphal": getHebrewStemMapValue('AG', 0),
+
+  // aspect - hebrew
+  "sequential-perfect": getAspectMapValue('q', 0),
+  "sequential-imperfect": getAspectMapValue('w', 0),
+  "cohortative": getAspectMapValue('h', 0),
+  "jussive": getAspectMapValue('j', 0),
+  "passive-participle": getAspectMapValue('s', 0),
+  "infinitive-absolute": getAspectMapValue('a', 0),
+  "infinitive-construct": getAspectMapValue('c', 0),
+
+  // aspect - greek
+  "present": getAspectMapValue('P', 0),
+  "future": getAspectMapValue('F', 0),
+  "aorist": getAspectMapValue('A', 0),
+  "pluperfect": getAspectMapValue('L', 0),
+
+  // aspect - both
+  "perfect": getAspectMapValue([ 'p', 'E' ], 0),
+  "imperfect": getAspectMapValue([ 'I', 'i' ], 0),
+
+  // mood - greek
+  "indicative": getGreekMoodMapValue('I', 0),
+  "subjunctive": getGreekMoodMapValue('S', 0),
+  "optative": getGreekMoodMapValue('O', 0),
+  "infinitive": getGreekMoodMapValue('N', 0),
+
+  // aspect - hebrew / mood - greek
+  "imperative": getGrammaticalDetailMapValue({ v: 'aspect', M: 'mood' }, { H: 5, G: 3 }, { v: 'H', M: 'G' }, [ 'v', 'M' ], 0),
+  "participle": getGrammaticalDetailMapValue({ r: 'aspect', P: 'mood' }, { H: 5, G: 3 }, { r: 'H', P: 'G' }, [ 'r', 'P' ], 0),
+
+  // type - hebrew
+  "cardinal-number": getTypeMapValue('Ac', 0),
+  "ordinal-number": getTypeMapValue('Ao', 0),
+  "gentilic": getTypeMapValue('Ng', 0),
+  "proper-name": getTypeMapValue('Np', 0),
+  "affirmation": getTypeMapValue('Ta', 0),
+  "exhortation": getTypeMapValue('Te', 0),
+  "negative": getTypeMapValue('Tn', 0),
+  "direct-object-marker": getTypeMapValue('To', 0),
+
+  // type - hebrew / pos - greek
+  "interjection": getGrammaticalDetailMapValue({ Tj: 'type', I: 'pos' }, 1, { Tj: 'H', I: 'G' }, [ 'Tj', 'I' ], 0),
+
+  // type - greek
+  "substantive": getTypeMapValue('AS', 0),
+  "predicate": getTypeMapValue('AP', 0),
+  "ascriptive": getTypeMapValue('AA', 0),
+  "restrictive": getTypeMapValue('AR', 0),
+  "article": getTypeMapValue('EA', 0),
+  "differential": getTypeMapValue('EF', 0),
+  "possessive": getTypeMapValue('EP', 0),
+  "quantifier": getTypeMapValue('EQ', 0),
+  "ordinal": getTypeMapValue('EO', 0),
+  "reflexive": getTypeMapValue('PE', 0),
+  "reciprocal": getTypeMapValue('PC', 0),
+  "transitive": getTypeMapValue('VT', 0),
+  "intransitive": getTypeMapValue('VI', 0),
+  "linking": getTypeMapValue('VL', 0),
+  "modal": getTypeMapValue('VM', 0),
+  "periphrastic": getTypeMapValue('VP', 0),
+  "exclamation": getTypeMapValue('IE', 0),
+  "directive": getTypeMapValue('ID', 0),
+  "response": getTypeMapValue('IR', 0),
+  "improper-preposition": getTypeMapValue('DI', 0),
+  "correlative": getTypeMapValue([ 'DO', 'CO' ], 0),
+  "coordinating": getTypeMapValue('CC', 0),
+  "subordinating": getTypeMapValue('CS', 0),
+
+  // type - both
+  "demonstrative": getTypeMapValue([ 'Pd', 'Tm', 'ED', 'PD' ], 0),
+  "indefinite": getTypeMapValue([ 'Pf', 'PI' ], 0),
+  "personal": getTypeMapValue([ 'Pp', 'PP' ], 0),
+  "interrogative": getTypeMapValue([ 'Pi', 'Ti', 'ET', 'PT' ], 0),
+  "relative": getTypeMapValue([ 'Pr', 'Tr', 'ER', 'PR' ], 0),
+  "number": getTypeMapValue([ 'Ac', 'Ao', 'EN' ], 0),
+
+  // voice - greek
+  "active": getGreekVoiceMapValue('A', 0),
+  "middle": getGreekVoiceMapValue('M', 0),
+  "passive": getGreekVoiceMapValue('P', 0),
+
+  // person - both
+  "1st": getPersonMapValue('1', 0),
+  "2nd": getPersonMapValue('2', 0),
+  "3rd": getPersonMapValue('3', 0),
+
+  // gender - hebrew
+  "gender-both": getGenderMapValue('b', 0),
+  "common": getGenderMapValue('c', 0),
+
+  // gender - greek
+  "neuter": getGenderMapValue('N', 0),
+
+  // gender - both
+  "masculine": getGenderMapValue([ 'm', 'M' ], 0),
+  "feminine": getGenderMapValue([ 'f', 'F' ], 0),
+
+  // number - hebrew
+  "dual": getNumberMapValue('d', 0),
+
+  // number - both
+  "singular": getNumberMapValue([ 's', 'S' ], 0),
+  "plural": getNumberMapValue([ 'p', 'P' ], 0),
+
+  // state - hebrew
+  "absolute": getHebrewStateMapValue('a', 0),
+  "construct": getHebrewStateMapValue('c', 0),
+  "determined": getHebrewStateMapValue('d', 0),
+
+  // case - greek
+  "nominative": getGreekCaseMapValue('N', 0),
+  "genitive": getGreekCaseMapValue('G', 0),
+  "dative": getGreekCaseMapValue('D', 0),
+  "accusative": getGreekCaseMapValue('A', 0),
+  "vocative": getGreekCaseMapValue('V', 0),
+
+  // attribute - greek
+  "comparative": getGreekAttributeMapValue('C', 0),
+  "superlatives": getGreekAttributeMapValue('S', 0),
+  "diminutive": getGreekAttributeMapValue('D', 0),
+  "indeclinable": getGreekAttributeMapValue('I', 0),
 
 }
 

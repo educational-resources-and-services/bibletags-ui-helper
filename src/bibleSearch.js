@@ -4,24 +4,6 @@ import { getOriginalLocsFromRange, getCorrespondingRefs, getRefFromLoc, getLocFr
 import { bibleSearchScopes } from './constants.js'
 import { mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock, getWordDetails } from './utils'
 
-export const BIBLE_SEARCH_FLAG_MAP = {
-  in: {
-    multiValue: true,
-  },
-  include: {
-    multiValue: true,
-  },
-  same: {
-    possibleValues: [
-      'verse',
-      /verses:[0-9]+/,
-      'phrase',
-      'sentence',
-      'paragraph',
-    ],
-  },
-}
-
 const WILD_CARD_LIMIT = 100
 
 const getLengthOfAllScopeMaps = wordAlts => (
@@ -33,6 +15,52 @@ const getLengthOfAllScopeMaps = wordAlts => (
         : wordAlts.reduce((total, { scopeMap }) => total + Object.values(scopeMap).length, 0)
     )
 )
+
+export const getQueryAndFlagInfo = ({ query, FLAG_MAP={} }) => {
+
+  // extract special query flags
+  const flags = {}
+  const flagRegex = /(\s|^)([-a-z]+:(?:[:-\w,/]+))(?=\s|$)/i
+
+  query = (query || "")
+    .split(flagRegex)
+    .filter(piece => {
+
+      if(flagRegex.test(piece)) {
+        let [ flag, ...flagValuePieces ] = piece.split(':')
+        let flagValue = flagValuePieces.join(':')
+
+        if(FLAG_MAP[flag]) {
+          const { multiValue, possibleValues } = FLAG_MAP[flag]
+          const flagValues = flagValue.split(/[\/,]/g)
+
+          if(
+            !possibleValues
+            || flagValues.every(val => (
+              val instanceof RegExp
+                ? val.test(val)
+                : val.includes(val)
+            ))
+          ) {
+            if(flags[flag] && multiValue) {
+              flags[flag].push(...flagValues)
+            } else {
+              flags[flag] = multiValue ? flagValues : flagValue
+            }
+            return false
+          }
+        }
+      }
+
+      return true
+
+    })
+    .join('')
+    .replace(/  +/g, ' ')
+    .trim()
+
+  return { query, flags }
+}
 
 export const bibleSearch = async ({
   query,
@@ -110,7 +138,11 @@ export const bibleSearch = async ({
 
       const unitWordRows = await getUnitWords({
         versionId: version.id,
-        id: `${same}:${primaryDetail}`,
+        id: (
+          primaryDetail instanceof Array
+            ? primaryDetail.map(detail => `${same}:${detail}`)
+            : `${same}:${primaryDetail}`
+        ),
         limit: WILD_CARD_LIMIT,
       })
 
