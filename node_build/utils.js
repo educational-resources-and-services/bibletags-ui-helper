@@ -231,33 +231,7 @@ var clock = function clock(descriptionOfNextSection) {
 
   lastClockTime = newClockTime;
   descriptionOfCurrentClockTimeSection = descriptionOfNextSection;
-}; // UHB
-// word.wordNumber,
-// word.form,
-// word.definitionId ? parseInt(word.definitionId.slice(1), 10) : 0,
-// word.lemma || 0,
-// `H${word.type || `${word.pos}_`}${word.stem || '__'}${word.aspect || '_'}${word.person || '_'}${word.gender || '_'}${word.number || '_'}${word.state || '_'}`,
-// const booleanColInfo = (
-//   ['isAramaic','b','l','k','m','sh','v','h1','h2','h3','h4','h5','n']
-//     .map(col => (
-//       word[col]
-//         ? col.slice(-1)
-//         : ''
-//     ))
-//     .join('')
-// )
-// const suffixInfo = (
-//   word.suffixPerson
-//     ? `${word.suffixPerson}${word.suffixGender}${word.suffixNumber}`
-//     : ''
-// )
-// UGNT
-// word.wordNumber,
-// word.form,
-// word.definitionId,
-// word.lemma,
-// `G${word.type || `${word.pos}_`}${word.mood || '_'}${word.voice || '_'}${word.aspect || '_'}${word.person || '_'}${word.gender || '_'}${word.number || '_'}${word.case || '_'}${word.attribute || '_'}`,
-
+};
 
 exports.clock = clock;
 
@@ -362,8 +336,7 @@ var getWordDetails = function getWordDetails(_ref) {
             var matches = _ref2.matches;
             return matches(wordInfo);
           });
-        }; // matchesAddlDetailsByWord[word] = wordInfo => console.log('>>>>', wordInfo, wordDetails.slice(1), wordDetails.slice(1).every(({ matches }) => matches(wordInfo))) || wordDetails.slice(1).every(({ matches }) => matches(wordInfo))
-
+        };
       } else if (word[0] === '=') {
         // TODO
         throw "\"Words translated to...\" search not yet available";
