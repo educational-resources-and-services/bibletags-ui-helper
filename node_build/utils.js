@@ -245,83 +245,112 @@ var getWordDetails = function getWordDetails(_ref) {
     var matchesAddlDetailsByWord = {};
     queryWords.forEach(function (word) {
       if (word[0] === '#') {
-        var wordDetails = word.slice(1).split('#').map(function (rawDetail) {
+        var wordDetails = word.slice(1).split('#').map(function (rawDetails) {
           // convert form of details
-          if (/^[GH][0-9]{5}$/.test(rawDetail)) {
+          var _ref2 = rawDetails.match(/^([^:]+):/) || [],
+              _ref3 = _slicedToArray(_ref2, 2),
+              x = _ref3[0],
+              colonDetailType = _ref3[1];
+
+          var returnObjs = rawDetails.replace(/^[^:]+:/, '').split('/').map(function (rawDetail) {
+            if (colonDetailType === 'lemma') {
+              return {
+                detail: "lemma:".concat(rawDetail),
+                matches: function matches(wordInfo) {
+                  return wordInfo[3] === rawDetail;
+                },
+                avgRowSizeInKB: 7
+              };
+            }
+
+            if (colonDetailType === 'form') {
+              return {
+                detail: "form:".concat(rawDetail),
+                matches: function matches(wordInfo) {
+                  return wordInfo[1] === rawDetail;
+                },
+                avgRowSizeInKB: 5
+              };
+            }
+
+            if (colonDetailType === 'suffix') {
+              var detail;
+              var valuesToMatchByType = {};
+              rawDetail.split("").forEach(function (suffixDetail) {
+                if (/[123]/.test(suffixDetail)) {
+                  detail = "suffixPerson:".concat(suffixDetail);
+                  valuesToMatchByType.person = suffixDetail;
+                } else if (/[mfbc]/.test(suffixDetail)) {
+                  detail = "suffixGender:".concat(suffixDetail);
+                  valuesToMatchByType.gender = suffixDetail;
+                } else if (/[spd]/.test(suffixDetail)) {
+                  detail = "suffixNumber:".concat(suffixDetail);
+                  valuesToMatchByType.number = suffixDetail;
+                }
+              });
+              return {
+                // Suffix is different than the other criteria in that we need items to match ALL of up to three elements.
+                // To faciliate this, we just get one of the scopeMaps via `detail` and then force a check on all details.
+                detail: detail,
+                matches: function matches(wordInfo) {
+                  return (!valuesToMatchByType.person || (wordInfo[6] || "")[0] === valuesToMatchByType.person) && (!valuesToMatchByType.gender || (wordInfo[6] || "")[1] === valuesToMatchByType.gender) && (!valuesToMatchByType.number || (wordInfo[6] || "")[2] === valuesToMatchByType.number);
+                },
+                avgRowSizeInKB: 0,
+                //Infinity,  // preference against this since suffix needs to be included in getWordNumbersMatchingAllWordDetails no matter what
+                forceMatchOnWordDetails: true
+              };
+            }
+
+            if (/^[GH][0-9]{5}$/.test(rawDetail)) {
+              return {
+                detail: "definitionId:".concat(rawDetail),
+                matches: function matches(wordInfo) {
+                  return rawDetail[0] === wordInfo[4][0] // matches H or G
+                  && wordInfo[2] === parseInt(rawDetail.slice(1), 10) // int form of strongs number matches
+                  ;
+                },
+                avgRowSizeInKB: 7
+              };
+            }
+
+            if (_constants.hebrewPrefixSuffixMap[rawDetail]) {
+              return _constants.hebrewPrefixSuffixMap[rawDetail];
+            }
+
+            if (_constants.grammaticalDetailMap[rawDetail]) {
+              return _constants.grammaticalDetailMap[rawDetail];
+            }
+
+            throw "unknown search token detail: ".concat(colonDetailType ? "".concat(colonDetailType, ":") : "").concat(rawDetail);
+          });
+
+          if (returnObjs.length === 1) {
+            return returnObjs[0];
+          } else {
             return {
-              detail: "definitionId:".concat(rawDetail),
+              detail: returnObjs.map(function (_ref4) {
+                var detail = _ref4.detail;
+                return detail;
+              }).flat(),
               matches: function matches(wordInfo) {
-                return rawDetail[0] === wordInfo[4][0] // matches H or G
-                && wordInfo[2] === parseInt(rawDetail.slice(1), 10) // int form of strongs number matches
-                ;
+                return returnObjs.some(function (_ref5) {
+                  var matches = _ref5.matches;
+                  return matches(wordInfo);
+                });
               },
-              avgRowSizeInKB: 7
-            };
-          } // TODO: all the parsing values need to be converted (eg. #noun => #pos:N)
-          // TODO: This is wrong due to the reality of the / operator
-          // if(/^suffix:/.test(rawDetail)) {
-          //   return (
-          //     rawDetail
-          //       .split(':')[1]
-          //       .split("/")
-          //       .map(suffixOption => (
-          //         suffixOption
-          //           .split("")
-          //           .map(suffixDetail => {
-          //             let suffixType = "Person"
-          //             if(/[msbc]/.test(suffixDetail)) {
-          //               suffixType = "Gender"
-          //             }
-          //             if(/[spd]/.test(suffixDetail)) {
-          //               suffixType = "Number"
-          //             }
-          //             return `suffix${suffixType}:${suffixDetail}`
-          //           })
-          //       ))
-          //   )
-          // }
-
-
-          if (/^lemma:/.test(rawDetail)) {
-            var lemma = rawDetail.split(':')[1];
-            return {
-              detail: rawDetail,
-              matches: function matches(wordInfo) {
-                return wordInfo[3] === lemma;
-              },
-              avgRowSizeInKB: 7
+              avgRowSizeInKB: returnObjs.map(function (_ref6) {
+                var avgRowSizeInKB = _ref6.avgRowSizeInKB;
+                return avgRowSizeInKB;
+              }).reduce(function (a, b) {
+                return a + b;
+              }, 0) / returnObjs.length,
+              forceMatchOnWordDetails: returnObjs.some(function (_ref7) {
+                var forceMatchOnWordDetails = _ref7.forceMatchOnWordDetails;
+                return forceMatchOnWordDetails;
+              })
             };
           }
-
-          if (/^form:/.test(rawDetail)) {
-            var form = rawDetail.split(':')[1];
-            return {
-              detail: rawDetail,
-              matches: function matches(wordInfo) {
-                return wordInfo[1] === form;
-              },
-              avgRowSizeInKB: 5
-            };
-          }
-
-          if (_constants.hebrewPrefixSuffixMap[rawDetail]) {
-            return _constants.hebrewPrefixSuffixMap[rawDetail];
-          }
-
-          if (_constants.grammaticalDetailMap[rawDetail]) {
-            return _constants.grammaticalDetailMap[rawDetail];
-          }
-
-          return {
-            detail: rawDetail,
-            matches: function matches(wordInfo) {
-              return true;
-            },
-            avgRowSizeInKB: 1
-          };
-          throw "unknown search token detail: ".concat(rawDetail);
-        }) // .flat(2)
-        ; // extract the wordDetail with the fewest likely hits; the rest should be used in getWordNumbersMatchingAllWordDetails
+        }); // extract the wordDetail with the fewest likely hits; the rest should be used in getWordNumbersMatchingAllWordDetails
 
         wordDetails.sort(function (a, b) {
           return a.avgRowSizeInKB > b.avgRowSizeInKB ? 1 : -1;
@@ -330,12 +359,14 @@ var getWordDetails = function getWordDetails(_ref) {
           word: word,
           primaryDetail: wordDetails[0].detail
         });
+        var wordDetailsToCheck = wordDetails[0].forceMatchOnWordDetails ? wordDetails : wordDetails.slice(1);
+        var wordDetailsToCheckLength = wordDetailsToCheck.length;
 
         matchesAddlDetailsByWord[word] = function (wordInfo) {
-          return wordDetails.slice(1).every(function (_ref2) {
-            var matches = _ref2.matches;
+          return wordDetailsToCheckLength > 1 ? wordDetailsToCheck.every(function (_ref8) {
+            var matches = _ref8.matches;
             return matches(wordInfo);
-          });
+          }) : wordDetailsToCheckLength === 0 ? true : wordDetailsToCheck[0].matches(wordInfo);
         };
       } else if (word[0] === '=') {
         // TODO
@@ -345,9 +376,9 @@ var getWordDetails = function getWordDetails(_ref) {
       }
     });
 
-    getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref3) {
-      var word = _ref3.word,
-          infoObjOrWordNumbers = _ref3.infoObjOrWordNumbers;
+    getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref9) {
+      var word = _ref9.word,
+          infoObjOrWordNumbers = _ref9.infoObjOrWordNumbers;
       return infoObjOrWordNumbers.filter(function (wordInfo) {
         return matchesAddlDetailsByWord[word](wordInfo);
       }).map(function (wordInfo) {
@@ -363,8 +394,8 @@ var getWordDetails = function getWordDetails(_ref) {
       };
     });
 
-    getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref4) {
-      var infoObjOrWordNumbers = _ref4.infoObjOrWordNumbers;
+    getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref10) {
+      var infoObjOrWordNumbers = _ref10.infoObjOrWordNumbers;
       return infoObjOrWordNumbers;
     };
   }

@@ -235,87 +235,113 @@ export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
 
         const wordDetails = (
           word.slice(1).split('#')
-            .map(rawDetail => {
+            .map(rawDetails => {
               // convert form of details
 
-              if(/^[GH][0-9]{5}$/.test(rawDetail)) {
+              const [ x, colonDetailType ] = rawDetails.match(/^([^:]+):/) || []
+              const returnObjs = rawDetails.replace(/^[^:]+:/, '').split('/').map(rawDetail => {
+
+                if(colonDetailType === 'lemma') {
+                  return {
+                    detail: `lemma:${rawDetail}`,
+                    matches: wordInfo => wordInfo[3] === rawDetail,
+                    avgRowSizeInKB: 7,
+                  }
+                }
+
+                if(colonDetailType === 'form') {
+                  return {
+                    detail: `form:${rawDetail}`,
+                    matches: wordInfo => wordInfo[1] === rawDetail,
+                    avgRowSizeInKB: 5,
+                  }
+                }
+
+                if(colonDetailType === 'suffix') {
+                  let detail
+                  const valuesToMatchByType = {}
+                  rawDetail.split("").forEach(suffixDetail => {
+                    if(/[123]/.test(suffixDetail)) {
+                      detail = `suffixPerson:${suffixDetail}`
+                      valuesToMatchByType.person = suffixDetail
+                    } else if(/[mfbc]/.test(suffixDetail)) {
+                      detail = `suffixGender:${suffixDetail}`
+                      valuesToMatchByType.gender = suffixDetail
+                    } else if(/[spd]/.test(suffixDetail)) {
+                      detail = `suffixNumber:${suffixDetail}`
+                      valuesToMatchByType.number = suffixDetail
+                    }
+                  })
+                  return {
+                    // Suffix is different than the other criteria in that we need items to match ALL of up to three elements.
+                    // To faciliate this, we just get one of the scopeMaps via `detail` and then force a check on all details.
+                    detail,
+                    matches: wordInfo => (
+                      (!valuesToMatchByType.person || (wordInfo[6] || "")[0] === valuesToMatchByType.person)
+                      && (!valuesToMatchByType.gender || (wordInfo[6] || "")[1] === valuesToMatchByType.gender)
+                      && (!valuesToMatchByType.number || (wordInfo[6] || "")[2] === valuesToMatchByType.number)
+                    ),
+                    avgRowSizeInKB: 0, //Infinity,  // preference against this since suffix needs to be included in getWordNumbersMatchingAllWordDetails no matter what
+                    forceMatchOnWordDetails: true,
+                  }
+                }
+
+                if(/^[GH][0-9]{5}$/.test(rawDetail)) {
+                  return {
+                    detail: `definitionId:${rawDetail}`,
+                    matches: wordInfo => (
+                      rawDetail[0] === wordInfo[4][0]  // matches H or G
+                      && wordInfo[2] === parseInt(rawDetail.slice(1), 10)  // int form of strongs number matches
+                    ),
+                    avgRowSizeInKB: 7,
+                  }
+                }
+
+                if(hebrewPrefixSuffixMap[rawDetail]) {
+                  return hebrewPrefixSuffixMap[rawDetail]
+                }
+
+                if(grammaticalDetailMap[rawDetail]) {
+                  return grammaticalDetailMap[rawDetail]
+                }
+
+                throw `unknown search token detail: ${colonDetailType ? `${colonDetailType}:` : ``}${rawDetail}`
+
+              })
+
+              if(returnObjs.length === 1) {
+                return returnObjs[0]
+
+              } else {
                 return {
-                  detail: `definitionId:${rawDetail}`,
-                  matches: wordInfo => (
-                    rawDetail[0] === wordInfo[4][0]  // matches H or G
-                    && wordInfo[2] === parseInt(rawDetail.slice(1), 10)  // int form of strongs number matches
-                  ),
-                  avgRowSizeInKB: 7,
+                  detail: returnObjs.map(({ detail }) => detail).flat(),
+                  matches: wordInfo => returnObjs.some(({ matches }) => matches(wordInfo)),
+                  avgRowSizeInKB: returnObjs.map(({ avgRowSizeInKB }) => avgRowSizeInKB).reduce((a,b) => a+b, 0) / returnObjs.length,
+                  forceMatchOnWordDetails: returnObjs.some(({ forceMatchOnWordDetails }) => forceMatchOnWordDetails),
                 }
               }
-
-              // TODO: all the parsing values need to be converted (eg. #noun => #pos:N)
-
-              // TODO: This is wrong due to the reality of the / operator
-              // if(/^suffix:/.test(rawDetail)) {
-              //   return (
-              //     rawDetail
-              //       .split(':')[1]
-              //       .split("/")
-              //       .map(suffixOption => (
-              //         suffixOption
-              //           .split("")
-              //           .map(suffixDetail => {
-              //             let suffixType = "Person"
-              //             if(/[msbc]/.test(suffixDetail)) {
-              //               suffixType = "Gender"
-              //             }
-              //             if(/[spd]/.test(suffixDetail)) {
-              //               suffixType = "Number"
-              //             }
-              //             return `suffix${suffixType}:${suffixDetail}`
-              //           })
-              //       ))
-              //   )
-              // }
-
-              if(/^lemma:/.test(rawDetail)) {
-                const lemma = rawDetail.split(':')[1]
-                return {
-                  detail: rawDetail,
-                  matches: wordInfo => wordInfo[3] === lemma,
-                  avgRowSizeInKB: 7,
-                }
-              }
-
-              if(/^form:/.test(rawDetail)) {
-                const form = rawDetail.split(':')[1]
-                return {
-                  detail: rawDetail,
-                  matches: wordInfo => wordInfo[1] === form,
-                  avgRowSizeInKB: 5,
-                }
-              }
-
-              if(hebrewPrefixSuffixMap[rawDetail]) {
-                return hebrewPrefixSuffixMap[rawDetail]
-              }
-
-              if(grammaticalDetailMap[rawDetail]) {
-                return grammaticalDetailMap[rawDetail]
-              }
-
-return {
-  detail: rawDetail,
-  matches: wordInfo => true,
-  avgRowSizeInKB: 1,
-}
-
-              throw `unknown search token detail: ${rawDetail}`
 
             })
-            // .flat(2)
         )
 
         // extract the wordDetail with the fewest likely hits; the rest should be used in getWordNumbersMatchingAllWordDetails
         wordDetails.sort((a, b) => a.avgRowSizeInKB > b.avgRowSizeInKB ? 1 : -1)
         wordDetailsArray.push({ word, primaryDetail: wordDetails[0].detail })
-        matchesAddlDetailsByWord[word] = wordInfo => wordDetails.slice(1).every(({ matches }) => matches(wordInfo))
+        const wordDetailsToCheck = (
+          wordDetails[0].forceMatchOnWordDetails
+            ? wordDetails
+            : wordDetails.slice(1)
+        )
+        const wordDetailsToCheckLength = wordDetailsToCheck.length
+        matchesAddlDetailsByWord[word] = wordInfo => (
+          wordDetailsToCheckLength > 1
+            ? wordDetailsToCheck.every(({ matches }) => matches(wordInfo))
+            : (
+              wordDetailsToCheckLength === 0
+                ? true
+                : wordDetailsToCheck[0].matches(wordInfo)
+            )
+        )
 
       } else if(word[0] === '=') {
         // TODO
