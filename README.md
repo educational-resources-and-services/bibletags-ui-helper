@@ -214,6 +214,10 @@ bibleSearch({ query, flags, hebrewOrdering, offset, limit, getVersions, getUnitW
 getQueryAndFlagInfo({ query, FLAG_MAP={} }): Object
 ```
 
+```js
+getInfoOnResultLocs({ resultsNeedingUsfm, lookupVersionInfo }): Object
+```
+
 ## Constants exposed
 
 ```js
