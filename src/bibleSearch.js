@@ -22,6 +22,53 @@ const getLengthOfAllScopeMaps = (wordAlts, lookForIsNot) => (
     )
 )
 
+export const getInfoOnResultLocs = ({ resultsNeedingUsfm, lookupVersionInfo }) => {
+
+  const versionResultsNeedingUsfmByLoc = {}
+  const locs = resultsNeedingUsfm
+    .map(({ originalLoc, versionResults }) => {
+      let [ originalFromLoc, originalToLoc ] = originalLoc.split('-')
+
+      const originalLocsForThisResult = (
+        (!originalToLoc || originalFromLoc === originalToLoc)
+          ? [ originalFromLoc ]
+          : getOriginalLocsFromRange(originalFromLoc, originalToLoc)
+      )
+
+      const locsForThisResult = (
+        originalLocsForThisResult
+          .map(originalLoc => {
+
+            const refs = getCorrespondingRefs({
+              baseVersion: {
+                info: {
+                  versificationModel: 'original',
+                },
+                ref: getRefFromLoc(originalLoc),
+              },
+              lookupVersionInfo,
+            })
+            const locs = refs.map(ref => getLocFromRef(ref).split(':')[0])
+
+            locs.forEach(loc => {
+              versionResultsNeedingUsfmByLoc[loc] = versionResults
+            })
+
+            return locs
+          })
+          .flat()
+      )
+
+      return locsForThisResult
+    })
+    .flat()
+
+  return {
+    locs,
+    versionResultsNeedingUsfmByLoc,
+  }
+}
+
 export const getQueryAndFlagInfo = ({ query, FLAG_MAP={} }) => {
 
   // extract special query flags
@@ -556,52 +603,12 @@ export const bibleSearch = async ({
   await Promise.all(Object.keys(resultsByVersionIdNeedingUsfm).map(async versionId => {
 
     const resultsNeedingUsfm = resultsByVersionIdNeedingUsfm[versionId]
-    const versionResultNeedingUsfmByLoc = {}
-
-    const locs = (
-      resultsNeedingUsfm
-        .map(({ originalLoc, versionResults }) => {
-          let [ originalFromLoc, originalToLoc ] = originalLoc.split('-')
-
-          const originalLocsForThisResult = (
-            (!originalToLoc || originalFromLoc === originalToLoc)
-              ? [ originalFromLoc ]
-              : getOriginalLocsFromRange(originalFromLoc, originalToLoc)
-          )
-
-          const locsForThisResult = (
-            originalLocsForThisResult
-              .map(originalLoc => {
-
-                const refs = getCorrespondingRefs({
-                  baseVersion: {
-                    info: {
-                      versificationModel: 'original',
-                    },
-                    ref: getRefFromLoc(originalLoc),
-                  },
-                  lookupVersionInfo: versionById[versionId],
-                })
-                const locs = refs.map(ref => getLocFromRef(ref).split(':')[0])
-
-                locs.forEach(loc => {
-                  versionResultNeedingUsfmByLoc[loc] = versionResults[0]
-                })
-
-                return locs
-              })
-              .flat()
-          )
-
-          return locsForThisResult
-        })
-        .flat()
-    )
+    const { locs, versionResultsNeedingUsfmByLoc } = getInfoOnResultLocs({ resultsNeedingUsfm, lookupVersionInfo: versionById[versionId] })
 
     const verses = await getVerses({ versionId, locs })
 
     verses.forEach(({ loc, usfm }) => {
-      versionResultNeedingUsfmByLoc[loc].usfm.push(usfm)
+      versionResultsNeedingUsfmByLoc[loc][0].usfm.push(usfm)
     })
 
   }))
