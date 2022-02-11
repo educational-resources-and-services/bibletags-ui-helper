@@ -371,9 +371,15 @@ export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
 
     })
 
-    getWordNumbersMatchingAllWordDetails = ({ word, infoObjOrWordNumbers }) => (
+    getWordNumbersMatchingAllWordDetails = ({ word, infoObjOrWordNumbers, includeVariants }) => (
       infoObjOrWordNumbers
-        .filter(wordInfo => matchesAddlDetailsByWord[word](wordInfo))
+        .filter(wordInfo => (
+          (
+            includeVariants
+            || wordInfo[0] !== null  // i.e. it is not a variant
+          )
+          && matchesAddlDetailsByWord[word](wordInfo)
+        ))
         .map(wordInfo => wordInfo[0])
     )
 

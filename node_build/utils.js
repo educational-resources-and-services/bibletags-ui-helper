@@ -400,9 +400,11 @@ var getWordDetails = function getWordDetails(_ref) {
 
     getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref9) {
       var word = _ref9.word,
-          infoObjOrWordNumbers = _ref9.infoObjOrWordNumbers;
+          infoObjOrWordNumbers = _ref9.infoObjOrWordNumbers,
+          includeVariants = _ref9.includeVariants;
       return infoObjOrWordNumbers.filter(function (wordInfo) {
-        return matchesAddlDetailsByWord[word](wordInfo);
+        return (includeVariants || wordInfo[0] !== null // i.e. it is not a variant
+        ) && matchesAddlDetailsByWord[word](wordInfo);
       }).map(function (wordInfo) {
         return wordInfo[0];
       });

@@ -135,28 +135,36 @@ var bibleSearch = /*#__PURE__*/function () {
             throw "in flag contains mixed original and translation versionIds";
 
           case 10:
-            if (!(versionIds.length > maxNumVersion)) {
+            if (!(includeVariants && !isOriginalLanguageSearch)) {
               _context5.next = 12;
+              break;
+            }
+
+            throw "include:variants only allowed for original language searches";
+
+          case 12:
+            if (!(versionIds.length > maxNumVersion)) {
+              _context5.next = 14;
               break;
             }
 
             throw "exceeded maximum number of versions";
 
-          case 12:
-            _context5.next = 14;
+          case 14:
+            _context5.next = 16;
             return getVersions(versionIds);
 
-          case 14:
+          case 16:
             versions = _context5.sent;
 
             if (!(versionIds.length !== versions.length)) {
-              _context5.next = 17;
+              _context5.next = 19;
               break;
             }
 
             throw "one or more invalid versions";
 
-          case 17:
+          case 19:
             _flags$same = flags.same, same = _flags$same === void 0 ? "verse" : _flags$same;
 
             if (isOriginalLanguageSearch && same === "verse") {
@@ -164,13 +172,13 @@ var bibleSearch = /*#__PURE__*/function () {
             }
 
             if (!(!isOriginalLanguageSearch && versionIds.length > 1 && same !== "verse")) {
-              _context5.next = 21;
+              _context5.next = 23;
               break;
             }
 
             throw "forbidden to search multiple versions when not using same:verse for the range";
 
-          case 21:
+          case 23:
             _getQueryArrayAndWord = (0, _utils.getQueryArrayAndWords)(query), queryArray = _getQueryArrayAndWord.queryArray, queryWords = _getQueryArrayAndWord.queryWords;
             stackedResultsByBookId = Array(1 + 66).fill().map(function () {
               return [];
@@ -186,7 +194,7 @@ var bibleSearch = /*#__PURE__*/function () {
               isOriginalLanguageSearch: isOriginalLanguageSearch
             }), wordDetailsArray = _getWordDetails.wordDetailsArray, getWordNumbersMatchingAllWordDetails = _getWordDetails.getWordNumbersMatchingAllWordDetails;
             allRows = [];
-            _context5.next = 33;
+            _context5.next = 35;
             return Promise.all(versions.map( /*#__PURE__*/function () {
               var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(version) {
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
@@ -269,15 +277,15 @@ var bibleSearch = /*#__PURE__*/function () {
               };
             }()));
 
-          case 33:
+          case 35:
             if (!(getLengthOfAllScopeMaps(allRows) > 100000)) {
-              _context5.next = 35;
+              _context5.next = 37;
               break;
             }
 
             throw "Search exceeds maximum complexity";
 
-          case 35:
+          case 37:
             // for each version, in order
             versionIds.forEach(function (versionId) {
               var evaluateGroup = function evaluateGroup(group) {
@@ -412,7 +420,8 @@ var bibleSearch = /*#__PURE__*/function () {
                         if (isNot || scopeMap[scopeKey]) {
                           var wordNumbersMatchingAllWordDetails = scopeMap[scopeKey] ? getWordNumbersMatchingAllWordDetails({
                             word: word,
-                            infoObjOrWordNumbers: scopeMap[scopeKey]
+                            infoObjOrWordNumbers: scopeMap[scopeKey],
+                            includeVariants: includeVariants
                           }) : [0] // this is a hit, but its wordNumber doesn't matter
                           ;
 
@@ -584,7 +593,7 @@ var bibleSearch = /*#__PURE__*/function () {
             results = stackedResultsByBookId.flat().slice(offset, offset + limit);
 
             if (!(same !== 'verse')) {
-              _context5.next = 53;
+              _context5.next = 55;
               break;
             }
 
@@ -597,7 +606,7 @@ var bibleSearch = /*#__PURE__*/function () {
               resultNeedingOriginalLocById[id] = result;
             });
             versionIdsToGetUnitRangesFrom = isOriginalLanguageSearch ? versionIds : versionIds.slice(0, 1);
-            _context5.next = 53;
+            _context5.next = 55;
             return Promise.all(versionIdsToGetUnitRangesFrom.map( /*#__PURE__*/function () {
               var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(versionId) {
                 var unitRanges;
@@ -632,7 +641,7 @@ var bibleSearch = /*#__PURE__*/function () {
               };
             }()));
 
-          case 53:
+          case 55:
             doClocking && (0, _utils.clock)("Get usfm for result being returned");
             resultsByVersionIdNeedingUsfm = [];
             results.forEach(function (result) {
@@ -640,7 +649,7 @@ var bibleSearch = /*#__PURE__*/function () {
               resultsByVersionIdNeedingUsfm[versionId] = resultsByVersionIdNeedingUsfm[versionId] || [];
               resultsByVersionIdNeedingUsfm[versionId].push(result);
             });
-            _context5.next = 58;
+            _context5.next = 60;
             return Promise.all(Object.keys(resultsByVersionIdNeedingUsfm).map( /*#__PURE__*/function () {
               var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(versionId) {
                 var resultsNeedingUsfm, versionResultNeedingUsfmByLoc, locs, verses;
@@ -707,7 +716,7 @@ var bibleSearch = /*#__PURE__*/function () {
               };
             }()));
 
-          case 58:
+          case 60:
             results.forEach(function (result) {
               result.versionResults[0].usfm = result.versionResults[0].usfm.join("\n");
             });
@@ -726,7 +735,7 @@ var bibleSearch = /*#__PURE__*/function () {
               otherSuggestedQueries: []
             });
 
-          case 61:
+          case 63:
           case "end":
             return _context5.stop();
         }

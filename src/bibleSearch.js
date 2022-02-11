@@ -106,6 +106,8 @@ export const bibleSearch = async ({
 
   if(isOriginalLanguageSearch && !versionIds.every(versionId => originalVersionIds.includes(versionId))) throw `in flag contains mixed original and translation versionIds`
 
+  if(includeVariants && !isOriginalLanguageSearch) throw `include:variants only allowed for original language searches`
+
   if(versionIds.length > maxNumVersion) throw `exceeded maximum number of versions`
 
   const versions = await getVersions(versionIds)
@@ -346,7 +348,7 @@ export const bibleSearch = async ({
               if(isNot || scopeMap[scopeKey]) {
                 const wordNumbersMatchingAllWordDetails = (
                   scopeMap[scopeKey]
-                    ? getWordNumbersMatchingAllWordDetails({ word, infoObjOrWordNumbers: scopeMap[scopeKey] })
+                    ? getWordNumbersMatchingAllWordDetails({ word, infoObjOrWordNumbers: scopeMap[scopeKey], includeVariants })
                     : [ 0 ]  // this is a hit, but its wordNumber doesn't matter
                 )
 
