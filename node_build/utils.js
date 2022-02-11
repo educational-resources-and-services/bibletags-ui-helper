@@ -7,6 +7,12 @@ exports.mergeAndUniquifyArraysOfScopeKeys = exports.getWordDetails = exports.get
 
 var _constants = require("./constants");
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -131,7 +137,7 @@ var getQueryArrayAndWords = function getQueryArrayAndWords(query) {
     var queryArray = JSON.parse("[".concat(query // next line: put space around chinese and japanese characters to treat them as separate words
     .replace(/([\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f])/g, ' $1 ').replace(/"/g, ',"\\"",').replace(/([^ ()",\\]+)/g, '"$1"').replace(/\(\)]/g, "").replace(/ +/g, ",").replace(/,,+/g, ",").replace(/\(/g, "[").replace(/\)/g, "]"), "]").replace(/\[,/g, "[").replace(/,]/g, "]"));
 
-    var furtherParseQueryArray = function furtherParseQueryArray(array) {
+    var furtherParseQueryArray = function furtherParseQueryArray(array, withinExactPhrase) {
       // handle parentheses
       array.forEach(function (item, idx) {
         while (item instanceof Array && item.filter(function (i) {
@@ -144,7 +150,9 @@ var getQueryArrayAndWords = function getQueryArrayAndWords(query) {
         }
 
         if (item instanceof Array) {
-          furtherParseQueryArray(item);
+          furtherParseQueryArray(item, withinExactPhrase || array.some(function (i) {
+            return i === '"';
+          }));
         }
 
         if (typeof item === 'string' && /^[^".+*]+[*+~]?$/.test(item) && item !== '/' && !queryWords.includes(item)) {
@@ -204,7 +212,13 @@ var getQueryArrayAndWords = function getQueryArrayAndWords(query) {
 
       if (array.find(function (item) {
         return ['*', '...'].includes(item);
-      }) && array[0] !== '"') throw "* and ... can only be used within quotation marks";
+      }) && array[0] !== '"') throw "* and ... can only be used within quotation marks"; // first word of exact phrase cannot be #not:__ without any positive detail
+
+      if (array[0] === '"' && /^(?:#not:[^#]+)+$/.test(array[1])) throw "first word of exact phrase cannot be #not:__ without any positive detail"; // subqueries of exact phrases cannot contain word represented by #not:__ without any positive detail
+
+      if (withinExactPhrase && array.some(function (item) {
+        return /^(?:#not:[^#]+)+$/.test(item);
+      })) throw "exact phrases cannot contain groups with words represented by #not:__ without any positive detail";
     };
 
     furtherParseQueryArray(queryArray);
@@ -247,6 +261,9 @@ var getWordDetails = function getWordDetails(_ref) {
       if (word[0] === '#') {
         var wordDetails = word.slice(1).split('#').map(function (rawDetails) {
           // convert form of details
+          var isNot = /^not:/.test(rawDetails);
+          rawDetails = rawDetails.replace(/^not:/, '');
+
           var _ref2 = rawDetails.match(/^([^:]+):/) || [],
               _ref3 = _slicedToArray(_ref2, 2),
               x = _ref3[0],
@@ -325,7 +342,9 @@ var getWordDetails = function getWordDetails(_ref) {
           });
 
           if (returnObjs.length === 1) {
-            return returnObjs[0];
+            return _objectSpread(_objectSpread({}, returnObjs[0]), {}, {
+              isNot: isNot
+            });
           } else {
             return {
               detail: returnObjs.map(function (_ref4) {
@@ -347,26 +366,29 @@ var getWordDetails = function getWordDetails(_ref) {
               forceMatchOnWordDetails: returnObjs.some(function (_ref7) {
                 var forceMatchOnWordDetails = _ref7.forceMatchOnWordDetails;
                 return forceMatchOnWordDetails;
-              })
+              }),
+              isNot: isNot
             };
           }
         }); // extract the wordDetail with the fewest likely hits; the rest should be used in getWordNumbersMatchingAllWordDetails
 
         wordDetails.sort(function (a, b) {
-          return a.avgRowSizeInKB > b.avgRowSizeInKB ? 1 : -1;
+          return a.isNot || a.avgRowSizeInKB > b.avgRowSizeInKB ? 1 : -1;
         });
         wordDetailsArray.push({
           word: word,
-          primaryDetail: wordDetails[0].detail
+          primaryDetail: wordDetails[0].detail,
+          isNot: wordDetails[0].isNot
         });
         var wordDetailsToCheck = wordDetails[0].forceMatchOnWordDetails ? wordDetails : wordDetails.slice(1);
         var wordDetailsToCheckLength = wordDetailsToCheck.length;
 
         matchesAddlDetailsByWord[word] = function (wordInfo) {
           return wordDetailsToCheckLength > 1 ? wordDetailsToCheck.every(function (_ref8) {
-            var matches = _ref8.matches;
-            return matches(wordInfo);
-          }) : wordDetailsToCheckLength === 0 ? true : wordDetailsToCheck[0].matches(wordInfo);
+            var matches = _ref8.matches,
+                isNot = _ref8.isNot;
+            return matches(wordInfo) === !isNot;
+          }) : wordDetailsToCheckLength === 0 ? !wordDetails[0].isNot : wordDetailsToCheck[0].matches(wordInfo) === !wordDetailsToCheck[0].isNot;
         };
       } else if (word[0] === '=') {
         // TODO

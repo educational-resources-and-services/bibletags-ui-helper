@@ -111,7 +111,7 @@ export const getQueryArrayAndWords = query => {
         .replace(/,]/g, "]")
     )
 
-    const furtherParseQueryArray = array => {
+    const furtherParseQueryArray = (array, withinExactPhrase) => {
 
       // handle parentheses
       array.forEach((item, idx) => {
@@ -120,7 +120,7 @@ export const getQueryArrayAndWords = query => {
           array[idx] = item = item.filter(i => i !== '"')[0]
         }
         if(item instanceof Array) {
-          furtherParseQueryArray(item)
+          furtherParseQueryArray(item, withinExactPhrase || array.some(i => i === '"'))
         }
         if(
           typeof item === 'string'
@@ -195,6 +195,18 @@ export const getQueryArrayAndWords = query => {
         && array[0] !== '"'
       ) throw `* and ... can only be used within quotation marks`
 
+      // first word of exact phrase cannot be #not:__ without any positive detail
+      if(
+        array[0] === '"'
+        && /^(?:#not:[^#]+)+$/.test(array[1])
+      ) throw `first word of exact phrase cannot be #not:__ without any positive detail`
+
+      // subqueries of exact phrases cannot contain word represented by #not:__ without any positive detail
+      if(
+        withinExactPhrase
+        && array.some(item => /^(?:#not:[^#]+)+$/.test(item))
+      ) throw `exact phrases cannot contain groups with words represented by #not:__ without any positive detail`
+
     }
     furtherParseQueryArray(queryArray)
 
@@ -238,6 +250,8 @@ export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
             .map(rawDetails => {
               // convert form of details
 
+              const isNot = /^not:/.test(rawDetails)
+              rawDetails = rawDetails.replace(/^not:/, '')
               const [ x, colonDetailType ] = rawDetails.match(/^([^:]+):/) || []
               const returnObjs = rawDetails.replace(/^[^:]+:/, '').split('/').map(rawDetail => {
 
@@ -310,7 +324,10 @@ export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
               })
 
               if(returnObjs.length === 1) {
-                return returnObjs[0]
+                return {
+                  ...returnObjs[0],
+                  isNot,
+                }
 
               } else {
                 return {
@@ -318,6 +335,7 @@ export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
                   matches: wordInfo => returnObjs.some(({ matches }) => matches(wordInfo)),
                   avgRowSizeInKB: returnObjs.map(({ avgRowSizeInKB }) => avgRowSizeInKB).reduce((a,b) => a+b, 0) / returnObjs.length,
                   forceMatchOnWordDetails: returnObjs.some(({ forceMatchOnWordDetails }) => forceMatchOnWordDetails),
+                  isNot,
                 }
               }
 
@@ -325,8 +343,8 @@ export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
         )
 
         // extract the wordDetail with the fewest likely hits; the rest should be used in getWordNumbersMatchingAllWordDetails
-        wordDetails.sort((a, b) => a.avgRowSizeInKB > b.avgRowSizeInKB ? 1 : -1)
-        wordDetailsArray.push({ word, primaryDetail: wordDetails[0].detail })
+        wordDetails.sort((a, b) => (a.isNot || a.avgRowSizeInKB > b.avgRowSizeInKB) ? 1 : -1)
+        wordDetailsArray.push({ word, primaryDetail: wordDetails[0].detail, isNot: wordDetails[0].isNot })
         const wordDetailsToCheck = (
           wordDetails[0].forceMatchOnWordDetails
             ? wordDetails
@@ -335,11 +353,11 @@ export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
         const wordDetailsToCheckLength = wordDetailsToCheck.length
         matchesAddlDetailsByWord[word] = wordInfo => (
           wordDetailsToCheckLength > 1
-            ? wordDetailsToCheck.every(({ matches }) => matches(wordInfo))
+            ? wordDetailsToCheck.every(({ matches, isNot }) => matches(wordInfo) === !isNot)
             : (
               wordDetailsToCheckLength === 0
-                ? true
-                : wordDetailsToCheck[0].matches(wordInfo)
+                ? !wordDetails[0].isNot
+                : wordDetailsToCheck[0].matches(wordInfo) === !wordDetailsToCheck[0].isNot
             )
         )
 

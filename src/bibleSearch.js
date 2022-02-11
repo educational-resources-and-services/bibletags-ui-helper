@@ -1,13 +1,19 @@
 import "regenerator-runtime/runtime.js"
 import { getOriginalLocsFromRange, getCorrespondingRefs, getRefFromLoc, getLocFromRef } from '@bibletags/bibletags-versification'
 
-import { bibleSearchScopes } from './constants.js'
+import { bibleSearchScopes, allVerseNumberScopeKeysByBookId } from './constants.js'
 import { mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock, getWordDetails } from './utils'
 
 const WILD_CARD_LIMIT = 100
 
-const getLengthOfAllScopeMaps = wordAlts => (
-  [ '*', '...' ].includes(wordAlts)
+const getLengthOfAllScopeMaps = (wordAlts, lookForIsNot) => (
+  (
+    [ '*', '...' ].includes(wordAlts)
+    || (
+      lookForIsNot
+      && (wordAlts[0] || {}).isNot
+    )
+  )
     ? Infinity
     : (
       wordAlts.scopeKeys
@@ -134,7 +140,7 @@ export const bibleSearch = async ({
 
     // get a row with scope map for each word
     wordResultsByVersionId[version.id] = {}
-    await Promise.all(wordDetailsArray.map(async ({ word, primaryDetail }) => {
+    await Promise.all(wordDetailsArray.map(async ({ word, primaryDetail, isNot }) => {
 
       const unitWordRows = await getUnitWords({
         versionId: version.id,
@@ -151,6 +157,7 @@ export const bibleSearch = async ({
       unitWordRows.forEach(row => {
         row.scopeMap = JSON.parse(row.scopeMap)
         row.word = word
+        row.isNot = isNot
         if(Object.values(bookIds).length > 0) {
           for(let scopeKey in row.scopeMap) {
             if(
@@ -199,8 +206,34 @@ export const bibleSearch = async ({
       doClocking && clock(`Get scopeKeys for eval of group: ${group.map(i => typeof i === 'string' ? i : '[]').join(" ")} (${versionId})`)
 
       let scopeKeysToExamine
+      const noWordsHavePositiveDetails = subqueryAndWordResults.every(rowsOrResultObj => (rowsOrResultObj[0] || {}).isNot)
+      const someWordsHaveNoPositiveDetails = subqueryAndWordResults.some(rowsOrResultObj => (rowsOrResultObj[0] || {}).isNot)
 
-      if(isOr) {
+      if(noWordsHavePositiveDetails || (isOr && someWordsHaveNoPositiveDetails)) {
+
+        scopeKeysToExamine = (
+          allVerseNumberScopeKeysByBookId
+            .filter((scopeKeys, bookId) => (
+              (
+                Object.values(bookIds).length === 0
+                || bookIds.includes(bookId)
+              )
+              && (
+                !versionById[versionId].partialScope
+                || (
+                  versionById[versionId].partialScope === 'ot'
+                  && bookId <= 39
+                )
+                || (
+                  versionById[versionId].partialScope === 'nt'
+                  && bookId >= 40
+                )
+              )
+            ))
+            .flat()
+        )
+
+      } else if(isOr) {
 
         scopeKeysToExamine = mergeAndUniquifyArraysOfScopeKeys(
           ...(
@@ -217,7 +250,7 @@ export const bibleSearch = async ({
       } else {  // it is a normal AND or an exact phrase
 
         const shortestSubqueryAndWordResult = subqueryAndWordResults.slice(1).reduce(
-          (a, b) => getLengthOfAllScopeMaps(a) < getLengthOfAllScopeMaps(b) ? a : b,
+          (a, b) => getLengthOfAllScopeMaps(a, true) < getLengthOfAllScopeMaps(b, true) ? a : b,
           subqueryAndWordResults[0],
         )
         scopeKeysToExamine = (
@@ -308,10 +341,14 @@ export const bibleSearch = async ({
             }
 
           } else {
-            subqueryOrWordResult.forEach(({ scopeMap, word }) => {
+            subqueryOrWordResult.forEach(({ scopeMap, word, isNot }) => {
 
-              if(scopeMap[scopeKey]) {
-                const wordNumbersMatchingAllWordDetails = getWordNumbersMatchingAllWordDetails({ word, infoObjOrWordNumbers: scopeMap[scopeKey] })
+              if(isNot || scopeMap[scopeKey]) {
+                const wordNumbersMatchingAllWordDetails = (
+                  scopeMap[scopeKey]
+                    ? getWordNumbersMatchingAllWordDetails({ word, infoObjOrWordNumbers: scopeMap[scopeKey] })
+                    : [ 0 ]  // this is a hit, but its wordNumber doesn't matter
+                )
 
                 if(isFirstItemInGroup) {
                   if(isOr) {
@@ -328,14 +365,16 @@ export const bibleSearch = async ({
                       if(numWordsInGroup - idx >= minimumNumHits) updatedHits.push([ wordNumber ])
                     } else if(isExactPhrase) {
                       hits.forEach(hit => {
+                        const soughtWordNumber = hit[1] + 1 + exactPhrasePlaceholderSpotsToShift
                         if(
-                          wordNumber === hit[1] + 1 + exactPhrasePlaceholderSpotsToShift
+                          wordNumber === 0  // i.e. is #not:__ hit
+                          || wordNumber === soughtWordNumber
                           || (
                             doExactPhraseFollowedBy
                             && wordNumber > hit[1]
                           )
                         ) {
-                          updatedHits.push([ hit[0], wordNumber ])
+                          updatedHits.push([ hit[0], wordNumber || soughtWordNumber ])
                           thisWordNumberIsPossibleHit = true
                         }
                       })
@@ -493,11 +532,13 @@ export const bibleSearch = async ({
       resultNeedingOriginalLocById[id] = result
     })
 
-    const unitRanges = await getUnitRanges({ versionId: versionIds[0], ids })
-
-    unitRanges.forEach(({ id, originalLoc }) => {
-      resultNeedingOriginalLocById[id].originalLoc = originalLoc
-    })
+    const versionIdsToGetUnitRangesFrom = isOriginalLanguageSearch ? versionIds : versionIds.slice(0, 1)
+    await Promise.all(versionIdsToGetUnitRangesFrom.map(async versionId => {
+      const unitRanges = await getUnitRanges({ versionId, ids })
+      unitRanges.forEach(({ id, originalLoc }) => {
+        resultNeedingOriginalLocById[id].originalLoc = originalLoc
+      })
+    }))
 
   }
 
