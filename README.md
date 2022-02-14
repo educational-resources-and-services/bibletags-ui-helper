@@ -218,6 +218,26 @@ getQueryAndFlagInfo({ query, FLAG_MAP={} }): Object
 getInfoOnResultLocs({ resultsNeedingUsfm, lookupVersionInfo }): Object
 ```
 
+```js
+containsHebrewChars(str): Boolean
+```
+
+```js
+containsGreekChars(str): Boolean
+```
+
+```js
+stripGreekAccents(str): String
+```
+
+```js
+stripHebrewVowelsEtc(str): String
+```
+
+```js
+stripVocalOfAccents(str): String
+```
+
 ## Constants exposed
 
 ```js

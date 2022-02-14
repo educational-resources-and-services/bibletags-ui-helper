@@ -1,8 +1,8 @@
-import "regenerator-runtime/runtime.js"
-import { getOriginalLocsFromRange, getCorrespondingRefs, getRefFromLoc, getLocFromRef } from '@bibletags/bibletags-versification'
+import "regenerator-runtime/runtime.js"  // needed to build-for-node given async functions
 
 import { bibleSearchScopes, allVerseNumberScopeKeysByBookId } from './constants.js'
 import { mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock, getWordDetails } from './utils'
+import { getInfoOnResultLocs } from './bibleSearchUtils'
 
 const WILD_CARD_LIMIT = 100
 
@@ -21,99 +21,6 @@ const getLengthOfAllScopeMaps = (wordAlts, lookForIsNot) => (
         : wordAlts.reduce((total, { scopeMap }) => total + Object.values(scopeMap).length, 0)
     )
 )
-
-export const getInfoOnResultLocs = ({ resultsNeedingUsfm, lookupVersionInfo }) => {
-
-  const versionResultsNeedingUsfmByLoc = {}
-  const locs = resultsNeedingUsfm
-    .map(({ originalLoc, versionResults }) => {
-      let [ originalFromLoc, originalToLoc ] = originalLoc.split('-')
-
-      const originalLocsForThisResult = (
-        (!originalToLoc || originalFromLoc === originalToLoc)
-          ? [ originalFromLoc ]
-          : getOriginalLocsFromRange(originalFromLoc, originalToLoc)
-      )
-
-      const locsForThisResult = (
-        originalLocsForThisResult
-          .map(originalLoc => {
-
-            const refs = getCorrespondingRefs({
-              baseVersion: {
-                info: {
-                  versificationModel: 'original',
-                },
-                ref: getRefFromLoc(originalLoc),
-              },
-              lookupVersionInfo,
-            })
-            const locs = refs.map(ref => getLocFromRef(ref).split(':')[0])
-
-            locs.forEach(loc => {
-              versionResultsNeedingUsfmByLoc[loc] = versionResults
-            })
-
-            return locs
-          })
-          .flat()
-      )
-
-      return locsForThisResult
-    })
-    .flat()
-
-  return {
-    locs,
-    versionResultsNeedingUsfmByLoc,
-  }
-}
-
-export const getQueryAndFlagInfo = ({ query, FLAG_MAP={} }) => {
-
-  // extract special query flags
-  const flags = {}
-  const flagRegex = /(\s|^)([-a-z]+:(?:[:-\w,/]+))(?=\s|$)/i
-
-  query = (query || "")
-    .split(flagRegex)
-    .filter(piece => {
-
-      if(flagRegex.test(piece)) {
-        let [ flag, ...flagValuePieces ] = piece.split(':')
-        let flagValue = flagValuePieces.join(':')
-
-        if(FLAG_MAP[flag]) {
-          const { multiValue, possibleValues } = FLAG_MAP[flag]
-          const flagValues = flagValue.split(/[\/,]/g)
-
-          if(
-            !possibleValues
-            || flagValues.every(val => (
-              val instanceof RegExp
-                ? val.test(val)
-                : val.includes(val)
-            ))
-          ) {
-            if(flags[flag] && multiValue) {
-              flags[flag].push(...flagValues)
-            } else {
-              flags[flag] = multiValue ? flagValues : flagValue
-            }
-            return false
-          }
-        }
-      }
-
-      return true
-
-    })
-    .join('')
-    .replace(/  +/g, ' ')
-    .trim()
-
-  return { query, flags }
-}
 
 export const bibleSearch = async ({
   query,
