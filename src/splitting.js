@@ -1,7 +1,7 @@
 import usfmJS from 'usfm-js'
 // import rewritePattern  from 'regexpu-core'
 
-import i18n from './i18n.js'
+import i18n from './i18n'
 import { defaultWordDividerRegex } from './constants'
 
 export const blockUsfmMarkers = [

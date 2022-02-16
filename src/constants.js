@@ -108,6 +108,15 @@ export const bibleSearchScopes = {
 
 }
 
+const otBibleSearchScopeKeys = Object.keys(bibleSearchScopes).filter(key => bibleSearchScopes[key].some(bookId => bookId <= 39))
+const ntBibleSearchScopeKeys = Object.keys(bibleSearchScopes).filter(key => bibleSearchScopes[key].some(bookId => bookId >= 40))
+
+export const bibleSearchScopeKeysByTestament = {
+  ot: otBibleSearchScopeKeys,
+  nt: ntBibleSearchScopeKeys,
+  both: [ ...otBibleSearchScopeKeys, ...ntBibleSearchScopeKeys ],
+}
+
 const getHebrewPrefixSuffixMapValue = (dataTerm, avgRowSizeInKB) => {
   const wordInfoChar = dataTerm.slice(-1)
   return {

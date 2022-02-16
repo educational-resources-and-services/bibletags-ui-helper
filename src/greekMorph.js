@@ -1,4 +1,4 @@
-import i18n from './i18n.js'
+import i18n from './i18n'
 
 const getPosTerm = code => {
   switch(code) {

@@ -393,3 +393,19 @@ export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
   return { wordDetailsArray, getWordNumbersMatchingAllWordDetails }
 
 }
+
+export const getLengthOfAllScopeMaps = (wordAlts, lookForIsNot) => (
+  (
+    [ '*', '...' ].includes(wordAlts)
+    || (
+      lookForIsNot
+      && (wordAlts[0] || {}).isNot
+    )
+  )
+    ? Infinity
+    : (
+      wordAlts.scopeKeys
+        ? wordAlts.scopeKeys.length
+        : wordAlts.reduce((total, { scopeMap }) => total + Object.values(scopeMap).length, 0)
+    )
+)

@@ -1,26 +1,10 @@
 import "regenerator-runtime/runtime.js"  // needed to build-for-node given async functions
 
-import { bibleSearchScopes, allVerseNumberScopeKeysByBookId } from './constants.js'
-import { mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock, getWordDetails } from './utils'
+import { bibleSearchScopes, allVerseNumberScopeKeysByBookId } from './constants'
+import { mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock, getWordDetails, getLengthOfAllScopeMaps } from './utils'
 import { getInfoOnResultLocs } from './bibleSearchUtils'
 
 const WILD_CARD_LIMIT = 100
-
-const getLengthOfAllScopeMaps = (wordAlts, lookForIsNot) => (
-  (
-    [ '*', '...' ].includes(wordAlts)
-    || (
-      lookForIsNot
-      && (wordAlts[0] || {}).isNot
-    )
-  )
-    ? Infinity
-    : (
-      wordAlts.scopeKeys
-        ? wordAlts.scopeKeys.length
-        : wordAlts.reduce((total, { scopeMap }) => total + Object.values(scopeMap).length, 0)
-    )
-)
 
 export const bibleSearch = async ({
   query,
