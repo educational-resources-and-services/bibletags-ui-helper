@@ -3,7 +3,20 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.maxVerseNumberByBookId = exports.hebrewPrefixSuffixMap = exports.grammaticalDetailMap = exports.defaultWordDividerRegex = exports.bibleSearchScopes = exports.bibleSearchFlagMap = exports.allVerseNumberScopeKeysByBookId = void 0;
+exports.maxVerseNumberByBookId = exports.hebrewPrefixSuffixMap = exports.grammaticalDetailMap = exports.defaultWordDividerRegex = exports.bibleSearchScopes = exports.bibleSearchScopeKeysByTestament = exports.bibleSearchFlagMap = exports.allVerseNumberScopeKeysByBookId = void 0;
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 var bibleSearchFlagMap = {
   "in": {
     multiValue: true
@@ -105,6 +118,22 @@ var bibleSearchScopes = {
   "Rev": [66]
 };
 exports.bibleSearchScopes = bibleSearchScopes;
+var otBibleSearchScopeKeys = Object.keys(bibleSearchScopes).filter(function (key) {
+  return bibleSearchScopes[key].some(function (bookId) {
+    return bookId <= 39;
+  });
+});
+var ntBibleSearchScopeKeys = Object.keys(bibleSearchScopes).filter(function (key) {
+  return bibleSearchScopes[key].some(function (bookId) {
+    return bookId >= 40;
+  });
+});
+var bibleSearchScopeKeysByTestament = {
+  ot: otBibleSearchScopeKeys,
+  nt: ntBibleSearchScopeKeys,
+  both: [].concat(_toConsumableArray(otBibleSearchScopeKeys), _toConsumableArray(ntBibleSearchScopeKeys))
+};
+exports.bibleSearchScopeKeysByTestament = bibleSearchScopeKeysByTestament;
 
 var getHebrewPrefixSuffixMapValue = function getHebrewPrefixSuffixMapValue(dataTerm, avgRowSizeInKB) {
   var wordInfoChar = dataTerm.slice(-1);

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.mergeAndUniquifyArraysOfScopeKeys = exports.getWordDetails = exports.getQueryArrayAndWords = exports.clock = void 0;
+exports.mergeAndUniquifyArraysOfScopeKeys = exports.getWordDetails = exports.getQueryArrayAndWords = exports.getLengthOfAllScopeMaps = exports.clock = void 0;
 
 var _constants = require("./constants");
 
@@ -431,3 +431,12 @@ var getWordDetails = function getWordDetails(_ref) {
 };
 
 exports.getWordDetails = getWordDetails;
+
+var getLengthOfAllScopeMaps = function getLengthOfAllScopeMaps(wordAlts, lookForIsNot) {
+  return ['*', '...'].includes(wordAlts) || lookForIsNot && (wordAlts[0] || {}).isNot ? Infinity : wordAlts.scopeKeys ? wordAlts.scopeKeys.length : wordAlts.reduce(function (total, _ref11) {
+    var scopeMap = _ref11.scopeMap;
+    return total + Object.values(scopeMap).length;
+  }, 0);
+};
+
+exports.getLengthOfAllScopeMaps = getLengthOfAllScopeMaps;

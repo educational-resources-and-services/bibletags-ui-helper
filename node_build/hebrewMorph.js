@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getHebrewPOSTerm = exports.getHebrewMorphPartDisplayInfo = exports.getGrammarColor = void 0;
 
-var _i18n = _interopRequireDefault(require("./i18n.js"));
+var _i18n = _interopRequireDefault(require("./i18n"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 

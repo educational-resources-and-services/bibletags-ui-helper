@@ -12,11 +12,14 @@ var _exportNames = {
   getVersionStr: true,
   getRefsInfo: true,
   getPassageStr: true,
+  getRefsFromPassageStr: true,
+  getBibleBookNames: true,
   getBibleBookName: true,
   getUsfmBibleBookAbbr: true,
   getBookIdFromUsfmBibleBookAbbr: true,
   getRefsFromUsfmRefStr: true,
   getUsfmRefStrFromLoc: true,
+  getBibleBookAbbreviatedNames: true,
   getBibleBookAbbreviatedName: true,
   getNormalizedPOSCode: true,
   getPOSTerm: true,
@@ -29,13 +32,13 @@ var _exportNames = {
   getWordHashes: true,
   isValidEmail: true
 };
-exports.isValidEmail = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookName = exports.getBibleBookAbbreviatedName = void 0;
+exports.isValidEmail = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
 
 var _md = _interopRequireDefault(require("md5"));
 
 var _bibletagsVersification = require("@bibletags/bibletags-versification");
 
-var _i18n = _interopRequireWildcard(require("./i18n.js"));
+var _i18n = _interopRequireWildcard(require("./i18n"));
 
 Object.keys(_i18n).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -49,7 +52,7 @@ Object.keys(_i18n).forEach(function (key) {
   });
 });
 
-var _hebrewMorph = require("./hebrewMorph.js");
+var _hebrewMorph = require("./hebrewMorph");
 
 Object.keys(_hebrewMorph).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -63,7 +66,7 @@ Object.keys(_hebrewMorph).forEach(function (key) {
   });
 });
 
-var _greekMorph = require("./greekMorph.js");
+var _greekMorph = require("./greekMorph");
 
 Object.keys(_greekMorph).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -77,7 +80,7 @@ Object.keys(_greekMorph).forEach(function (key) {
   });
 });
 
-var _splitting = require("./splitting.js");
+var _splitting = require("./splitting");
 
 Object.keys(_splitting).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -91,35 +94,7 @@ Object.keys(_splitting).forEach(function (key) {
   });
 });
 
-var _constants = require("./constants.js");
-
-Object.keys(_constants).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-  if (key in exports && exports[key] === _constants[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _constants[key];
-    }
-  });
-});
-
-var _bibleSearch = require("./bibleSearch.js");
-
-Object.keys(_bibleSearch).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-  if (key in exports && exports[key] === _bibleSearch[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _bibleSearch[key];
-    }
-  });
-});
-
-var _bibleSearchUtils = require("./bibleSearchUtils.js");
+var _bibleSearchUtils = require("./bibleSearchUtils");
 
 Object.keys(_bibleSearchUtils).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -133,23 +108,65 @@ Object.keys(_bibleSearchUtils).forEach(function (key) {
   });
 });
 
+var _constants = require("./constants");
+
+Object.keys(_constants).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _constants[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _constants[key];
+    }
+  });
+});
+
+var _bibleSearch = require("./bibleSearch");
+
+Object.keys(_bibleSearch).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _bibleSearch[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _bibleSearch[key];
+    }
+  });
+});
+
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
 function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 var getOrigLangVersionIdFromRef = function getOrigLangVersionIdFromRef(ref) {
   return ref.bookId <= 39 ? 'uhb' : 'ugnt';
@@ -328,8 +345,143 @@ var getPassageStr = function getPassageStr(params) {
 
 exports.getPassageStr = getPassageStr;
 
+var getRefsFromPassageStr = function getRefsFromPassageStr(passageStr) {
+  var normalizedPassageStr = passageStr.replace(/  +/g, ' ').trim();
+
+  var indicateBookId = function indicateBookId(book, bookId) {
+    return {
+      suggestedQuery: book,
+      bookId: bookId
+    };
+  };
+
+  var bookSuggestionOptions = [].concat(_toConsumableArray(getBibleBookNames().map(indicateBookId)), _toConsumableArray(getBibleBookAbbreviatedNames().map(indicateBookId))).filter(function (_ref3) {
+    var suggestedQuery = _ref3.suggestedQuery;
+    return suggestedQuery;
+  }); // split off potential versionId
+
+  var passageStrSets = [{
+    passageStr: normalizedPassageStr
+  }];
+
+  var _normalizedPassageStr = normalizedPassageStr.match(/^(.*?)(?: ([a-z0-9]{2,9}))?$/i),
+      _normalizedPassageStr2 = _slicedToArray(_normalizedPassageStr, 3),
+      x = _normalizedPassageStr2[0],
+      passageStrWithoutVersionId = _normalizedPassageStr2[1],
+      versionId = _normalizedPassageStr2[2];
+
+  passageStrSets.push({
+    passageStr: passageStrWithoutVersionId,
+    versionId: versionId
+  });
+
+  for (var _i2 = 0, _passageStrSets = passageStrSets; _i2 < _passageStrSets.length; _i2++) {
+    var passageStrSet = _passageStrSets[_i2];
+    var _passageStr = passageStrSet.passageStr,
+        _versionId = passageStrSet.versionId;
+
+    var pieces = _passageStr.split(' ');
+
+    var nonBookPart = pieces.pop();
+    var book = pieces.join(' ');
+    var bookId = parseInt(((0, _bibleSearchUtils.findAutoCompleteSuggestions)({
+      str: book,
+      suggestionOptions: bookSuggestionOptions,
+      max: 1
+    })[0] || {}).bookId, 10);
+    if (!bookId) continue;
+
+    var _nonBookPart$split = nonBookPart.split(/[-–—]/g),
+        _nonBookPart$split2 = _slicedToArray(_nonBookPart$split, 3),
+        nonBookPartFirstHalf = _nonBookPart$split2[0],
+        nonBookPartSecondHalf = _nonBookPart$split2[1],
+        x1 = _nonBookPart$split2[2];
+
+    if (!nonBookPartFirstHalf || x1) continue;
+
+    var _nonBookPartFirstHalf = nonBookPartFirstHalf.split(':'),
+        _nonBookPartFirstHalf2 = _slicedToArray(_nonBookPartFirstHalf, 3),
+        startChapter = _nonBookPartFirstHalf2[0],
+        startVerse = _nonBookPartFirstHalf2[1],
+        x2 = _nonBookPartFirstHalf2[2];
+
+    if (!startChapter || x2) continue;
+    var endChapter = startChapter;
+    var endVerse = startVerse;
+
+    if (nonBookPartSecondHalf) {
+      var _nonBookPartFirstHalf3 = nonBookPartFirstHalf.split(':'),
+          _nonBookPartFirstHalf4 = _slicedToArray(_nonBookPartFirstHalf3, 3),
+          nonBookPartSecondHalfPiece1 = _nonBookPartFirstHalf4[0],
+          nonBookPartSecondHalfPiece2 = _nonBookPartFirstHalf4[1],
+          x3 = _nonBookPartFirstHalf4[2];
+
+      if (!nonBookPartSecondHalfPiece1 || x3) continue;
+
+      if (nonBookPartSecondHalfPiece2) {
+        endChapter = nonBookPartSecondHalfPiece1;
+        endVerse = nonBookPartSecondHalfPiece2;
+      } else {
+        endVerse = nonBookPartSecondHalfPiece1;
+      }
+    }
+
+    var refs = [_objectSpread({
+      bookId: bookId,
+      chapter: parseInt(startChapter, 10)
+    }, !startVerse ? {} : {
+      verse: parseInt(startVerse, 10)
+    })];
+
+    if (startVerse !== endVerse || startChapter !== endChapter) {
+      refs.push(_objectSpread({
+        bookId: bookId,
+        chapter: parseInt(endChapter, 10)
+      }, !endVerse ? {} : {
+        verse: parseInt(endVerse, 10)
+      }));
+    }
+
+    refs = refs.filter(function (_ref4) {
+      var chapter = _ref4.chapter,
+          verse = _ref4.verse;
+      return chapter && verse !== NaN;
+    });
+
+    if (refs.length > 0) {
+      return {
+        refs: refs,
+        versionId: _versionId
+      };
+    } // TODO: make this work with i18n!
+    // get i18n ref signatures
+    // determine book
+    // if has start_chapter and end_chapter
+    // determine start_chapter
+    // determine end_chapter
+    // else 
+    // determine chapter
+    // if has start_verse and end_verse
+    // determine start_verse
+    // determine end_verse
+    // else 
+    // determine verse
+
+  }
+
+  return null;
+};
+
+exports.getRefsFromPassageStr = getRefsFromPassageStr;
+
+var getBibleBookNames = function getBibleBookNames() {
+  return ["", (0, _i18n["default"])("Genesis", "", "book"), (0, _i18n["default"])("Exodus", "", "book"), (0, _i18n["default"])("Leviticus", "", "book"), (0, _i18n["default"])("Numbers", "", "book"), (0, _i18n["default"])("Deuteronomy", "", "book"), (0, _i18n["default"])("Joshua", "", "book"), (0, _i18n["default"])("Judges", "", "book"), (0, _i18n["default"])("Ruth", "", "book"), (0, _i18n["default"])("1 Samuel", "", "book"), (0, _i18n["default"])("2 Samuel", "", "book"), (0, _i18n["default"])("1 Kings", "", "book"), (0, _i18n["default"])("2 Kings", "", "book"), (0, _i18n["default"])("1 Chronicles", "", "book"), (0, _i18n["default"])("2 Chronicles", "", "book"), (0, _i18n["default"])("Ezra", "", "book"), (0, _i18n["default"])("Nehemiah", "", "book"), (0, _i18n["default"])("Esther", "", "book"), (0, _i18n["default"])("Job", "", "book"), (0, _i18n["default"])("Psalms", "", "book"), (0, _i18n["default"])("Proverbs", "", "book"), (0, _i18n["default"])("Ecclesiastes", "", "book"), (0, _i18n["default"])("Song of Songs", "", "book"), (0, _i18n["default"])("Isaiah", "", "book"), (0, _i18n["default"])("Jeremiah", "", "book"), (0, _i18n["default"])("Lamentations", "", "book"), (0, _i18n["default"])("Ezekiel", "", "book"), (0, _i18n["default"])("Daniel", "", "book"), (0, _i18n["default"])("Hosea", "", "book"), (0, _i18n["default"])("Joel", "", "book"), (0, _i18n["default"])("Amos", "", "book"), (0, _i18n["default"])("Obadiah", "", "book"), (0, _i18n["default"])("Jonah", "", "book"), (0, _i18n["default"])("Micah", "", "book"), (0, _i18n["default"])("Nahum", "", "book"), (0, _i18n["default"])("Habakkuk", "", "book"), (0, _i18n["default"])("Zephaniah", "", "book"), (0, _i18n["default"])("Haggai", "", "book"), (0, _i18n["default"])("Zechariah", "", "book"), (0, _i18n["default"])("Malachi", "", "book"), (0, _i18n["default"])("Matthew", "", "book"), (0, _i18n["default"])("Mark", "", "book"), (0, _i18n["default"])("Luke", "", "book"), (0, _i18n["default"])("John", "", "book"), (0, _i18n["default"])("Acts", "", "book"), (0, _i18n["default"])("Romans", "", "book"), (0, _i18n["default"])("1 Corinthians", "", "book"), (0, _i18n["default"])("2 Corinthians", "", "book"), (0, _i18n["default"])("Galatians", "", "book"), (0, _i18n["default"])("Ephesians", "", "book"), (0, _i18n["default"])("Philippians", "", "book"), (0, _i18n["default"])("Colossians", "", "book"), (0, _i18n["default"])("1 Thessalonians", "", "book"), (0, _i18n["default"])("2 Thessalonians", "", "book"), (0, _i18n["default"])("1 Timothy", "", "book"), (0, _i18n["default"])("2 Timothy", "", "book"), (0, _i18n["default"])("Titus", "", "book"), (0, _i18n["default"])("Philemon", "", "book"), (0, _i18n["default"])("Hebrews", "", "book"), (0, _i18n["default"])("James", "", "book"), (0, _i18n["default"])("1 Peter", "", "book"), (0, _i18n["default"])("2 Peter", "", "book"), (0, _i18n["default"])("1 John", "", "book"), (0, _i18n["default"])("2 John", "", "book"), (0, _i18n["default"])("3 John", "", "book"), (0, _i18n["default"])("Jude", "", "book"), (0, _i18n["default"])("Revelation", "", "book")];
+};
+
+exports.getBibleBookNames = getBibleBookNames;
+
 var getBibleBookName = function getBibleBookName(bookId) {
-  return ["", (0, _i18n["default"])("Genesis", "", "book"), (0, _i18n["default"])("Exodus", "", "book"), (0, _i18n["default"])("Leviticus", "", "book"), (0, _i18n["default"])("Numbers", "", "book"), (0, _i18n["default"])("Deuteronomy", "", "book"), (0, _i18n["default"])("Joshua", "", "book"), (0, _i18n["default"])("Judges", "", "book"), (0, _i18n["default"])("Ruth", "", "book"), (0, _i18n["default"])("1 Samuel", "", "book"), (0, _i18n["default"])("2 Samuel", "", "book"), (0, _i18n["default"])("1 Kings", "", "book"), (0, _i18n["default"])("2 Kings", "", "book"), (0, _i18n["default"])("1 Chronicles", "", "book"), (0, _i18n["default"])("2 Chronicles", "", "book"), (0, _i18n["default"])("Ezra", "", "book"), (0, _i18n["default"])("Nehemiah", "", "book"), (0, _i18n["default"])("Esther", "", "book"), (0, _i18n["default"])("Job", "", "book"), (0, _i18n["default"])("Psalms", "", "book"), (0, _i18n["default"])("Proverbs", "", "book"), (0, _i18n["default"])("Ecclesiastes", "", "book"), (0, _i18n["default"])("Song of Songs", "", "book"), (0, _i18n["default"])("Isaiah", "", "book"), (0, _i18n["default"])("Jeremiah", "", "book"), (0, _i18n["default"])("Lamentations", "", "book"), (0, _i18n["default"])("Ezekiel", "", "book"), (0, _i18n["default"])("Daniel", "", "book"), (0, _i18n["default"])("Hosea", "", "book"), (0, _i18n["default"])("Joel", "", "book"), (0, _i18n["default"])("Amos", "", "book"), (0, _i18n["default"])("Obadiah", "", "book"), (0, _i18n["default"])("Jonah", "", "book"), (0, _i18n["default"])("Micah", "", "book"), (0, _i18n["default"])("Nahum", "", "book"), (0, _i18n["default"])("Habakkuk", "", "book"), (0, _i18n["default"])("Zephaniah", "", "book"), (0, _i18n["default"])("Haggai", "", "book"), (0, _i18n["default"])("Zechariah", "", "book"), (0, _i18n["default"])("Malachi", "", "book"), (0, _i18n["default"])("Matthew", "", "book"), (0, _i18n["default"])("Mark", "", "book"), (0, _i18n["default"])("Luke", "", "book"), (0, _i18n["default"])("John", "", "book"), (0, _i18n["default"])("Acts", "", "book"), (0, _i18n["default"])("Romans", "", "book"), (0, _i18n["default"])("1 Corinthians", "", "book"), (0, _i18n["default"])("2 Corinthians", "", "book"), (0, _i18n["default"])("Galatians", "", "book"), (0, _i18n["default"])("Ephesians", "", "book"), (0, _i18n["default"])("Philippians", "", "book"), (0, _i18n["default"])("Colossians", "", "book"), (0, _i18n["default"])("1 Thessalonians", "", "book"), (0, _i18n["default"])("2 Thessalonians", "", "book"), (0, _i18n["default"])("1 Timothy", "", "book"), (0, _i18n["default"])("2 Timothy", "", "book"), (0, _i18n["default"])("Titus", "", "book"), (0, _i18n["default"])("Philemon", "", "book"), (0, _i18n["default"])("Hebrews", "", "book"), (0, _i18n["default"])("James", "", "book"), (0, _i18n["default"])("1 Peter", "", "book"), (0, _i18n["default"])("2 Peter", "", "book"), (0, _i18n["default"])("1 John", "", "book"), (0, _i18n["default"])("2 John", "", "book"), (0, _i18n["default"])("3 John", "", "book"), (0, _i18n["default"])("Jude", "", "book"), (0, _i18n["default"])("Revelation", "", "book")][bookId];
+  return getBibleBookNames()[bookId];
 };
 
 exports.getBibleBookName = getBibleBookName;
@@ -429,33 +581,39 @@ var getUsfmRefStrFromLoc = function getUsfmRefStrFromLoc(loc) {
 
 exports.getUsfmRefStrFromLoc = getUsfmRefStrFromLoc;
 
+var getBibleBookAbbreviatedNames = function getBibleBookAbbreviatedNames() {
+  return ["", (0, _i18n["default"])("Gen", "Abbreviation for Genesis", "book"), (0, _i18n["default"])("Ex", "Abbreviation for Exodus", "book"), (0, _i18n["default"])("Lev", "Abbreviation for Leviticus", "book"), (0, _i18n["default"])("Num", "Abbreviation for Numbers", "book"), (0, _i18n["default"])("Dt", "Abbreviation for Deuteronomy", "book"), (0, _i18n["default"])("Jsh", "Abbreviation for Joshua", "book"), (0, _i18n["default"])("Jdg", "Abbreviation for Judges", "book"), (0, _i18n["default"])("Rth", "Abbreviation for Ruth", "book"), (0, _i18n["default"])("1Sa", "Abbreviation for 1 Samuel", "book"), (0, _i18n["default"])("2Sa", "Abbreviation for 2 Samuel", "book"), (0, _i18n["default"])("1Ki", "Abbreviation for 1 Kings", "book"), (0, _i18n["default"])("2Ki", "Abbreviation for 2 Kings", "book"), (0, _i18n["default"])("1Ch", "Abbreviation for 1 Chronicles", "book"), (0, _i18n["default"])("2Ch", "Abbreviation for 2 Chronicles", "book"), (0, _i18n["default"])("Ezr", "Abbreviation for Ezra", "book"), (0, _i18n["default"])("Neh", "Abbreviation for Nehemiah", "book"), (0, _i18n["default"])("Est", "Abbreviation for Esther", "book"), (0, _i18n["default"])("Job", "Abbreviation for Job", "book"), (0, _i18n["default"])("Ps", "Abbreviation for Psalms", "book"), (0, _i18n["default"])("Prv", "Abbreviation for Proverbs", "book"), (0, _i18n["default"])("Ecc", "Abbreviation for Ecclesiastes", "book"), (0, _i18n["default"])("Sng", "Abbreviation for Song", "book"), (0, _i18n["default"])("Is", "Abbreviation for Isaiah", "book"), (0, _i18n["default"])("Jer", "Abbreviation for Jeremiah", "book"), (0, _i18n["default"])("Lam", "Abbreviation for Lamentations", "book"), (0, _i18n["default"])("Ezk", "Abbreviation for Ezekiel", "book"), (0, _i18n["default"])("Dan", "Abbreviation for Daniel", "book"), (0, _i18n["default"])("Hos", "Abbreviation for Hosea", "book"), (0, _i18n["default"])("Jl", "Abbreviation for Joel", "book"), (0, _i18n["default"])("Amo", "Abbreviation for Amos", "book"), (0, _i18n["default"])("Ob", "Abbreviation for Obadiah", "book"), (0, _i18n["default"])("Jon", "Abbreviation for Jonah", "book"), (0, _i18n["default"])("Mic", "Abbreviation for Micah", "book"), (0, _i18n["default"])("Nah", "Abbreviation for Nahum", "book"), (0, _i18n["default"])("Hab", "Abbreviation for Habakkuk", "book"), (0, _i18n["default"])("Zph", "Abbreviation for Zephaniah", "book"), (0, _i18n["default"])("Hag", "Abbreviation for Haggai", "book"), (0, _i18n["default"])("Zch", "Abbreviation for Zechariah", "book"), (0, _i18n["default"])("Mal", "Abbreviation for Malachi", "book"), (0, _i18n["default"])("Mt", "Abbreviation for Matthew", "book"), (0, _i18n["default"])("Mrk", "Abbreviation for Mark", "book"), (0, _i18n["default"])("Lk", "Abbreviation for Luke", "book"), (0, _i18n["default"])("Jhn", "Abbreviation for John", "book"), (0, _i18n["default"])("Act", "Abbreviation for Acts", "book"), (0, _i18n["default"])("Rom", "Abbreviation for Romans", "book"), (0, _i18n["default"])("1Co", "Abbreviation for 1 Corinthians", "book"), (0, _i18n["default"])("2Co", "Abbreviation for 2 Corinthians", "book"), (0, _i18n["default"])("Gal", "Abbreviation for Galatians", "book"), (0, _i18n["default"])("Eph", "Abbreviation for Ephesians", "book"), (0, _i18n["default"])("Php", "Abbreviation for Philippians", "book"), (0, _i18n["default"])("Col", "Abbreviation for Colossians", "book"), (0, _i18n["default"])("1Th", "Abbreviation for 1 Thessalonians", "book"), (0, _i18n["default"])("2Th", "Abbreviation for 2 Thessalonians", "book"), (0, _i18n["default"])("1Ti", "Abbreviation for 1 Timothy", "book"), (0, _i18n["default"])("2Ti", "Abbreviation for 2 Timothy", "book"), (0, _i18n["default"])("Tts", "Abbreviation for Titus", "book"), (0, _i18n["default"])("Phm", "Abbreviation for Philemon", "book"), (0, _i18n["default"])("Heb", "Abbreviation for Hebrews", "book"), (0, _i18n["default"])("Jam", "Abbreviation for James", "book"), (0, _i18n["default"])("1Pe", "Abbreviation for 1 Peter", "book"), (0, _i18n["default"])("2Pe", "Abbreviation for 2 Peter", "book"), (0, _i18n["default"])("1Jn", "Abbreviation for 1 John", "book"), (0, _i18n["default"])("2Jn", "Abbreviation for 2 John", "book"), (0, _i18n["default"])("3Jn", "Abbreviation for 3 John", "book"), (0, _i18n["default"])("Jud", "Abbreviation for Jude", "book"), (0, _i18n["default"])("Rev", "Abbreviation for Revelation", "book")];
+};
+
+exports.getBibleBookAbbreviatedNames = getBibleBookAbbreviatedNames;
+
 var getBibleBookAbbreviatedName = function getBibleBookAbbreviatedName(bookId) {
-  return ["", (0, _i18n["default"])("Gen", "Abbreviation for Genesis", "book"), (0, _i18n["default"])("Ex", "Abbreviation for Exodus", "book"), (0, _i18n["default"])("Lev", "Abbreviation for Leviticus", "book"), (0, _i18n["default"])("Num", "Abbreviation for Numbers", "book"), (0, _i18n["default"])("Dt", "Abbreviation for Deuteronomy", "book"), (0, _i18n["default"])("Jsh", "Abbreviation for Joshua", "book"), (0, _i18n["default"])("Jdg", "Abbreviation for Judges", "book"), (0, _i18n["default"])("Rth", "Abbreviation for Ruth", "book"), (0, _i18n["default"])("1Sa", "Abbreviation for 1 Samuel", "book"), (0, _i18n["default"])("2Sa", "Abbreviation for 2 Samuel", "book"), (0, _i18n["default"])("1Ki", "Abbreviation for 1 Kings", "book"), (0, _i18n["default"])("2Ki", "Abbreviation for 2 Kings", "book"), (0, _i18n["default"])("1Ch", "Abbreviation for 1 Chronicles", "book"), (0, _i18n["default"])("2Ch", "Abbreviation for 2 Chronicles", "book"), (0, _i18n["default"])("Ezr", "Abbreviation for Ezra", "book"), (0, _i18n["default"])("Neh", "Abbreviation for Nehemiah", "book"), (0, _i18n["default"])("Est", "Abbreviation for Esther", "book"), (0, _i18n["default"])("Job", "Abbreviation for Job", "book"), (0, _i18n["default"])("Ps", "Abbreviation for Psalms", "book"), (0, _i18n["default"])("Prv", "Abbreviation for Proverbs", "book"), (0, _i18n["default"])("Ecc", "Abbreviation for Ecclesiastes", "book"), (0, _i18n["default"])("Sng", "Abbreviation for Song", "book"), (0, _i18n["default"])("Is", "Abbreviation for Isaiah", "book"), (0, _i18n["default"])("Jer", "Abbreviation for Jeremiah", "book"), (0, _i18n["default"])("Lam", "Abbreviation for Lamentations", "book"), (0, _i18n["default"])("Ezk", "Abbreviation for Ezekiel", "book"), (0, _i18n["default"])("Dan", "Abbreviation for Daniel", "book"), (0, _i18n["default"])("Hos", "Abbreviation for Hosea", "book"), (0, _i18n["default"])("Jl", "Abbreviation for Joel", "book"), (0, _i18n["default"])("Amo", "Abbreviation for Amos", "book"), (0, _i18n["default"])("Ob", "Abbreviation for Obadiah", "book"), (0, _i18n["default"])("Jon", "Abbreviation for Jonah", "book"), (0, _i18n["default"])("Mic", "Abbreviation for Micah", "book"), (0, _i18n["default"])("Nah", "Abbreviation for Nahum", "book"), (0, _i18n["default"])("Hab", "Abbreviation for Habakkuk", "book"), (0, _i18n["default"])("Zph", "Abbreviation for Zephaniah", "book"), (0, _i18n["default"])("Hag", "Abbreviation for Haggai", "book"), (0, _i18n["default"])("Zch", "Abbreviation for Zechariah", "book"), (0, _i18n["default"])("Mal", "Abbreviation for Malachi", "book"), (0, _i18n["default"])("Mt", "Abbreviation for Matthew", "book"), (0, _i18n["default"])("Mrk", "Abbreviation for Mark", "book"), (0, _i18n["default"])("Lk", "Abbreviation for Luke", "book"), (0, _i18n["default"])("Jhn", "Abbreviation for John", "book"), (0, _i18n["default"])("Act", "Abbreviation for Acts", "book"), (0, _i18n["default"])("Rom", "Abbreviation for Romans", "book"), (0, _i18n["default"])("1Co", "Abbreviation for 1 Corinthians", "book"), (0, _i18n["default"])("2Co", "Abbreviation for 2 Corinthians", "book"), (0, _i18n["default"])("Gal", "Abbreviation for Galatians", "book"), (0, _i18n["default"])("Eph", "Abbreviation for Ephesians", "book"), (0, _i18n["default"])("Php", "Abbreviation for Philippians", "book"), (0, _i18n["default"])("Col", "Abbreviation for Colossians", "book"), (0, _i18n["default"])("1Th", "Abbreviation for 1 Thessalonians", "book"), (0, _i18n["default"])("2Th", "Abbreviation for 2 Thessalonians", "book"), (0, _i18n["default"])("1Ti", "Abbreviation for 1 Timothy", "book"), (0, _i18n["default"])("2Ti", "Abbreviation for 2 Timothy", "book"), (0, _i18n["default"])("Tts", "Abbreviation for Titus", "book"), (0, _i18n["default"])("Phm", "Abbreviation for Philemon", "book"), (0, _i18n["default"])("Heb", "Abbreviation for Hebrews", "book"), (0, _i18n["default"])("Jam", "Abbreviation for James", "book"), (0, _i18n["default"])("1Pe", "Abbreviation for 1 Peter", "book"), (0, _i18n["default"])("2Pe", "Abbreviation for 2 Peter", "book"), (0, _i18n["default"])("1Jn", "Abbreviation for 1 John", "book"), (0, _i18n["default"])("2Jn", "Abbreviation for 2 John", "book"), (0, _i18n["default"])("3Jn", "Abbreviation for 3 John", "book"), (0, _i18n["default"])("Jud", "Abbreviation for Jude", "book"), (0, _i18n["default"])("Rev", "Abbreviation for Revelation", "book")][bookId];
+  return getBibleBookAbbreviatedNames()[bookId];
 };
 
 exports.getBibleBookAbbreviatedName = getBibleBookAbbreviatedName;
 
-var getNormalizedPOSCode = function getNormalizedPOSCode(_ref3) {
-  var morphLang = _ref3.morphLang,
-      morphPos = _ref3.morphPos;
+var getNormalizedPOSCode = function getNormalizedPOSCode(_ref5) {
+  var morphLang = _ref5.morphLang,
+      morphPos = _ref5.morphPos;
   return ['He', 'Ar'].includes(morphLang) ? morphPos : (0, _greekMorph.getNormalizedGreekPOSCode)(morphPos);
 };
 
 exports.getNormalizedPOSCode = getNormalizedPOSCode;
 
-var getPOSTerm = function getPOSTerm(_ref4) {
-  var languageId = _ref4.languageId,
-      posCode = _ref4.posCode;
+var getPOSTerm = function getPOSTerm(_ref6) {
+  var languageId = _ref6.languageId,
+      posCode = _ref6.posCode;
   return languageId === 'heb' ? (0, _hebrewMorph.getHebrewPOSTerm)(posCode) : (0, _greekMorph.getGreekPOSTerm)(posCode);
 };
 
 exports.getPOSTerm = getPOSTerm;
 
-var getMorphPartDisplayInfo = function getMorphPartDisplayInfo(_ref5) {
-  var morphLang = _ref5.morphLang,
-      morphPart = _ref5.morphPart,
-      isPrefixOrSuffix = _ref5.isPrefixOrSuffix,
-      wordIsMultiPart = _ref5.wordIsMultiPart;
+var getMorphPartDisplayInfo = function getMorphPartDisplayInfo(_ref7) {
+  var morphLang = _ref7.morphLang,
+      morphPart = _ref7.morphPart,
+      isPrefixOrSuffix = _ref7.isPrefixOrSuffix,
+      wordIsMultiPart = _ref7.wordIsMultiPart;
   return ['He', 'Ar'].includes(morphLang) ? (0, _hebrewMorph.getHebrewMorphPartDisplayInfo)({
     morphLang: morphLang,
     morphPart: morphPart,
@@ -506,9 +664,9 @@ var hash64 = function hash64(str) {
 
 exports.hash64 = hash64;
 
-var getWordsHash = function getWordsHash(_ref6) {
-  var usfm = _ref6.usfm,
-      wordDividerRegex = _ref6.wordDividerRegex;
+var getWordsHash = function getWordsHash(_ref8) {
+  var usfm = _ref8.usfm,
+      wordDividerRegex = _ref8.wordDividerRegex;
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
@@ -526,9 +684,9 @@ var getWordsHash = function getWordsHash(_ref6) {
 
 exports.getWordsHash = getWordsHash;
 
-var getWordHashes = function getWordHashes(_ref7) {
-  var usfm = _ref7.usfm,
-      wordDividerRegex = _ref7.wordDividerRegex;
+var getWordHashes = function getWordHashes(_ref9) {
+  var usfm = _ref9.usfm,
+      wordDividerRegex = _ref9.wordDividerRegex;
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex

@@ -7,7 +7,7 @@ exports.tagInList = exports.splitVerseIntoWords = exports.specialUsfmMarkers = e
 
 var _usfmJs = _interopRequireDefault(require("usfm-js"));
 
-var _i18n = _interopRequireDefault(require("./i18n.js"));
+var _i18n = _interopRequireDefault(require("./i18n"));
 
 var _constants = require("./constants");
 
