@@ -388,7 +388,10 @@ exports.completeQueryGroupings = completeQueryGroupings;
 
 var getFlagSuggestions = function getFlagSuggestions(_ref6) {
   var searchTextInComposition = _ref6.searchTextInComposition,
-      versionAbbrs = _ref6.versionAbbrs,
+      _ref6$versionAbbrsFor = _ref6.versionAbbrsForIn,
+      versionAbbrsForIn = _ref6$versionAbbrsFor === void 0 ? [] : _ref6$versionAbbrsFor,
+      _ref6$versionAbbrsFor2 = _ref6.versionAbbrsForInclude,
+      versionAbbrsForInclude = _ref6$versionAbbrsFor2 === void 0 ? [] : _ref6$versionAbbrsFor2,
       _ref6$max = _ref6.max,
       max = _ref6$max === void 0 ? 3 : _ref6$max;
   var normalizedSearchText = searchTextInComposition.replace(/  +/g, ' ').replace(/^ /g, '');
@@ -404,12 +407,12 @@ var getFlagSuggestions = function getFlagSuggestions(_ref6) {
   if (type === 'in') {
     // in:[range]/[versionId]
     var testament = containsHebrew && !containsGreek && 'ot' || !containsHebrew && containsGreek && 'nt' || 'both';
-    suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray([].concat(_toConsumableArray(versionAbbrs), _toConsumableArray(_index.bibleSearchScopeKeysByTestament[testament])).map(function (val) {
+    suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray([].concat(_toConsumableArray(versionAbbrsForIn), _toConsumableArray(_index.bibleSearchScopeKeysByTestament[testament])).map(function (val) {
       return "".concat(searchTextWithoutCurrentWord, " in:").concat(val);
     })));
   } else if ('include'.indexOf(type) === 0) {
     // include:variants/[versionId]
-    suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray(['variants'].concat(_toConsumableArray(versionAbbrs)).map(function (val) {
+    suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray(['variants'].concat(_toConsumableArray(versionAbbrsForInclude)).map(function (val) {
       return "".concat(searchTextWithoutCurrentWord, " include:").concat(val);
     })));
   } else if (!containsHebrew && !containsGreek) {
