@@ -268,7 +268,7 @@ export const completeQueryGroupings = query => {
 
 }
 
-export const getFlagSuggestions = ({ searchTextInComposition, versionAbbrs, max=3 }) => {
+export const getFlagSuggestions = ({ searchTextInComposition, versionAbbrsForIn=[], versionAbbrsForInclude=[], max=3 }) => {
 
   let normalizedSearchText = (
     searchTextInComposition
@@ -293,11 +293,11 @@ export const getFlagSuggestions = ({ searchTextInComposition, versionAbbrs, max=
       || (!containsHebrew && containsGreek && 'nt')
       || 'both'
     )
-    suggestedQueryOptions.push( ...[ ...versionAbbrs, ...bibleSearchScopeKeysByTestament[testament] ].map(val => `${searchTextWithoutCurrentWord} in:${val}`) )
+    suggestedQueryOptions.push( ...[ ...versionAbbrsForIn, ...bibleSearchScopeKeysByTestament[testament] ].map(val => `${searchTextWithoutCurrentWord} in:${val}`) )
 
     } else if('include'.indexOf(type) === 0) {
     // include:variants/[versionId]
-    suggestedQueryOptions.push( ...[ 'variants', ...versionAbbrs ].map(val => `${searchTextWithoutCurrentWord} include:${val}`) )
+    suggestedQueryOptions.push( ...[ 'variants', ...versionAbbrsForInclude ].map(val => `${searchTextWithoutCurrentWord} include:${val}`) )
 
   } else if(!containsHebrew && !containsGreek) {  // type === 'same'
     // same:[scope]
