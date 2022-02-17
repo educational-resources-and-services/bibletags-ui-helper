@@ -3,6 +3,7 @@ import { getOriginalLocsFromRange, getCorrespondingRefs, getRefFromLoc, getLocFr
 
 import { bibleSearchScopeKeysByTestament } from './index'
 import { grammaticalDetailMap } from './constants'
+import { getQueryArrayAndWords } from './utils'
 
 export const containsHebrewChars = text => /[\u0590-\u05FF]/.test(text)
 export const containsGreekChars = text => /[\u0370-\u03FF\u1F00-\u1FFF]/.test(text)
@@ -161,8 +162,10 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
 
   const matchingSuggestions = []
   const lowerCaseStr = str.toLowerCase()
+  const [ x, lowerCaseStrBase, lowerCaseStrFinalDetail ] = lowerCaseStr.match(/^(.*?[#:]?)([^#:]*)$/)
+  const lowerCaseStrFinalDetailWords = lowerCaseStrFinalDetail.split(/[-–— ]/g)
 
-  // no mistakes first
+  // no mistakes, same order first
   for(let suggestionOption of suggestionOptions) {
     if(suggestionOption.suggestedQuery.toLowerCase().indexOf(lowerCaseStr) === 0) {
       matchingSuggestions.push(suggestionOption)
@@ -170,26 +173,96 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
     if(matchingSuggestions.length >= max) break
   }
 
-  // TODO: all words exist in full or in part (matching from the beginnings)
+  // all words exist in full or in part (matching from the beginnings)
+  if(matchingSuggestions.length < max) {
+    for(let suggestionOption of suggestionOptions) {
+      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = suggestionOption.suggestedQuery.toLowerCase().match(/^(.*?[#:]?)([^#:]*)$/)
+      const suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g)
+      if(
+        lowerCaseStrBase === suggestionOptionBase
+        && lowerCaseStrFinalDetailWords.every(strWord => suggestionOptionFinalDetailWords.some(optWord => optWord.indexOf(strWord) === 0))
+      ) {
+        matchingSuggestions.push(suggestionOption)
+      }
+      if(matchingSuggestions.length >= max) break
+    }
+  }
 
-  // TODO: look for hits with correct first letter in last word + up to one mistake (missing/added/alt char) in last 3 letters (clock this to make sure it is not slow)
+  // look for hits with correct first letter in last word + up to one mistake (missing/added/alt char)
+  if(matchingSuggestions.length < max) {
+    for(let suggestionOption of suggestionOptions) {
+      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = suggestionOption.suggestedQuery.toLowerCase().match(/^(.*?[#:]?)([^#:]*)$/)
+      const suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g)
+      const finalWordInFinalDetail = lowerCaseStrFinalDetailWords[lowerCaseStrFinalDetailWords.length - 1]
+      if(
+        lowerCaseStrBase === suggestionOptionBase
+        && lowerCaseStrFinalDetailWords.slice(0,-1).every(strWord => suggestionOptionFinalDetailWords.some(optWord => optWord.indexOf(strWord) === 0))
+        && suggestionOptionFinalDetailWords.some(optWord => {
+          if(optWord[0] !== finalWordInFinalDetail[0]) return false
+          let i1 = 1
+          let i2 = 1
+          let foundDifference = false
+          while(finalWordInFinalDetail[i1]) {
+            if(finalWordInFinalDetail[i1] !== optWord[i2]) {
+              if(foundDifference) return false  // two differences means it is not a match
+              foundDifference = true
+              if(finalWordInFinalDetail[i1 + 1] === optWord[i2]) {
+                i1++
+              } else if(finalWordInFinalDetail[i1] === optWord[i2 + 1]) {
+                i2++
+              }
+            }
+            i1++
+            i2++
+          }
+          return true
+        })
+      ) {
+        matchingSuggestions.push(suggestionOption)
+      }
+      if(matchingSuggestions.length >= max) break
+    }
+  }
 
   return matchingSuggestions
 }
 
-export const isValidBibleSearch = ({ query }) => true  // TODO
+export const isValidBibleSearch = ({ query }) => {
+
+  // validate strongs
+  if((query.match(/#[HG][0-9]/g) || []).length !== (query.match(/#[HG][0-9]{5}(?=[# ")]|$)/g) || []).length) return false
+  if(query.split(/( +|[()"])/g).some(wordOrConnector => (wordOrConnector.match(/#[HG][0-9]{5}(?=[# ")]|$)/g) || []).length >= 2)) return false  // no double-strongs in one word like #H12345#H23456
+
+  // validate grammar details
+  // TODO
+
+  // validate flags
+  // TODO
+
+  // validate groupings+
+  try {
+    getQueryArrayAndWords(query)
+  } catch(err) {
+    return false
+  }
+
+  return true
+
+}
 
 export const completeQueryGroupings = query => {
 
   if((query.match(/"/g) || []).length % 2 === 1) {
     query += '"'
   }
+  query = query.replace(/""$/, '')
 
   const numLeftParens = (query.match(/\(/g) || []).length
   const numRightParens = (query.match(/\)/g) || []).length
   if(numLeftParens > numRightParens) {
     query += Array(numLeftParens - numRightParens).fill(')').join('')
   }
+  query = query.replace(/\(\)$/, '')
 
   return query
 
@@ -202,12 +275,12 @@ export const getFlagSuggestions = ({ searchTextInComposition, versionAbbrs, max=
       .replace(/  +/g, ' ')
       .replace(/^ /g, '')
   )
-  const searchTextWords = normalizedSearchText.split(' ')
-  const currentWord = searchTextWords.pop()
-  const searchTextWithoutCurrentWord = searchTextWords.join(' ')
+  const searchTextPieces = normalizedSearchText.split(' ')
+  const currentPiece = searchTextPieces.pop()
+  const searchTextWithoutCurrentWord = searchTextPieces.join(' ')
   normalizedSearchText = normalizedSearchText.trim()
 
-  const type = currentWord.split(':')[0]
+  const type = currentPiece.split(':')[0]
   let suggestedQueryOptions = []
   const containsHebrew = containsHebrewChars(searchTextInComposition) || /#H[0-9]{5}/.test(searchTextInComposition)
   const containsGreek = containsGreekChars(searchTextInComposition) || /#G[0-9]{5}/.test(searchTextInComposition)
@@ -242,7 +315,7 @@ export const getFlagSuggestions = ({ searchTextInComposition, versionAbbrs, max=
 
 }
 
-export const getGrammarDetailsForAutoCompletionSuggestions = ({ currentWord, searchTextInComposition }) => {
+export const getGrammarDetailsForAutoCompletionSuggestions = ({ currentWord, normalizedSearchText }) => {
 
   // TODO: set up with i18n for grammatical details
 
@@ -264,7 +337,12 @@ export const getGrammarDetailsForAutoCompletionSuggestions = ({ currentWord, sea
     `#n^`,
   )
 
-  details = details.filter(detail => !new RegExp(`#${escapeRegex(detail)}(?:[# ]|$)`).test(currentWord))
+  details = details.filter(detail => !new RegExp(`#${escapeRegex(detail)}(?:[# ")]|$)`).test(currentWord))
+
+  details = [
+    ...details,
+    ...details.map(detail => `not:${detail}`),
+  ]
 
   return details
 
