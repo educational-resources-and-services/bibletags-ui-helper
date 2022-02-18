@@ -380,10 +380,13 @@ var getRefsFromPassageStr = function getRefsFromPassageStr(passageStr) {
     var _passageStr = passageStrSet.passageStr,
         _versionId = passageStrSet.versionId;
 
-    var pieces = _passageStr.split(' ');
+    var _passageStr$match = _passageStr.match(/^(.+?)(?: ([-–—0-9:]+))?$/),
+        _passageStr$match2 = _slicedToArray(_passageStr$match, 3),
+        _x = _passageStr$match2[0],
+        book = _passageStr$match2[1],
+        _passageStr$match2$ = _passageStr$match2[2],
+        nonBookPart = _passageStr$match2$ === void 0 ? '' : _passageStr$match2$;
 
-    var nonBookPart = pieces.pop();
-    var book = pieces.join(' ');
     var bookId = parseInt(((0, _bibleSearchUtils.findAutoCompleteSuggestions)({
       str: book,
       suggestionOptions: bookSuggestionOptions,
