@@ -197,9 +197,7 @@ export const getRefsFromPassageStr = passageStr => {
   for(let passageStrSet of passageStrSets) {
     const { passageStr, versionId } = passageStrSet
 
-    const pieces = passageStr.split(' ')
-    const nonBookPart = pieces.pop()
-    const book = pieces.join(' ')
+    const [ x, book, nonBookPart='' ] = passageStr.match(/^(.+?)(?: ([-–—0-9:]+))?$/)
 
     const bookId = (
       parseInt(
