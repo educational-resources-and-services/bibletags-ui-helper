@@ -229,12 +229,15 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
 
 export const isValidBibleSearch = ({ query }) => {
 
+  const queryWordsOrConnectors = query.split(/[ ()"]/g)
+
+  // valid use of #
+  if(queryWordsOrConnectors.some(wordOrConnector => /[^#=].*?[#=]|[#=].*?[#=]/.test(wordOrConnector))) return false
+  if(queryWordsOrConnectors.includes('#')) return false
+
   // validate strongs
   if((query.match(/#[HG][0-9]/g) || []).length !== (query.match(/#[HG][0-9]{5}(?=[# ")]|$)/g) || []).length) return false
-  if(query.split(/( +|[()"])/g).some(wordOrConnector => (wordOrConnector.match(/#[HG][0-9]{5}(?=[# ")]|$)/g) || []).length >= 2)) return false  // no double-strongs in one word like #H12345#H23456
-
-  // validate grammar details
-  // TODO
+  if(queryWordsOrConnectors.some(wordOrConnector => (wordOrConnector.match(/#[HG][0-9]{5}(?=[# ")]|$)/g) || []).length >= 2)) return false  // no double-strongs in one word like #H12345#H23456
 
   // validate flags
   // TODO
@@ -262,7 +265,9 @@ export const completeQueryGroupings = query => {
   if(numLeftParens > numRightParens) {
     query += Array(numLeftParens - numRightParens).fill(')').join('')
   }
-  query = query.replace(/\(\)$/, '')
+  while(/\(\)/.test(query)) {
+    query = query.replace(/\(\)/g, '')
+  }
 
   return query
 

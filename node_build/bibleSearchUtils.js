@@ -345,13 +345,17 @@ exports.findAutoCompleteSuggestions = findAutoCompleteSuggestions;
 
 var isValidBibleSearch = function isValidBibleSearch(_ref5) {
   var query = _ref5.query;
-  // validate strongs
+  var queryWordsOrConnectors = query.split(/[ ()"]/g); // valid use of #
+
+  if (queryWordsOrConnectors.some(function (wordOrConnector) {
+    return /[^#=].*?[#=]|[#=].*?[#=]/.test(wordOrConnector);
+  })) return false;
+  if (queryWordsOrConnectors.includes('#')) return false; // validate strongs
+
   if ((query.match(/#[HG][0-9]/g) || []).length !== (query.match(/#[HG][0-9]{5}(?=[# ")]|$)/g) || []).length) return false;
-  if (query.split(/( +|[()"])/g).some(function (wordOrConnector) {
+  if (queryWordsOrConnectors.some(function (wordOrConnector) {
     return (wordOrConnector.match(/#[HG][0-9]{5}(?=[# ")]|$)/g) || []).length >= 2;
   })) return false; // no double-strongs in one word like #H12345#H23456
-  // validate grammar details
-  // TODO
   // validate flags
   // TODO
   // validate groupings+
@@ -380,7 +384,10 @@ var completeQueryGroupings = function completeQueryGroupings(query) {
     query += Array(numLeftParens - numRightParens).fill(')').join('');
   }
 
-  query = query.replace(/\(\)$/, '');
+  while (/\(\)/.test(query)) {
+    query = query.replace(/\(\)/g, '');
+  }
+
   return query;
 };
 
