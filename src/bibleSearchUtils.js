@@ -282,10 +282,12 @@ export const getFlagSuggestions = ({ searchTextInComposition, versionAbbrsForIn=
   )
   const searchTextPieces = normalizedSearchText.split(' ')
   const currentPiece = searchTextPieces.pop()
-  const searchTextWithoutCurrentWord = searchTextPieces.join(' ')
+  const searchTextWithoutCurrentPiece = searchTextPieces.join(' ')
   normalizedSearchText = normalizedSearchText.trim()
 
-  const type = currentPiece.split(':')[0]
+  const [ type, currentValue='' ] = currentPiece.split(':')
+  const currentValueUpToLastComma = currentValue.replace(/^((?:.*,)?)[^,]*$/, '$1')
+  const valuesAlreadyUsed = currentValueUpToLastComma.split(',').filter(Boolean)
   let suggestedQueryOptions = []
   const containsHebrew = containsHebrewChars(searchTextInComposition) || /#H[0-9]{5}/.test(searchTextInComposition)
   const containsGreek = containsGreekChars(searchTextInComposition) || /#G[0-9]{5}/.test(searchTextInComposition)
@@ -298,15 +300,26 @@ export const getFlagSuggestions = ({ searchTextInComposition, versionAbbrsForIn=
       || (!containsHebrew && containsGreek && 'nt')
       || 'both'
     )
-    suggestedQueryOptions.push( ...[ ...versionAbbrsForIn, ...bibleSearchScopeKeysByTestament[testament] ].map(val => `${searchTextWithoutCurrentWord} in:${val}`) )
+    if(valuesAlreadyUsed.length > 0) {
+      const arrayToUse = versionAbbrsForIn.includes(valuesAlreadyUsed[0]) ? versionAbbrsForIn : bibleSearchScopeKeysByTestament[testament]
+      suggestedQueryOptions.push( ...arrayToUse.filter(val => !valuesAlreadyUsed.includes(val)).map(val => `${searchTextWithoutCurrentPiece} in:${currentValueUpToLastComma}${val}`) )
+    } else {
+      suggestedQueryOptions.push( ...[ ...versionAbbrsForIn, ...bibleSearchScopeKeysByTestament[testament] ].map(val => `${searchTextWithoutCurrentPiece} in:${val}`) )
+    }
 
-    } else if('include'.indexOf(type) === 0) {
+  } else if('include'.indexOf(type) === 0) {
     // include:variants/[versionId]
-    suggestedQueryOptions.push( ...[ 'variants', ...versionAbbrsForInclude ].map(val => `${searchTextWithoutCurrentWord} include:${val}`) )
+    const includeArray = [ 'variants' ]
+    if(valuesAlreadyUsed.length > 0) {
+      const arrayToUse = versionAbbrsForInclude.includes(valuesAlreadyUsed[0]) ? versionAbbrsForInclude : includeArray
+      suggestedQueryOptions.push( ...arrayToUse.filter(val => !valuesAlreadyUsed.includes(val)).map(val => `${searchTextWithoutCurrentPiece} include:${currentValueUpToLastComma}${val}`) )
+    } else {
+      suggestedQueryOptions.push( ...[ ...includeArray, ...versionAbbrsForInclude ].filter(val => !valuesAlreadyUsed.includes(val)).map(val => `${searchTextWithoutCurrentPiece} include:${val}`) )
+    }
 
   } else if(!containsHebrew && !containsGreek) {  // type === 'same'
     // same:[scope]
-    suggestedQueryOptions.push( ...[ 'phrase', 'verse', 'sentence', 'paragraph' ].map(val => `${searchTextWithoutCurrentWord} same:${val}`) )
+    suggestedQueryOptions.push( ...[ 'phrase', 'verse', 'sentence', 'paragraph' ].map(val => `${searchTextWithoutCurrentPiece} same:${val}`) )
   }
 
   return findAutoCompleteSuggestions({
