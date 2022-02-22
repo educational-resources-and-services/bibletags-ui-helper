@@ -404,9 +404,17 @@ var getFlagSuggestions = function getFlagSuggestions(_ref6) {
   var normalizedSearchText = searchTextInComposition.replace(/  +/g, ' ').replace(/^ /g, '');
   var searchTextPieces = normalizedSearchText.split(' ');
   var currentPiece = searchTextPieces.pop();
-  var searchTextWithoutCurrentWord = searchTextPieces.join(' ');
+  var searchTextWithoutCurrentPiece = searchTextPieces.join(' ');
   normalizedSearchText = normalizedSearchText.trim();
-  var type = currentPiece.split(':')[0];
+
+  var _currentPiece$split = currentPiece.split(':'),
+      _currentPiece$split2 = _slicedToArray(_currentPiece$split, 2),
+      type = _currentPiece$split2[0],
+      _currentPiece$split2$ = _currentPiece$split2[1],
+      currentValue = _currentPiece$split2$ === void 0 ? '' : _currentPiece$split2$;
+
+  var currentValueUpToLastComma = currentValue.replace(/^((?:.*,)?)[^,]*$/, '$1');
+  var valuesAlreadyUsed = currentValueUpToLastComma.split(',').filter(Boolean);
   var suggestedQueryOptions = [];
   var containsHebrew = containsHebrewChars(searchTextInComposition) || /#H[0-9]{5}/.test(searchTextInComposition);
   var containsGreek = containsGreekChars(searchTextInComposition) || /#G[0-9]{5}/.test(searchTextInComposition);
@@ -414,19 +422,43 @@ var getFlagSuggestions = function getFlagSuggestions(_ref6) {
   if (type === 'in') {
     // in:[range]/[versionId]
     var testament = containsHebrew && !containsGreek && 'ot' || !containsHebrew && containsGreek && 'nt' || 'both';
-    suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray([].concat(_toConsumableArray(versionAbbrsForIn), _toConsumableArray(_index.bibleSearchScopeKeysByTestament[testament])).map(function (val) {
-      return "".concat(searchTextWithoutCurrentWord, " in:").concat(val);
-    })));
+
+    if (valuesAlreadyUsed.length > 0) {
+      var arrayToUse = versionAbbrsForIn.includes(valuesAlreadyUsed[0]) ? versionAbbrsForIn : _index.bibleSearchScopeKeysByTestament[testament];
+      suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray(arrayToUse.filter(function (val) {
+        return !valuesAlreadyUsed.includes(val);
+      }).map(function (val) {
+        return "".concat(searchTextWithoutCurrentPiece, " in:").concat(currentValueUpToLastComma).concat(val);
+      })));
+    } else {
+      suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray([].concat(_toConsumableArray(versionAbbrsForIn), _toConsumableArray(_index.bibleSearchScopeKeysByTestament[testament])).map(function (val) {
+        return "".concat(searchTextWithoutCurrentPiece, " in:").concat(val);
+      })));
+    }
   } else if ('include'.indexOf(type) === 0) {
     // include:variants/[versionId]
-    suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray(['variants'].concat(_toConsumableArray(versionAbbrsForInclude)).map(function (val) {
-      return "".concat(searchTextWithoutCurrentWord, " include:").concat(val);
-    })));
+    var includeArray = ['variants'];
+
+    if (valuesAlreadyUsed.length > 0) {
+      var _arrayToUse = versionAbbrsForInclude.includes(valuesAlreadyUsed[0]) ? versionAbbrsForInclude : includeArray;
+
+      suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray(_arrayToUse.filter(function (val) {
+        return !valuesAlreadyUsed.includes(val);
+      }).map(function (val) {
+        return "".concat(searchTextWithoutCurrentPiece, " include:").concat(currentValueUpToLastComma).concat(val);
+      })));
+    } else {
+      suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray([].concat(includeArray, _toConsumableArray(versionAbbrsForInclude)).filter(function (val) {
+        return !valuesAlreadyUsed.includes(val);
+      }).map(function (val) {
+        return "".concat(searchTextWithoutCurrentPiece, " include:").concat(val);
+      })));
+    }
   } else if (!containsHebrew && !containsGreek) {
     // type === 'same'
     // same:[scope]
     suggestedQueryOptions.push.apply(suggestedQueryOptions, _toConsumableArray(['phrase', 'verse', 'sentence', 'paragraph'].map(function (val) {
-      return "".concat(searchTextWithoutCurrentWord, " same:").concat(val);
+      return "".concat(searchTextWithoutCurrentPiece, " same:").concat(val);
     })));
   }
 
