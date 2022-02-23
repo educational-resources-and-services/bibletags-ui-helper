@@ -235,7 +235,11 @@ var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
   }
 
   if (matchingSuggestions.length < max) {
-    var _iterator2 = _createForOfIteratorHelper(suggestionOptions),
+    var remainingSuggestionOptions = suggestionOptions.filter(function (suggestionOption) {
+      return !matchingSuggestions.includes(suggestionOption);
+    });
+
+    var _iterator2 = _createForOfIteratorHelper(remainingSuggestionOptions),
         _step2;
 
     try {
@@ -275,7 +279,11 @@ var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
 
 
   if (matchingSuggestions.length < max) {
-    var _iterator3 = _createForOfIteratorHelper(suggestionOptions),
+    var _remainingSuggestionOptions = suggestionOptions.filter(function (suggestionOption) {
+      return !matchingSuggestions.includes(suggestionOption);
+    });
+
+    var _iterator3 = _createForOfIteratorHelper(_remainingSuggestionOptions),
         _step3;
 
     try {

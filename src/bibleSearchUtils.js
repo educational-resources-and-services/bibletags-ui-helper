@@ -175,7 +175,8 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
 
   // all words exist in full or in part (matching from the beginnings)
   if(matchingSuggestions.length < max) {
-    for(let suggestionOption of suggestionOptions) {
+    const remainingSuggestionOptions = suggestionOptions.filter(suggestionOption => !matchingSuggestions.includes(suggestionOption))
+    for(let suggestionOption of remainingSuggestionOptions) {
       const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = suggestionOption.suggestedQuery.toLowerCase().match(/^(.*?[#:]?)([^#:]*)$/)
       const suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g)
       if(
@@ -190,7 +191,8 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
 
   // look for hits with correct first letter in last word + up to one mistake (missing/added/alt char)
   if(matchingSuggestions.length < max) {
-    for(let suggestionOption of suggestionOptions) {
+    const remainingSuggestionOptions = suggestionOptions.filter(suggestionOption => !matchingSuggestions.includes(suggestionOption))
+    for(let suggestionOption of remainingSuggestionOptions) {
       const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = suggestionOption.suggestedQuery.toLowerCase().match(/^(.*?[#:]?)([^#:]*)$/)
       const suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g)
       const finalWordInFinalDetail = lowerCaseStrFinalDetailWords[lowerCaseStrFinalDetailWords.length - 1]

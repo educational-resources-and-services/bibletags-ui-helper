@@ -191,7 +191,7 @@ export const getRefsFromPassageStr = passageStr => {
   const [ x, passageStrWithoutVersionId, versionId ] = normalizedPassageStr.match(/^(.*?)(?: ([a-z0-9]{2,9}))?$/i)
   passageStrSets.push({
     passageStr: passageStrWithoutVersionId,
-    versionId,
+    versionId: versionId && versionId.toLowerCase(),
   })
 
   for(let passageStrSet of passageStrSets) {
@@ -222,7 +222,7 @@ export const getRefsFromPassageStr = passageStr => {
     let endChapter = startChapter
     let endVerse = startVerse
     if(nonBookPartSecondHalf) {
-      const [ nonBookPartSecondHalfPiece1, nonBookPartSecondHalfPiece2, x3 ] = nonBookPartFirstHalf.split(':')
+      const [ nonBookPartSecondHalfPiece1, nonBookPartSecondHalfPiece2, x3 ] = nonBookPartSecondHalf.split(':')
       if(!nonBookPartSecondHalfPiece1 || x3) continue
       if(nonBookPartSecondHalfPiece2) {
         endChapter = nonBookPartSecondHalfPiece1

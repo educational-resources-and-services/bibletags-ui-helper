@@ -372,7 +372,7 @@ var getRefsFromPassageStr = function getRefsFromPassageStr(passageStr) {
 
   passageStrSets.push({
     passageStr: passageStrWithoutVersionId,
-    versionId: versionId
+    versionId: versionId && versionId.toLowerCase()
   });
 
   for (var _i2 = 0, _passageStrSets = passageStrSets; _i2 < _passageStrSets.length; _i2++) {
@@ -413,11 +413,11 @@ var getRefsFromPassageStr = function getRefsFromPassageStr(passageStr) {
     var endVerse = startVerse;
 
     if (nonBookPartSecondHalf) {
-      var _nonBookPartFirstHalf3 = nonBookPartFirstHalf.split(':'),
-          _nonBookPartFirstHalf4 = _slicedToArray(_nonBookPartFirstHalf3, 3),
-          nonBookPartSecondHalfPiece1 = _nonBookPartFirstHalf4[0],
-          nonBookPartSecondHalfPiece2 = _nonBookPartFirstHalf4[1],
-          x3 = _nonBookPartFirstHalf4[2];
+      var _nonBookPartSecondHal = nonBookPartSecondHalf.split(':'),
+          _nonBookPartSecondHal2 = _slicedToArray(_nonBookPartSecondHal, 3),
+          nonBookPartSecondHalfPiece1 = _nonBookPartSecondHal2[0],
+          nonBookPartSecondHalfPiece2 = _nonBookPartSecondHal2[1],
+          x3 = _nonBookPartSecondHal2[2];
 
       if (!nonBookPartSecondHalfPiece1 || x3) continue;
 
