@@ -179,6 +179,9 @@ export const inlineUsfmMarkers = [
   // "xdc",
   // "rq",
 
+  // Apparatus
+  "zApparatusJson",
+
   // Special Text
   // "add",
   // "bk",

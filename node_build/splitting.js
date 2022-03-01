@@ -148,7 +148,8 @@ var inlineUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 // "xnt",
 // "xdc",
 // "rq",
-// Special Text
+// Apparatus
+"zApparatusJson", // Special Text
 // "add",
 // "bk",
 // "dc",
