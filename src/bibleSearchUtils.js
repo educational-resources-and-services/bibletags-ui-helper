@@ -234,7 +234,7 @@ export const isValidBibleSearch = ({ query }) => {
   const queryWordsOrConnectors = query.split(/[ ()"]/g)
 
   // valid use of #
-  if(queryWordsOrConnectors.some(wordOrConnector => /[^#=].*?[#=]|[#=].*?[#=]/.test(wordOrConnector))) return false
+  if(queryWordsOrConnectors.some(wordOrConnector => /(?:[#=]{2}|#.*?=|=.*?#|[#=]$)/.test(wordOrConnector))) return false
   if(queryWordsOrConnectors.includes('#')) return false
 
   // validate strongs

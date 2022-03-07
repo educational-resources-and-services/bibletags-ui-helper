@@ -356,7 +356,7 @@ var isValidBibleSearch = function isValidBibleSearch(_ref5) {
   var queryWordsOrConnectors = query.split(/[ ()"]/g); // valid use of #
 
   if (queryWordsOrConnectors.some(function (wordOrConnector) {
-    return /[^#=].*?[#=]|[#=].*?[#=]/.test(wordOrConnector);
+    return /(?:[#=]{2}|#.*?=|=.*?#|[#=]$)/.test(wordOrConnector);
   })) return false;
   if (queryWordsOrConnectors.includes('#')) return false; // validate strongs
 
