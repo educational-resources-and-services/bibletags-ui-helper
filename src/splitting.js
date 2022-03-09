@@ -785,6 +785,22 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     }
   })
 
+  // handle zApparatusJson
+  let baseWords = []
+  modifiedVerseObjects.forEach(vsObj => {
+    if(vsObj.type === "word") {
+      baseWords.push(vsObj)
+    } else if(vsObj.tag === "zApparatusJson") {
+      try {
+        vsObj.apparatusJson = JSON.parse(vsObj.content)
+        vsObj.baseWords = baseWords
+        delete vsObj.content
+      } catch(e) {}
+    } else if(vsObj.tag === "v") {
+      baseWords = []
+    }
+  })
+
   if(!inlineMarkersOnly) {
     modifiedVerseObjects = wrapVerseObjects(modifiedVerseObjects)
   }
