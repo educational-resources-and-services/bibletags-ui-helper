@@ -155,6 +155,10 @@ blockUsfmMarkers: Array
 ```
 
 ```js
+wordPartDividerRegex: RegExp
+```
+
+```js
 headingBlockUsfmMarkers: Array
 ```
 
@@ -200,6 +204,10 @@ getHebrewPOSTerm(posCode): String
 
 ```js
 getGrammarColor({ isPrefixOrSuffix, morphPart="" }): String | undefined
+```
+
+```js
+grammarColors: Object
 ```
 
 ```js

@@ -153,7 +153,7 @@ const getGrammarTerms = code => {
   }
 }
 
-const grammarColors = {
+export const grammarColors = {
   C: "#C95047",
   R: "#84A671",
   Sd: "#24ada8",

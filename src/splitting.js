@@ -3,6 +3,9 @@ import usfmJS from 'usfm-js'
 
 import i18n from './i18n'
 import { defaultWordDividerRegex } from './constants'
+import { getMainWordPartIndex, getIsEntirelyPrefixAndSuffix, getMorphPartDisplayInfo } from './index'
+
+export const wordPartDividerRegex = /\u2060/g
 
 export const blockUsfmMarkers = [
   // see http://ubsicap.github.io/usfm/index.html
@@ -785,11 +788,30 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     }
   })
 
-  // handle zApparatusJson
+  // handle zApparatusJson and Hebrew verse parts
   let baseWords = []
   modifiedVerseObjects.forEach(vsObj => {
     if(vsObj.type === "word") {
       baseWords.push(vsObj)
+      const wordParts = (vsObj.text || ``).split(wordPartDividerRegex)
+      if(wordParts.length > 1) {
+        const morphLang = vsObj.morph.substr(0,2)
+        const morphParts = vsObj.morph.substr(3).split(':')
+        const mainPartIdx = getMainWordPartIndex(morphParts)
+        const isEntirelyPrefixAndSuffix = getIsEntirelyPrefixAndSuffix(vsObj)
+        if(wordParts.length === morphParts.length) {
+          vsObj.children = wordParts.map((text, idx) => {
+            const newObj = { text }
+            const isPrefixOrSuffix = isEntirelyPrefixAndSuffix || idx !== mainPartIdx
+            const morphPart = morphParts[idx]
+            if(isPrefixOrSuffix) {
+              newObj.color = getMorphPartDisplayInfo({ morphLang, morphPart, isPrefixOrSuffix, wordIsMultiPart: true }).color
+            }
+            return newObj
+          })
+          delete vsObj.text
+        }
+      }
     } else if(vsObj.tag === "zApparatusJson") {
       try {
         vsObj.apparatusJson = JSON.parse(vsObj.content)
