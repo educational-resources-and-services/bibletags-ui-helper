@@ -3,13 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.tagInList = exports.splitVerseIntoWords = exports.specialUsfmMarkers = exports.inlineUsfmMarkers = exports.headingBlockUsfmMarkers = exports.getPiecesFromUSFM = exports.blockUsfmMarkers = void 0;
+exports.wordPartDividerRegex = exports.tagInList = exports.splitVerseIntoWords = exports.specialUsfmMarkers = exports.inlineUsfmMarkers = exports.headingBlockUsfmMarkers = exports.getPiecesFromUSFM = exports.blockUsfmMarkers = void 0;
 
 var _usfmJs = _interopRequireDefault(require("usfm-js"));
 
 var _i18n = _interopRequireDefault(require("./i18n"));
 
 var _constants = require("./constants");
+
+var _index = require("./index");
 
 var _excluded = ["text", "content"];
 
@@ -37,6 +39,8 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
+var wordPartDividerRegex = /\u2060/g;
+exports.wordPartDividerRegex = wordPartDividerRegex;
 var blockUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 // // Identification
 // "id",
@@ -727,12 +731,42 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
     } else {
       modifiedVerseObjects.push(verseObj);
     }
-  }); // handle zApparatusJson
+  }); // handle zApparatusJson and Hebrew verse parts
 
   var baseWords = [];
   modifiedVerseObjects.forEach(function (vsObj) {
     if (vsObj.type === "word") {
       baseWords.push(vsObj);
+      var wordParts = (vsObj.text || "").split(wordPartDividerRegex);
+
+      if (wordParts.length > 1) {
+        var morphLang = vsObj.morph.substr(0, 2);
+        var morphParts = vsObj.morph.substr(3).split(':');
+        var mainPartIdx = (0, _index.getMainWordPartIndex)(morphParts);
+        var isEntirelyPrefixAndSuffix = (0, _index.getIsEntirelyPrefixAndSuffix)(vsObj);
+
+        if (wordParts.length === morphParts.length) {
+          vsObj.children = wordParts.map(function (text, idx) {
+            var newObj = {
+              text: text
+            };
+            var isPrefixOrSuffix = isEntirelyPrefixAndSuffix || idx !== mainPartIdx;
+            var morphPart = morphParts[idx];
+
+            if (isPrefixOrSuffix) {
+              newObj.color = (0, _index.getMorphPartDisplayInfo)({
+                morphLang: morphLang,
+                morphPart: morphPart,
+                isPrefixOrSuffix: isPrefixOrSuffix,
+                wordIsMultiPart: true
+              }).color;
+            }
+
+            return newObj;
+          });
+          delete vsObj.text;
+        }
+      }
     } else if (vsObj.tag === "zApparatusJson") {
       try {
         vsObj.apparatusJson = JSON.parse(vsObj.content);

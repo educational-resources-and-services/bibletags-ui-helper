@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getHebrewPOSTerm = exports.getHebrewMorphPartDisplayInfo = exports.getGrammarColor = void 0;
+exports.grammarColors = exports.getHebrewPOSTerm = exports.getHebrewMorphPartDisplayInfo = exports.getGrammarColor = void 0;
 
 var _i18n = _interopRequireDefault(require("./i18n"));
 
@@ -219,6 +219,7 @@ var grammarColors = {
   Tr: "#b73ecc",
   Ti: "#D68945"
 };
+exports.grammarColors = grammarColors;
 
 var getGrammarColor = function getGrammarColor(_ref) {
   var isPrefixOrSuffix = _ref.isPrefixOrSuffix,
