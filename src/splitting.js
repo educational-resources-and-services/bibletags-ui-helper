@@ -475,9 +475,9 @@ const reduceLevels = unitObjs => (
 
 const filterOutEmptyObjects = unitObjs => (
   unitObjs.filter(unitObj => {
-    const { text, children, content } = unitObj
+    const { text, children, content, apparatusJson } = unitObj
 
-    if(!text && (!children || !children.length) && !content) {
+    if(!text && (!children || !children.length) && !content && !apparatusJson) {
       return false
     }
 
@@ -792,7 +792,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
   let baseWords = []
   modifiedVerseObjects.forEach(vsObj => {
     if(vsObj.type === "word") {
-      baseWords.push(vsObj)
+      baseWords.push(JSON.parse(JSON.stringify(vsObj)))
       const wordParts = (vsObj.text || ``).split(wordPartDividerRegex)
       if(wordParts.length > 1) {
         const morphLang = vsObj.morph.substr(0,2)

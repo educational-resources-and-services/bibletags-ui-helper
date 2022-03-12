@@ -437,9 +437,10 @@ var filterOutEmptyObjects = function filterOutEmptyObjects(unitObjs) {
   return unitObjs.filter(function (unitObj) {
     var text = unitObj.text,
         children = unitObj.children,
-        content = unitObj.content;
+        content = unitObj.content,
+        apparatusJson = unitObj.apparatusJson;
 
-    if (!text && (!children || !children.length) && !content) {
+    if (!text && (!children || !children.length) && !content && !apparatusJson) {
       return false;
     }
 
@@ -736,7 +737,7 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
   var baseWords = [];
   modifiedVerseObjects.forEach(function (vsObj) {
     if (vsObj.type === "word") {
-      baseWords.push(vsObj);
+      baseWords.push(JSON.parse(JSON.stringify(vsObj)));
       var wordParts = (vsObj.text || "").split(wordPartDividerRegex);
 
       if (wordParts.length > 1) {
