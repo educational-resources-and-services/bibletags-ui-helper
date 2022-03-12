@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime.js"  // needed to build-for-node given async
 import { getOriginalLocsFromRange, getCorrespondingRefs, getRefFromLoc, getLocFromRef } from '@bibletags/bibletags-versification'
 
 import { bibleSearchScopeKeysByTestament } from './index'
-import { grammaticalDetailMap } from './constants'
+import { grammaticalDetailMap, bibleSearchFlagMap } from './constants'
 import { getQueryArrayAndWords } from './utils'
 
 export const containsHebrewChars = text => /[\u0590-\u05FF]/.test(text)
@@ -229,8 +229,9 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
   return matchingSuggestions
 }
 
-export const isValidBibleSearch = ({ query }) => {
+export const isValidBibleSearch = params => {  // should be object with `query` key
 
+  const { query } = getQueryAndFlagInfo({ ...params, FLAG_MAP: bibleSearchFlagMap })  // get rid of the flags
   const queryWordsOrConnectors = query.split(/[ ()"]/g)
 
   // valid use of #
