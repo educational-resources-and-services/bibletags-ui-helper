@@ -519,19 +519,22 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
         wordNumberInVerse = 1
       }
 
-      if(text) {
-        const textSplitOnWords = splitOnWords({ text, regexes })
+      if(text || tag === "w") {
 
-        unitObj.children = textSplitOnWords.map((wordOrWordDivider, idx) => {
-          const doesNotHaveWord = regexes.wordDividerStartToEnd.test(wordOrWordDivider)
-          return {
-            text: wordOrWordDivider,
-            ...(doesNotHaveWord ? {} : { type: "word" }),
-            ...((doesNotHaveWord || (splitWordInfo && idx > 0)) ? {} : { wordNumberInVerse: wordNumberInVerse++ }),
-          }
-        })
+        if(text) {
+          const textSplitOnWords = splitOnWords({ text, regexes })
 
-        delete unitObj.text
+          unitObj.children = textSplitOnWords.map((wordOrWordDivider, idx) => {
+            const doesNotHaveWord = regexes.wordDividerStartToEnd.test(wordOrWordDivider)
+            return {
+              text: wordOrWordDivider,
+              ...(doesNotHaveWord ? {} : { type: "word" }),
+              ...((doesNotHaveWord || (splitWordInfo && idx > 0)) ? {} : { wordNumberInVerse: wordNumberInVerse++ }),
+            }
+          })
+
+          delete unitObj.text
+        }
 
         if(splitWordInfo) {
 

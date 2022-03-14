@@ -488,22 +488,24 @@ var getGroupedVerseObjects = function getGroupedVerseObjects(_ref5) {
         wordNumberInVerse = 1;
       }
 
-      if (text) {
-        var textSplitOnWords = splitOnWords({
-          text: text,
-          regexes: regexes
-        });
-        unitObj.children = textSplitOnWords.map(function (wordOrWordDivider, idx) {
-          var doesNotHaveWord = regexes.wordDividerStartToEnd.test(wordOrWordDivider);
-          return _objectSpread(_objectSpread({
-            text: wordOrWordDivider
-          }, doesNotHaveWord ? {} : {
-            type: "word"
-          }), doesNotHaveWord || splitWordInfo && idx > 0 ? {} : {
-            wordNumberInVerse: wordNumberInVerse++
+      if (text || tag === "w") {
+        if (text) {
+          var textSplitOnWords = splitOnWords({
+            text: text,
+            regexes: regexes
           });
-        });
-        delete unitObj.text;
+          unitObj.children = textSplitOnWords.map(function (wordOrWordDivider, idx) {
+            var doesNotHaveWord = regexes.wordDividerStartToEnd.test(wordOrWordDivider);
+            return _objectSpread(_objectSpread({
+              text: wordOrWordDivider
+            }, doesNotHaveWord ? {} : {
+              type: "word"
+            }), doesNotHaveWord || splitWordInfo && idx > 0 ? {} : {
+              wordNumberInVerse: wordNumberInVerse++
+            });
+          });
+          delete unitObj.text;
+        }
 
         if (splitWordInfo) {
           var firstChild = unitObj.children[0];
