@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.maxVerseNumberByBookId = exports.hebrewPrefixSuffixMap = exports.grammaticalDetailMap = exports.defaultWordDividerRegex = exports.bibleSearchScopes = exports.bibleSearchScopeKeysByTestament = exports.bibleSearchFlagMap = exports.allVerseNumberScopeKeysByBookId = void 0;
 
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -184,7 +186,7 @@ var getGrammaticalDetailMapValue = function getGrammaticalDetailMapValue(type, t
   });
   return {
     detail: values.map(function (val) {
-      return "".concat(type[val] || type, ":").concat(val);
+      return "".concat(_typeof(type) === 'object' && type[val] || type, ":").concat(val);
     }),
     avgRowSizeInKB: avgRowSizeInKB,
     matches: function matches(wordInfo) {
@@ -304,20 +306,34 @@ var getGreekAttributeMapValue = function getGreekAttributeMapValue() {
 };
 
 var grammaticalDetailMap = {
-  // pos - greek
-  "determiner": getPosMapValue('E', 899),
-  "foreign": getPosMapValue('F', 1),
   // pos - both
-  "adjective": getPosMapValue('A', 600),
   "noun": getPosMapValue('N', 5045),
+  "verb": getPosMapValue('V', 3013),
+  "adjective": getPosMapValue('A', 600),
   "conjunction": getPosMapValue('C', 588),
   "adverb": getPosMapValue('D', 329),
   "preposition": getPosMapValue('R', 901),
   "pronoun": getPosMapValue('P', 722),
   "particle": getPosMapValue('T', 772),
-  "verb": getPosMapValue('V', 3013),
+  // pos - greek
+  "determiner": getPosMapValue('E', 899),
+  "foreign": getPosMapValue('F', 1),
+  // gender - both
+  "masculine": getGenderMapValue(['m', 'M'], 4858),
+  "feminine": getGenderMapValue(['f', 'F'], 1492),
+  // gender - hebrew
+  "gender-both": getGenderMapValue('b', 1106),
+  "common": getGenderMapValue('c', 681),
+  // gender - greek
+  "neuter": getGenderMapValue('N', 743),
+  // number - both
+  "singular": getNumberMapValue(['s', 'S'], 5688),
+  "plural": getNumberMapValue(['p', 'P'], 2443),
+  // number - hebrew
+  "dual": getNumberMapValue('d', 192),
   // stem - hebrew
   "qal": getHebrewStemMapValue('Hq', 2919),
+  //only one stem needs to be tested for result accuracy
   "niphal": getHebrewStemMapValue(['HN', 'AN'], 0),
   "piel": getHebrewStemMapValue('Hp', 0),
   "pual": getHebrewStemMapValue('HP', 0),
@@ -364,6 +380,14 @@ var grammaticalDetailMap = {
   "ithpalpel": getHebrewStemMapValue('AL', 0),
   "ithpolel": getHebrewStemMapValue('AO', 0),
   "ittaphal": getHebrewStemMapValue('AG', 0),
+  // aspect - both
+  "perfect": getAspectMapValue(['p', 'E'], 998),
+  "imperfect": getAspectMapValue(['I', 'i'], 953),
+  // aspect - greek
+  "present": getAspectMapValue('P', 735),
+  "future": getAspectMapValue('F', 113),
+  "aorist": getAspectMapValue('A', 781),
+  "pluperfect": getAspectMapValue('L', 5),
   // aspect - hebrew
   "sequential-perfect": getAspectMapValue('q', 372),
   "sequential-imperfect": getAspectMapValue('w', 958),
@@ -372,19 +396,11 @@ var grammaticalDetailMap = {
   "passive-participle": getAspectMapValue('s', 94),
   "infinitive-absolute": getAspectMapValue('a', 52),
   "infinitive-construct": getAspectMapValue('c', 442),
-  // aspect - greek
-  "present": getAspectMapValue('P', 735),
-  "future": getAspectMapValue('F', 113),
-  "aorist": getAspectMapValue('A', 781),
-  "pluperfect": getAspectMapValue('L', 5),
-  // aspect - both
-  "perfect": getAspectMapValue(['p', 'E'], 998),
-  "imperfect": getAspectMapValue(['I', 'i'], 953),
   // mood - greek
-  "indicative": getGreekMoodMapValue('I', 0),
-  "subjunctive": getGreekMoodMapValue('S', 0),
-  "optative": getGreekMoodMapValue('O', 0),
-  "infinitive": getGreekMoodMapValue('N', 0),
+  "indicative": getGreekMoodMapValue('I', 987),
+  "subjunctive": getGreekMoodMapValue('S', 124),
+  "optative": getGreekMoodMapValue('O', 4),
+  "infinitive": getGreekMoodMapValue('N', 159),
   // aspect - hebrew / mood - greek
   "imperative": getGrammaticalDetailMapValue({
     v: 'aspect',
@@ -395,7 +411,7 @@ var grammaticalDetailMap = {
   }, {
     v: 'H',
     M: 'G'
-  }, ['v', 'M'], 0),
+  }, ['v', 'M'], 188),
   "participle": getGrammaticalDetailMapValue({
     r: 'aspect',
     P: 'mood'
@@ -405,16 +421,16 @@ var grammaticalDetailMap = {
   }, {
     r: 'H',
     P: 'G'
-  }, ['r', 'P'], 0),
+  }, ['r', 'P'], 487),
   // type - hebrew
-  "cardinal-number": getTypeMapValue('Ac', 0),
-  "ordinal-number": getTypeMapValue('Ao', 0),
-  "gentilic": getTypeMapValue('Ng', 0),
-  "proper-name": getTypeMapValue('Np', 0),
-  "affirmation": getTypeMapValue('Ta', 0),
-  "exhortation": getTypeMapValue('Te', 0),
-  "negative": getTypeMapValue('Tn', 0),
-  "direct-object-marker": getTypeMapValue('To', 0),
+  "cardinal-number": getTypeMapValue('Ac', 378),
+  "ordinal-number": getTypeMapValue('Ao', 45),
+  "gentilic": getTypeMapValue('Ng', 129),
+  "proper-name": getTypeMapValue('Np', 2049),
+  "affirmation": getTypeMapValue('Ta', 62),
+  "exhortation": getTypeMapValue('Te', 18),
+  "negative": getTypeMapValue('Tn', 363),
+  "direct-object-marker": getTypeMapValue('To', 555),
   // type - hebrew / pos - greek
   "interjection": getGrammaticalDetailMapValue({
     Tj: 'type',
@@ -422,74 +438,61 @@ var grammaticalDetailMap = {
   }, 1, {
     Tj: 'H',
     I: 'G'
-  }, ['Tj', 'I'], 0),
+  }, ['Tj', 'I'], 22),
   // type - greek
-  "substantive": getTypeMapValue('AS', 0),
-  "predicate": getTypeMapValue('AP', 0),
-  "ascriptive": getTypeMapValue('AA', 0),
-  "restrictive": getTypeMapValue('AR', 0),
-  "article": getTypeMapValue('EA', 0),
-  "differential": getTypeMapValue('EF', 0),
-  "possessive": getTypeMapValue('EP', 0),
-  "quantifier": getTypeMapValue('EQ', 0),
-  "ordinal": getTypeMapValue('EO', 0),
-  "reflexive": getTypeMapValue('PE', 0),
-  "reciprocal": getTypeMapValue('PC', 0),
-  "transitive": getTypeMapValue('VT', 0),
-  "intransitive": getTypeMapValue('VI', 0),
-  "linking": getTypeMapValue('VL', 0),
-  "modal": getTypeMapValue('VM', 0),
-  "periphrastic": getTypeMapValue('VP', 0),
-  "exclamation": getTypeMapValue('IE', 0),
-  "directive": getTypeMapValue('ID', 0),
-  "response": getTypeMapValue('IR', 0),
-  "improper-preposition": getTypeMapValue('DI', 0),
-  "correlative": getTypeMapValue(['DO', 'CO'], 0),
-  "coordinating": getTypeMapValue('CC', 0),
-  "subordinating": getTypeMapValue('CS', 0),
+  "substantive": getTypeMapValue('AS', 189),
+  "predicate": getTypeMapValue('AP', 64),
+  "ascriptive": getTypeMapValue('AA', 80),
+  "restrictive": getTypeMapValue('AR', 13),
+  "article": getTypeMapValue('EA', 728),
+  "differential": getTypeMapValue('EF', 15),
+  "possessive": getTypeMapValue('EP', 21),
+  "quantifier": getTypeMapValue('EQ', 69),
+  "ordinal": getTypeMapValue('EO', 8),
+  "reflexive": getTypeMapValue('PE', 35),
+  "reciprocal": getTypeMapValue('PC', 7),
+  // "transitive": getTypeMapValue('VT', 0),
+  // "intransitive": getTypeMapValue('VI', 0),
+  // "linking": getTypeMapValue('VL', 0),
+  // "modal": getTypeMapValue('VM', 0),
+  // "periphrastic": getTypeMapValue('VP', 0),
+  "exclamation": getTypeMapValue('IE', 11),
+  "directive": getTypeMapValue('ID', 14),
+  "response": getTypeMapValue('IR', 1),
+  "improper-preposition": getTypeMapValue('DI', 38),
+  "correlative": getTypeMapValue(['DO', 'CO'], 72),
+  "coordinating": getTypeMapValue('CC', 638),
+  "subordinating": getTypeMapValue('CS', 196),
   // type - both
-  "demonstrative": getTypeMapValue(['Pd', 'Tm', 'ED', 'PD'], 0),
-  "indefinite": getTypeMapValue(['Pf', 'PI'], 0),
-  "personal": getTypeMapValue(['Pp', 'PP'], 0),
-  "interrogative": getTypeMapValue(['Pi', 'Ti', 'ET', 'PT'], 0),
-  "relative": getTypeMapValue(['Pr', 'Tr', 'ER', 'PR'], 0),
-  "number": getTypeMapValue(['Ac', 'Ao', 'EN'], 0),
+  "demonstrative": getTypeMapValue(['Pd', 'Tm', 'ED', 'PD'], 126),
+  "indefinite": getTypeMapValue(['Pf', 'PI'], 53),
+  "personal": getTypeMapValue(['Pp', 'PP'], 442),
+  "interrogative": getTypeMapValue(['Pi', 'Ti', 'ET', 'PT'], 29),
+  "relative": getTypeMapValue(['Pr', 'Tr', 'ER', 'PR'], 103),
+  "number": getTypeMapValue(['Ac', 'Ao', 'EN'], 153),
   // voice - greek
-  "active": getGreekVoiceMapValue('A', 0),
-  "middle": getGreekVoiceMapValue('M', 0),
-  "passive": getGreekVoiceMapValue('P', 0),
+  "active": getGreekVoiceMapValue('A', 1290),
+  "middle": getGreekVoiceMapValue('M', 282),
+  "passive": getGreekVoiceMapValue('P', 261),
   // person - both
-  "1st": getPersonMapValue('1', 0),
-  "2nd": getPersonMapValue('2', 0),
-  "3rd": getPersonMapValue('3', 0),
-  // gender - hebrew
-  "gender-both": getGenderMapValue('b', 0),
-  "common": getGenderMapValue('c', 0),
-  // gender - greek
-  "neuter": getGenderMapValue('N', 0),
-  // gender - both
-  "masculine": getGenderMapValue(['m', 'M'], 0),
-  "feminine": getGenderMapValue(['f', 'F'], 0),
-  // number - hebrew
-  "dual": getNumberMapValue('d', 0),
-  // number - both
-  "singular": getNumberMapValue(['s', 'S'], 0),
-  "plural": getNumberMapValue(['p', 'P'], 0),
+  "1st": getPersonMapValue('1', 381),
+  "2nd": getPersonMapValue('2', 522),
+  "3rd": getPersonMapValue('3', 1688),
   // state - hebrew
-  "absolute": getHebrewStateMapValue('a', 0),
-  "construct": getHebrewStateMapValue('c', 0),
+  "absolute": getHebrewStateMapValue('a', 4286),
+  "construct": getHebrewStateMapValue('c', 3684),
   "determined": getHebrewStateMapValue('d', 0),
   // case - greek
-  "nominative": getGreekCaseMapValue('N', 0),
-  "genitive": getGreekCaseMapValue('G', 0),
-  "dative": getGreekCaseMapValue('D', 0),
-  "accusative": getGreekCaseMapValue('A', 0),
-  "vocative": getGreekCaseMapValue('V', 0),
+  "nominative": getGreekCaseMapValue('N', 1325),
+  "genitive": getGreekCaseMapValue('G', 1241),
+  "dative": getGreekCaseMapValue('D', 794),
+  "accusative": getGreekCaseMapValue('A', 1433),
+  "vocative": getGreekCaseMapValue('V', 55),
   // attribute - greek
-  "comparative": getGreekAttributeMapValue('C', 0),
-  "superlatives": getGreekAttributeMapValue('S', 0),
-  "diminutive": getGreekAttributeMapValue('D', 0),
-  "indeclinable": getGreekAttributeMapValue('I', 0)
+  "comparative": getGreekAttributeMapValue('C', 25),
+  "superlatives": getGreekAttributeMapValue('S', 8),
+  "diminutive": getGreekAttributeMapValue('D', 12),
+  "indeclinable": getGreekAttributeMapValue('I', 68)
 };
 exports.grammaticalDetailMap = grammaticalDetailMap;
 var maxVerseNumberByBookId = [0, 1533, 1213, 859, 1289, 959, 658, 618, 85, 811, 695, 817, 719, 943, 822, 280, 405, 167, 1070, 2527, 915, 222, 117, 1291, 1364, 154, 1273, 357, 197, 73, 146, 21, 48, 105, 47, 56, 53, 38, 211, 55, 1071, 678, 1151, 879, 1007, 433, 437, 256, 149, 155, 104, 95, 89, 47, 113, 83, 46, 25, 303, 108, 105, 61, 105, 13, 15, 25, 405];

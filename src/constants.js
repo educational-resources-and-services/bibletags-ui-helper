@@ -152,7 +152,7 @@ const getGrammaticalDetailMapValue = (type, typeIndex, requiredLanguageChar, val
   const hasVaryingValueLengths = values.some(val => val.length !== valueLength)
 
   return {
-    detail: values.map(val => `${type[val] || type}:${val}`),
+    detail: values.map(val => `${(typeof type === 'object' && type[val]) || type}:${val}`),
     avgRowSizeInKB,
     matches: wordInfo => {
 
@@ -199,19 +199,37 @@ const getGreekAttributeMapValue = (...params) => getGrammaticalDetailMapValue('a
 
 export const grammaticalDetailMap = {
 
-  // pos - greek
-  "determiner": getPosMapValue('E', 899),
-  "foreign": getPosMapValue('F', 1),
-
   // pos - both
-  "adjective": getPosMapValue('A', 600),
   "noun": getPosMapValue('N', 5045),
+  "verb": getPosMapValue('V', 3013),
+  "adjective": getPosMapValue('A', 600),
   "conjunction": getPosMapValue('C', 588),
   "adverb": getPosMapValue('D', 329),
   "preposition": getPosMapValue('R', 901),
   "pronoun": getPosMapValue('P', 722),
   "particle": getPosMapValue('T', 772),
-  "verb": getPosMapValue('V', 3013),
+
+  // pos - greek
+  "determiner": getPosMapValue('E', 899),
+  "foreign": getPosMapValue('F', 1),
+
+  // gender - both
+  "masculine": getGenderMapValue([ 'm', 'M' ], 4858),
+  "feminine": getGenderMapValue([ 'f', 'F' ], 1492),
+
+  // gender - hebrew
+  "gender-both": getGenderMapValue('b', 1106),
+  "common": getGenderMapValue('c', 681),
+
+  // gender - greek
+  "neuter": getGenderMapValue('N', 743),
+
+  // number - both
+  "singular": getNumberMapValue([ 's', 'S' ], 5688),
+  "plural": getNumberMapValue([ 'p', 'P' ], 2443),
+
+  // number - hebrew
+  "dual": getNumberMapValue('d', 192),
 
   // stem - hebrew
   "qal": getHebrewStemMapValue('Hq', 2919), //only one stem needs to be tested for result accuracy
@@ -262,6 +280,16 @@ export const grammaticalDetailMap = {
   "ithpolel": getHebrewStemMapValue('AO', 0),
   "ittaphal": getHebrewStemMapValue('AG', 0),
 
+  // aspect - both
+  "perfect": getAspectMapValue([ 'p', 'E' ], 998),
+  "imperfect": getAspectMapValue([ 'I', 'i' ], 953),
+
+  // aspect - greek
+  "present": getAspectMapValue('P', 735),
+  "future": getAspectMapValue('F', 113),
+  "aorist": getAspectMapValue('A', 781),
+  "pluperfect": getAspectMapValue('L', 5),
+
   // aspect - hebrew
   "sequential-perfect": getAspectMapValue('q', 372),
   "sequential-imperfect": getAspectMapValue('w', 958),
@@ -270,16 +298,6 @@ export const grammaticalDetailMap = {
   "passive-participle": getAspectMapValue('s', 94),
   "infinitive-absolute": getAspectMapValue('a', 52),
   "infinitive-construct": getAspectMapValue('c', 442),
-
-  // aspect - greek
-  "present": getAspectMapValue('P', 735),
-  "future": getAspectMapValue('F', 113),
-  "aorist": getAspectMapValue('A', 781),
-  "pluperfect": getAspectMapValue('L', 5),
-
-  // aspect - both
-  "perfect": getAspectMapValue([ 'p', 'E' ], 998),
-  "imperfect": getAspectMapValue([ 'I', 'i' ], 953),
 
   // mood - greek
   "indicative": getGreekMoodMapValue('I', 987),
@@ -316,11 +334,11 @@ export const grammaticalDetailMap = {
   "ordinal": getTypeMapValue('EO', 8),
   "reflexive": getTypeMapValue('PE', 35),
   "reciprocal": getTypeMapValue('PC', 7),
-  "transitive": getTypeMapValue('VT', 0),
-  "intransitive": getTypeMapValue('VI', 0),
-  "linking": getTypeMapValue('VL', 0),
-  "modal": getTypeMapValue('VM', 0),
-  "periphrastic": getTypeMapValue('VP', 0),
+  // "transitive": getTypeMapValue('VT', 0),
+  // "intransitive": getTypeMapValue('VI', 0),
+  // "linking": getTypeMapValue('VL', 0),
+  // "modal": getTypeMapValue('VM', 0),
+  // "periphrastic": getTypeMapValue('VP', 0),
   "exclamation": getTypeMapValue('IE', 11),
   "directive": getTypeMapValue('ID', 14),
   "response": getTypeMapValue('IR', 1),
@@ -346,24 +364,6 @@ export const grammaticalDetailMap = {
   "1st": getPersonMapValue('1', 381),
   "2nd": getPersonMapValue('2', 522),
   "3rd": getPersonMapValue('3', 1688),
-
-  // gender - hebrew
-  "gender-both": getGenderMapValue('b', 1106),
-  "common": getGenderMapValue('c', 681),
-
-  // gender - greek
-  "neuter": getGenderMapValue('N', 743),
-
-  // gender - both
-  "masculine": getGenderMapValue([ 'm', 'M' ], 4858),
-  "feminine": getGenderMapValue([ 'f', 'F' ], 1492),
-
-  // number - hebrew
-  "dual": getNumberMapValue('d', 192),
-
-  // number - both
-  "singular": getNumberMapValue([ 's', 'S' ], 5688),
-  "plural": getNumberMapValue([ 'p', 'P' ], 2443),
 
   // state - hebrew
   "absolute": getHebrewStateMapValue('a', 4286),

@@ -132,21 +132,11 @@ var getPosTypeTerm = function getPosTypeTerm(code) {
 
     case 'RT':
       return (0, _i18n["default"])("interrogative", "", "grammar");
-
-    case 'VT':
-      return (0, _i18n["default"])("transitive", "", "grammar");
-
-    case 'VI':
-      return (0, _i18n["default"])("intransitive", "", "grammar");
-
-    case 'VL':
-      return (0, _i18n["default"])("linking", "", "grammar");
-
-    case 'VM':
-      return (0, _i18n["default"])("modal", "", "grammar");
-
-    case 'VP':
-      return (0, _i18n["default"])("periphrastic", "", "grammar");
+    // case 'VT': return i18n("transitive", "", "grammar")
+    // case 'VI': return i18n("intransitive", "", "grammar")
+    // case 'VL': return i18n("linking", "", "grammar")
+    // case 'VM': return i18n("modal", "", "grammar")
+    // case 'VP': return i18n("periphrastic", "", "grammar")
 
     case 'IE':
       return (0, _i18n["default"])("exclamation", "", "grammar");
