@@ -742,7 +742,7 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
       baseWords.push(JSON.parse(JSON.stringify(vsObj)));
       var wordParts = (vsObj.text || "").split(wordPartDividerRegex);
 
-      if (wordParts.length > 1) {
+      if (wordParts.length > 1 && vsObj.morph) {
         var morphLang = vsObj.morph.substr(0, 2);
         var morphParts = vsObj.morph.substr(3).split(':');
         var mainPartIdx = (0, _index.getMainWordPartIndex)(morphParts);

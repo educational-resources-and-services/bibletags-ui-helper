@@ -797,7 +797,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     if(vsObj.type === "word") {
       baseWords.push(JSON.parse(JSON.stringify(vsObj)))
       const wordParts = (vsObj.text || ``).split(wordPartDividerRegex)
-      if(wordParts.length > 1) {
+      if(wordParts.length > 1 && vsObj.morph) {
         const morphLang = vsObj.morph.substr(0,2)
         const morphParts = vsObj.morph.substr(3).split(':')
         const mainPartIdx = getMainWordPartIndex(morphParts)
