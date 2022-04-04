@@ -889,5 +889,12 @@ export const splitVerseIntoWords = ({ usfm, wordDividerRegex }={}) => {
     return words
   }
 
-  return getWords( getPiecesFromUSFM({ usfm, wordDividerRegex }) )
+  return getWords(
+    getPiecesFromUSFM({
+      usfm,
+      wordDividerRegex,
+      inlineMarkersOnly: true,
+      splitIntoWords: true,
+    })
+  )
 }

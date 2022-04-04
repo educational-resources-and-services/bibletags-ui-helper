@@ -848,7 +848,9 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
 
   return getWords(getPiecesFromUSFM({
     usfm: usfm,
-    wordDividerRegex: wordDividerRegex
+    wordDividerRegex: wordDividerRegex,
+    inlineMarkersOnly: true,
+    splitIntoWords: true
   }));
 };
 
