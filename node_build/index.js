@@ -655,7 +655,7 @@ var getIsEntirelyPrefixAndSuffix = function getIsEntirelyPrefixAndSuffix(wordInf
 
 exports.getIsEntirelyPrefixAndSuffix = getIsEntirelyPrefixAndSuffix;
 var toBase64 = typeof btoa === 'undefined' ? function (str) {
-  return Buffer.from(str).toString('base64');
+  return Buffer.from(str, 'binary').toString('base64');
 } : btoa;
 exports.toBase64 = toBase64;
 
