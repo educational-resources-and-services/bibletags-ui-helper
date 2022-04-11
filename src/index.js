@@ -599,7 +599,7 @@ export const getStrongs = wordInfo => (wordInfo ? (wordInfo.strong || '').replac
 
 export const getIsEntirelyPrefixAndSuffix = wordInfo => (wordInfo && !getStrongs(wordInfo))
 
-export const toBase64 = btoa || (str => Buffer.from(str).toString('base64'))
+export const toBase64 = typeof btoa === 'undefined' ? (str => Buffer.from(str).toString('base64')) : btoa
 
 const hexToBase64 = hex => toBase64(hex.match(/\w{2}/g).map(a => String.fromCharCode(parseInt(a, 16))).join(""))
 
