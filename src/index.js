@@ -599,7 +599,9 @@ export const getStrongs = wordInfo => (wordInfo ? (wordInfo.strong || '').replac
 
 export const getIsEntirelyPrefixAndSuffix = wordInfo => (wordInfo && !getStrongs(wordInfo))
 
-const hexToBase64 = hex => btoa(hex.match(/\w{2}/g).map(a => String.fromCharCode(parseInt(a, 16))).join(""))
+export const toBase64 = btoa || (str => Buffer.from(str).toString('base64'))
+
+const hexToBase64 = hex => toBase64(hex.match(/\w{2}/g).map(a => String.fromCharCode(parseInt(a, 16))).join(""))
 
 // FYI: maximum length of 32-digit base16 (hex) is 22-digits, though it is buffered to 24 digits with ='s
 export const hash64 = str => hexToBase64(md5(str))
@@ -622,10 +624,13 @@ export const getWordsHash = ({ usfm, wordDividerRegex }) => {
 
 export const getWordHashes = ({ usfm, wordDividerRegex }) => {
 
-  const words = splitVerseIntoWords({
-    usfm,
-    wordDividerRegex,
-  })
+  const words = (
+    splitVerseIntoWords({
+      usfm,
+      wordDividerRegex,
+    })
+      .map(word => word.toLowerCase())
+  )
 
   return words.map((word, index) => ({
     wordNumberInVerse: index + 1,

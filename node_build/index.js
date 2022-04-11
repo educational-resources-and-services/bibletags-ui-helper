@@ -27,12 +27,13 @@ var _exportNames = {
   getMainWordPartIndex: true,
   getStrongs: true,
   getIsEntirelyPrefixAndSuffix: true,
+  toBase64: true,
   hash64: true,
   getWordsHash: true,
   getWordHashes: true,
   isValidEmail: true
 };
-exports.isValidEmail = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
+exports.toBase64 = exports.isValidEmail = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
 
 var _md = _interopRequireDefault(require("md5"));
 
@@ -654,8 +655,14 @@ var getIsEntirelyPrefixAndSuffix = function getIsEntirelyPrefixAndSuffix(wordInf
 
 exports.getIsEntirelyPrefixAndSuffix = getIsEntirelyPrefixAndSuffix;
 
+var toBase64 = btoa || function (str) {
+  return Buffer.from(str).toString('base64');
+};
+
+exports.toBase64 = toBase64;
+
 var hexToBase64 = function hexToBase64(hex) {
-  return btoa(hex.match(/\w{2}/g).map(function (a) {
+  return toBase64(hex.match(/\w{2}/g).map(function (a) {
     return String.fromCharCode(parseInt(a, 16));
   }).join(""));
 }; // FYI: maximum length of 32-digit base16 (hex) is 22-digits, though it is buffered to 24 digits with ='s
@@ -693,6 +700,8 @@ var getWordHashes = function getWordHashes(_ref9) {
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
+  }).map(function (word) {
+    return word.toLowerCase();
   });
   return words.map(function (word, index) {
     return {
