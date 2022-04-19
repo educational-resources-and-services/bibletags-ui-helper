@@ -500,7 +500,7 @@ var getGroupedVerseObjects = function getGroupedVerseObjects(_ref5) {
               text: wordOrWordDivider
             }, doesNotHaveWord ? {} : {
               type: "word"
-            }), doesNotHaveWord || splitWordInfo && idx > 0 ? {} : {
+            }), doesNotHaveWord || splitWordInfo && idx === 0 ? {} : {
               wordNumberInVerse: wordNumberInVerse++
             });
           });

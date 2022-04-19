@@ -529,7 +529,7 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
             return {
               text: wordOrWordDivider,
               ...(doesNotHaveWord ? {} : { type: "word" }),
-              ...((doesNotHaveWord || (splitWordInfo && idx > 0)) ? {} : { wordNumberInVerse: wordNumberInVerse++ }),
+              ...((doesNotHaveWord || (splitWordInfo && idx === 0)) ? {} : { wordNumberInVerse: wordNumberInVerse++ }),
             }
           })
 
