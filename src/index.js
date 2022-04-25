@@ -1,5 +1,6 @@
 import md5 from 'md5'
 import { getRefFromLoc } from "@bibletags/bibletags-versification"
+import { Buffer } from 'buffer'
 
 import i18n, { i18nNumber } from './i18n'
 import { getHebrewPOSTerm, getHebrewMorphPartDisplayInfo } from './hebrewMorph'

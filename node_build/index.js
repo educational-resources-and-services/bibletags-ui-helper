@@ -39,6 +39,8 @@ var _md = _interopRequireDefault(require("md5"));
 
 var _bibletagsVersification = require("@bibletags/bibletags-versification");
 
+var _buffer = require("buffer");
+
 var _i18n = _interopRequireWildcard(require("./i18n"));
 
 Object.keys(_i18n).forEach(function (key) {
@@ -655,7 +657,7 @@ var getIsEntirelyPrefixAndSuffix = function getIsEntirelyPrefixAndSuffix(wordInf
 
 exports.getIsEntirelyPrefixAndSuffix = getIsEntirelyPrefixAndSuffix;
 var toBase64 = typeof btoa === 'undefined' ? function (str) {
-  return Buffer.from(str, 'binary').toString('base64');
+  return _buffer.Buffer.from(str, 'binary').toString('base64');
 } : btoa;
 exports.toBase64 = toBase64;
 
