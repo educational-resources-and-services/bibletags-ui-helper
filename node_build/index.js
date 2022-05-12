@@ -680,16 +680,14 @@ var getWordsHash = function getWordsHash(_ref8) {
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
-  }); // The following line gets me a base64 2-digit hash for each word. This
-  // leaves 4096 possible values for each word which makes the likelihood
-  // of two different word sets with the same hash values very, very low.
-  // Two different editions of a single text would need to have all the same
-  // words except one, and that one word switch would only have a 1/4096
-  // chance of getting an equivelant hash.
+  }).map(function (word) {
+    return word.toLowerCase();
+  }); // After importing the full ESV, I found only 1 redundancy in the 
+  // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).
+  // Thus, it is inconcievable that a matching verse ref in the same designated
+  // version would have the same 4-char hash if there was any difference.
 
-  return words.map(function (word) {
-    return hash64(word).substr(0, 2);
-  }).join('');
+  return hash64(JSON.stringify(words)).slice(0, 4);
 };
 
 exports.getWordsHash = getWordsHash;
@@ -702,14 +700,20 @@ var getWordHashes = function getWordHashes(_ref9) {
     wordDividerRegex: wordDividerRegex
   }).map(function (word) {
     return word.toLowerCase();
-  });
+  }); // After importing the full ESV, I found only 1 redundancy in the 
+  // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).
+  // Thus, it is more than sufficient to use 6 chars for the hash (which we
+  // do not want ANY invalid matches with) and 3 chars for the
+  // secondary hashes (since those only are checked when the main
+  // hash matches).
+
   return words.map(function (word, index) {
     return {
       wordNumberInVerse: index + 1,
-      hash: hash64(word),
-      withBeforeHash: hash64(JSON.stringify(words.slice(index === 0 ? 0 : index - 1, index + 1))),
-      withAfterHash: hash64(JSON.stringify(words.slice(index, index + 2))),
-      withBeforeAndAfterHash: hash64(JSON.stringify(words.slice(index === 0 ? 0 : index - 1, index + 2)))
+      hash: hash64(word).slice(0, 6),
+      withBeforeHash: hash64("".concat(words[index - 1], "\n").concat(words[index])).slice(0, 3),
+      withAfterHash: hash64("".concat(words[index], "\n").concat(words[index + 1])).slice(0, 3),
+      withBeforeAndAfterHash: hash64("".concat(words[index - 1], "\n").concat(words[index], "\n").concat(words[index + 1])).slice(0, 3)
     };
   });
 };
