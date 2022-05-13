@@ -90,8 +90,7 @@ var blockUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 // "pmr",
 // "pi#",
 // "mi",
-// "nb",
-// "pc",
+"nb", // "pc",
 // "ph#",
 "b", // Poetry
 "q#", "qr", "qc", "qa", // "qm#",

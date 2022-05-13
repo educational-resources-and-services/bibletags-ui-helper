@@ -67,7 +67,7 @@ export const blockUsfmMarkers = [
   // "pmr",
   // "pi#",
   // "mi",
-  // "nb",
+  "nb",
   // "pc",
   // "ph#",
   "b",
