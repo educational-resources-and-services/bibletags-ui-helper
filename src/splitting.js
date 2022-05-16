@@ -598,16 +598,22 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
           
           splitWordInfo = null
         }
-        
+
         const lastChild = unitObj.children[unitObj.children.length - 1]
-        splitWordInfo = lastChild.type === "word" && !includesEmptyWordDividers
-          ? {
-            arrayWhichEndsWithWord: unitObj.children,
-            ancestorLineWhichEndsWithWord: [ unitObj.children, lastChild ],
-            commonAncestorArray: unitObjs,
-            indexOfChildOfCommonAncestor: unitObjIndex,
-          }
-          : null
+        splitWordInfo = (
+          (
+            lastChild.type === "word"
+            && !includesEmptyWordDividers
+            && tagInList({ tag, list: inlineUsfmMarkers })
+          )
+            ? {
+              arrayWhichEndsWithWord: unitObj.children,
+              ancestorLineWhichEndsWithWord: [ unitObj.children, lastChild ],
+              commonAncestorArray: unitObjs,
+              indexOfChildOfCommonAncestor: unitObjIndex,
+            }
+            : null
+        )
 
       } else if(children) {
         const childrenInfo = getGroupedVerseObjectsRecursive({
@@ -616,18 +622,24 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
           splitWordInfo,
         })
         unitObj.children = childrenInfo.groupedVerseObjects
-        splitWordInfo = childrenInfo.splitWordInfo && !includesEmptyWordDividers
-          ? {
-            ...childrenInfo.splitWordInfo,
-            ancestorLineWhichEndsWithWord: [
-              ...childrenInfo.splitWordInfo.ancestorLineWhichEndsWithWord,
-              childrenInfo.splitWordInfo.commonAncestorArray,
-              childrenInfo.splitWordInfo.commonAncestorArray[childrenInfo.splitWordInfo.indexOfChildOfCommonAncestor],
-            ],
-            commonAncestorArray: unitObjs,
-            indexOfChildOfCommonAncestor: unitObjIndex,
-          }
-          : null
+        splitWordInfo = (
+          (
+            childrenInfo.splitWordInfo
+            && !includesEmptyWordDividers
+            && tagInList({ tag, list: inlineUsfmMarkers })
+          )
+            ? {
+              ...childrenInfo.splitWordInfo,
+              ancestorLineWhichEndsWithWord: [
+                ...childrenInfo.splitWordInfo.ancestorLineWhichEndsWithWord,
+                childrenInfo.splitWordInfo.commonAncestorArray,
+                childrenInfo.splitWordInfo.commonAncestorArray[childrenInfo.splitWordInfo.indexOfChildOfCommonAncestor],
+              ],
+              commonAncestorArray: unitObjs,
+              indexOfChildOfCommonAncestor: unitObjIndex,
+            }
+            : null
+        )
 
       } else if(tag) {
         splitWordInfo = null

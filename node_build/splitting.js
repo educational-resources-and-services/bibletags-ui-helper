@@ -559,7 +559,10 @@ var getGroupedVerseObjects = function getGroupedVerseObjects(_ref5) {
         }
 
         var lastChild = unitObj.children[unitObj.children.length - 1];
-        splitWordInfo = lastChild.type === "word" && !includesEmptyWordDividers ? {
+        splitWordInfo = lastChild.type === "word" && !includesEmptyWordDividers && tagInList({
+          tag: tag,
+          list: inlineUsfmMarkers
+        }) ? {
           arrayWhichEndsWithWord: unitObj.children,
           ancestorLineWhichEndsWithWord: [unitObj.children, lastChild],
           commonAncestorArray: unitObjs,
@@ -572,7 +575,10 @@ var getGroupedVerseObjects = function getGroupedVerseObjects(_ref5) {
           splitWordInfo: splitWordInfo
         });
         unitObj.children = childrenInfo.groupedVerseObjects;
-        splitWordInfo = childrenInfo.splitWordInfo && !includesEmptyWordDividers ? _objectSpread(_objectSpread({}, childrenInfo.splitWordInfo), {}, {
+        splitWordInfo = childrenInfo.splitWordInfo && !includesEmptyWordDividers && tagInList({
+          tag: tag,
+          list: inlineUsfmMarkers
+        }) ? _objectSpread(_objectSpread({}, childrenInfo.splitWordInfo), {}, {
           ancestorLineWhichEndsWithWord: [].concat(_toConsumableArray(childrenInfo.splitWordInfo.ancestorLineWhichEndsWithWord), [childrenInfo.splitWordInfo.commonAncestorArray, childrenInfo.splitWordInfo.commonAncestorArray[childrenInfo.splitWordInfo.indexOfChildOfCommonAncestor]]),
           commonAncestorArray: unitObjs,
           indexOfChildOfCommonAncestor: unitObjIndex
