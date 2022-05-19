@@ -444,11 +444,16 @@ const splitOnWords = ({ text, regexes }) => {
     // escape apostraphes
     .replace(/(\w)’(\w)/g, "$1ESCAPEDAPOSTRAPHE$2")
 
+    // escape large numbers with commas
+    .replace(/([0-9]),([0-9]{3}),([0-9]{3})/g, "$1ESCAPEDCOMMA$2ESCAPEDCOMMA$3")
+    .replace(/([0-9]),([0-9]{3})/g, "$1ESCAPEDCOMMA$2")
+
     // split to words
     .split(regexes.wordDividerInGroupGlobal)
 
-    // unescape apostraphes
+    // unescape apostraphes and commas
     .map(word => word.replace(/ESCAPEDAPOSTRAPHE/g, "’"))
+    .map(word => word.replace(/ESCAPEDCOMMA/g, ","))
 
     // filter out empties
     .filter(word => word !== "")

@@ -401,10 +401,13 @@ var splitOnWords = function splitOnWords(_ref3) {
   var text = _ref3.text,
       regexes = _ref3.regexes;
   return text // escape apostraphes
-  .replace(/(\w)’(\w)/g, "$1ESCAPEDAPOSTRAPHE$2") // split to words
-  .split(regexes.wordDividerInGroupGlobal) // unescape apostraphes
+  .replace(/(\w)’(\w)/g, "$1ESCAPEDAPOSTRAPHE$2") // escape large numbers with commas
+  .replace(/([0-9]),([0-9]{3}),([0-9]{3})/g, "$1ESCAPEDCOMMA$2ESCAPEDCOMMA$3").replace(/([0-9]),([0-9]{3})/g, "$1ESCAPEDCOMMA$2") // split to words
+  .split(regexes.wordDividerInGroupGlobal) // unescape apostraphes and commas
   .map(function (word) {
     return word.replace(/ESCAPEDAPOSTRAPHE/g, "’");
+  }).map(function (word) {
+    return word.replace(/ESCAPEDCOMMA/g, ",");
   }) // filter out empties
   .filter(function (word) {
     return word !== "";
