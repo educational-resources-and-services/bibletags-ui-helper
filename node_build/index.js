@@ -31,9 +31,10 @@ var _exportNames = {
   hash64: true,
   getWordsHash: true,
   getWordHashes: true,
-  isValidEmail: true
+  isValidEmail: true,
+  isOriginalLanguageSearch: true
 };
-exports.toBase64 = exports.isValidEmail = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
+exports.toBase64 = exports.isValidEmail = exports.isOriginalLanguageSearch = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
 
 var _md = _interopRequireDefault(require("md5"));
 
@@ -726,3 +727,9 @@ var isValidEmail = function isValidEmail(email) {
 };
 
 exports.isValidEmail = isValidEmail;
+
+var isOriginalLanguageSearch = function isOriginalLanguageSearch(searchText) {
+  return /^\(?"?[#=]/.test(searchText);
+};
+
+exports.isOriginalLanguageSearch = isOriginalLanguageSearch;
