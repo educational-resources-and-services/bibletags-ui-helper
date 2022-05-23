@@ -919,7 +919,7 @@ export const splitVerseIntoWords = ({ usfm, wordDividerRegex, pieces }={}) => {
 
   const wordsWithNumber = getWordsWithNumber(pieces)
 
-  if(wordsWithNumber.some(({ word, wordNumberInVerse }, idx) => wordNumberInVerse !== idx+1)) {
+  if(wordsWithNumber.some(({ wordNumberInVerse }, idx) => wordNumberInVerse !== idx+1)) {
     throw `error in splitVerseIntoWords: ${JSON.stringify({ usfm, pieces })}`
   }
 

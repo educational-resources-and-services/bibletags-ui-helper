@@ -614,7 +614,7 @@ export const getWordsHash = ({ usfm, wordDividerRegex }) => {
       usfm,
       wordDividerRegex,
     })
-      .map(({ word }) => word.toLowerCase())
+      .map(({ text }) => text.toLowerCase())
   )
 
   // After importing the full ESV, I found only 1 redundancy in the 
@@ -632,7 +632,7 @@ export const getWordHashes = ({ usfm, wordDividerRegex }) => {
       usfm,
       wordDividerRegex,
     })
-      .map(({ word }) => word.toLowerCase())
+      .map(({ text }) => text.toLowerCase())
   )
 
   // After importing the full ESV, I found only 1 redundancy in the 

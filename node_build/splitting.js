@@ -876,8 +876,7 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
   var wordsWithNumber = getWordsWithNumber(pieces);
 
   if (wordsWithNumber.some(function (_ref11, idx) {
-    var word = _ref11.word,
-        wordNumberInVerse = _ref11.wordNumberInVerse;
+    var wordNumberInVerse = _ref11.wordNumberInVerse;
     return wordNumberInVerse !== idx + 1;
   })) {
     throw "error in splitVerseIntoWords: ".concat(JSON.stringify({

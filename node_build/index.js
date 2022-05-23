@@ -682,8 +682,8 @@ var getWordsHash = function getWordsHash(_ref8) {
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
   }).map(function (_ref9) {
-    var word = _ref9.word;
-    return word.toLowerCase();
+    var text = _ref9.text;
+    return text.toLowerCase();
   }); // After importing the full ESV, I found only 1 redundancy in the 
   // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).
   // Thus, it is inconcievable that a matching verse ref in the same designated
@@ -701,8 +701,8 @@ var getWordHashes = function getWordHashes(_ref10) {
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
   }).map(function (_ref11) {
-    var word = _ref11.word;
-    return word.toLowerCase();
+    var text = _ref11.text;
+    return text.toLowerCase();
   }); // After importing the full ESV, I found only 1 redundancy in the 
   // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).
   // Thus, it is more than sufficient to use 6 chars for the hash (which we
