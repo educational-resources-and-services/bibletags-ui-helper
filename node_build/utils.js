@@ -135,7 +135,7 @@ var getQueryArrayAndWords = function getQueryArrayAndWords(query) {
     if (query.replace(/ \.\.\. /g, '').indexOf('.') !== -1) throw "illegal period(s) in search query";
     var queryWords = [];
     var queryArray = JSON.parse("[".concat(query // next line: put space around chinese and japanese characters to treat them as separate words
-    .replace(/([\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f])/g, ' $1 ').replace(/"/g, ',"\\"",').replace(/([^ ()",\\]+)/g, '"$1"').replace(/\(\)]/g, "").replace(/ +/g, ",").replace(/,,+/g, ",").replace(/\(/g, "[").replace(/\)/g, "]"), "]").replace(/\[,/g, "[").replace(/,]/g, "]"));
+    .replace(/([\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f])/g, ' $1 ').replace(/([0-9]),([0-9]{3}),([0-9]{3})/g, "$1ESCAPEDCOMMA$2ESCAPEDCOMMA$3").replace(/([0-9]),([0-9]{3})/g, "$1ESCAPEDCOMMA$2").replace(/"/g, ',"\\"",').replace(/([^ ()",\\]+)/g, '"$1"').replace(/\(\)]/g, "").replace(/ +/g, ",").replace(/,,+/g, ",").replace(/\(/g, "[").replace(/\)/g, "]"), "]").replace(/\[,/g, "[").replace(/,]/g, "]").replace(/ESCAPEDCOMMA/g, ","));
 
     var furtherParseQueryArray = function furtherParseQueryArray(array, withinExactPhrase) {
       // handle parentheses
