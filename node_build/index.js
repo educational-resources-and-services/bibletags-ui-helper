@@ -681,7 +681,8 @@ var getWordsHash = function getWordsHash(_ref8) {
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
-  }).map(function (word) {
+  }).map(function (_ref9) {
+    var word = _ref9.word;
     return word.toLowerCase();
   }); // After importing the full ESV, I found only 1 redundancy in the 
   // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).
@@ -693,13 +694,14 @@ var getWordsHash = function getWordsHash(_ref8) {
 
 exports.getWordsHash = getWordsHash;
 
-var getWordHashes = function getWordHashes(_ref9) {
-  var usfm = _ref9.usfm,
-      wordDividerRegex = _ref9.wordDividerRegex;
+var getWordHashes = function getWordHashes(_ref10) {
+  var usfm = _ref10.usfm,
+      wordDividerRegex = _ref10.wordDividerRegex;
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
-  }).map(function (word) {
+  }).map(function (_ref11) {
+    var word = _ref11.word;
     return word.toLowerCase();
   }); // After importing the full ESV, I found only 1 redundancy in the 
   // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).

@@ -880,9 +880,16 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
 
 }
 
-export const splitVerseIntoWords = ({ usfm, wordDividerRegex }={}) => {
+export const splitVerseIntoWords = ({ usfm, wordDividerRegex, pieces }={}) => {
 
-  const getWords = unitObjs => {
+  pieces = pieces || getPiecesFromUSFM({
+    usfm,
+    wordDividerRegex,
+    inlineMarkersOnly: true,
+    splitIntoWords: true,
+  })
+
+  const getWordsWithNumber = pieces => {
     let words = []
 
     const getWordText = unitObj => {
@@ -890,15 +897,19 @@ export const splitVerseIntoWords = ({ usfm, wordDividerRegex }={}) => {
       return text || (children && children.map(child => getWordText(child)).join("")) || ""
     }
 
-    unitObjs.forEach(unitObj => {
-      const { type, children } = unitObj
+    pieces.forEach(unitObj => {
+      const { type, children, wordNumberInVerse, tag } = unitObj
 
       if(type === "word") {
-        words.push(getWordText(unitObj))
+        let text = getWordText(unitObj)
+        if([ 'nd', 'sc' ].includes(tag)) {
+          text = text.toUpperCase()
+        }
+        words.push({ wordNumberInVerse, text })
       } else if(children) {
         words = [
           ...words,
-          ...getWords(children),
+          ...getWordsWithNumber(children),
         ]
       }
     })
@@ -906,12 +917,11 @@ export const splitVerseIntoWords = ({ usfm, wordDividerRegex }={}) => {
     return words
   }
 
-  return getWords(
-    getPiecesFromUSFM({
-      usfm,
-      wordDividerRegex,
-      inlineMarkersOnly: true,
-      splitIntoWords: true,
-    })
-  )
+  const wordsWithNumber = getWordsWithNumber(pieces)
+
+  if(wordsWithNumber.some(({ word, wordNumberInVerse }, idx) => wordNumberInVerse !== idx+1)) {
+    throw `error in splitVerseIntoWords: ${JSON.stringify({ usfm, pieces })}`
+  }
+
+  return wordsWithNumber
 }

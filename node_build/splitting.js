@@ -828,9 +828,17 @@ exports.getPiecesFromUSFM = getPiecesFromUSFM;
 var splitVerseIntoWords = function splitVerseIntoWords() {
   var _ref10 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       usfm = _ref10.usfm,
-      wordDividerRegex = _ref10.wordDividerRegex;
+      wordDividerRegex = _ref10.wordDividerRegex,
+      pieces = _ref10.pieces;
 
-  var getWords = function getWords(unitObjs) {
+  pieces = pieces || getPiecesFromUSFM({
+    usfm: usfm,
+    wordDividerRegex: wordDividerRegex,
+    inlineMarkersOnly: true,
+    splitIntoWords: true
+  });
+
+  var getWordsWithNumber = function getWordsWithNumber(pieces) {
     var words = [];
 
     var getWordText = function getWordText(unitObj) {
@@ -841,25 +849,44 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
       }).join("") || "";
     };
 
-    unitObjs.forEach(function (unitObj) {
+    pieces.forEach(function (unitObj) {
       var type = unitObj.type,
-          children = unitObj.children;
+          children = unitObj.children,
+          wordNumberInVerse = unitObj.wordNumberInVerse,
+          tag = unitObj.tag;
 
       if (type === "word") {
-        words.push(getWordText(unitObj));
+        var text = getWordText(unitObj);
+
+        if (['nd', 'sc'].includes(tag)) {
+          text = text.toUpperCase();
+        }
+
+        words.push({
+          wordNumberInVerse: wordNumberInVerse,
+          text: text
+        });
       } else if (children) {
-        words = [].concat(_toConsumableArray(words), _toConsumableArray(getWords(children)));
+        words = [].concat(_toConsumableArray(words), _toConsumableArray(getWordsWithNumber(children)));
       }
     });
     return words;
   };
 
-  return getWords(getPiecesFromUSFM({
-    usfm: usfm,
-    wordDividerRegex: wordDividerRegex,
-    inlineMarkersOnly: true,
-    splitIntoWords: true
-  }));
+  var wordsWithNumber = getWordsWithNumber(pieces);
+
+  if (wordsWithNumber.some(function (_ref11, idx) {
+    var word = _ref11.word,
+        wordNumberInVerse = _ref11.wordNumberInVerse;
+    return wordNumberInVerse !== idx + 1;
+  })) {
+    throw "error in splitVerseIntoWords: ".concat(JSON.stringify({
+      usfm: usfm,
+      pieces: pieces
+    }));
+  }
+
+  return wordsWithNumber;
 };
 
 exports.splitVerseIntoWords = splitVerseIntoWords;
