@@ -255,6 +255,7 @@ export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
 
               const isNot = /^not:/.test(rawDetails)
               rawDetails = rawDetails.replace(/^not:/, '')
+              rawDetails = rawDetails.replace(/^suffix$/, 'suffix:s/p')
               const [ x, colonDetailType ] = rawDetails.match(/^([^:]+):/) || []
               const returnObjs = rawDetails.replace(/^[^:]+:/, '').split('/').map(rawDetail => {
 

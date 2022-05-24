@@ -263,6 +263,7 @@ var getWordDetails = function getWordDetails(_ref) {
           // convert form of details
           var isNot = /^not:/.test(rawDetails);
           rawDetails = rawDetails.replace(/^not:/, '');
+          rawDetails = rawDetails.replace(/^suffix$/, 'suffix:s/p');
 
           var _ref2 = rawDetails.match(/^([^:]+):/) || [],
               _ref3 = _slicedToArray(_ref2, 2),
