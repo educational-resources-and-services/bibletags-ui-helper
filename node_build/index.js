@@ -362,7 +362,16 @@ var getRefsFromPassageStr = function getRefsFromPassageStr(passageStr) {
   var bookSuggestionOptions = [].concat(_toConsumableArray(getBibleBookNames().map(indicateBookId)), _toConsumableArray(getBibleBookAbbreviatedNames().map(indicateBookId))).filter(function (_ref3) {
     var suggestedQuery = _ref3.suggestedQuery;
     return suggestedQuery;
-  }); // split off potential versionId
+  });
+  var digitWithSpaceAfterRegex = /^([1-4]) /;
+  bookSuggestionOptions = [].concat(_toConsumableArray(bookSuggestionOptions), _toConsumableArray(bookSuggestionOptions.map(function (_ref4) {
+    var suggestedQuery = _ref4.suggestedQuery,
+        bookId = _ref4.bookId;
+    return digitWithSpaceAfterRegex.test(suggestedQuery) ? {
+      suggestedQuery: suggestedQuery.replace(digitWithSpaceAfterRegex, '$1'),
+      bookId: bookId
+    } : null;
+  }).filter(Boolean))); // split off potential versionId
 
   var passageStrSets = [{
     passageStr: normalizedPassageStr
@@ -449,9 +458,9 @@ var getRefsFromPassageStr = function getRefsFromPassageStr(passageStr) {
       }));
     }
 
-    refs = refs.filter(function (_ref4) {
-      var chapter = _ref4.chapter,
-          verse = _ref4.verse;
+    refs = refs.filter(function (_ref5) {
+      var chapter = _ref5.chapter,
+          verse = _ref5.verse;
       return chapter && verse !== NaN;
     });
 
@@ -600,27 +609,27 @@ var getBibleBookAbbreviatedName = function getBibleBookAbbreviatedName(bookId) {
 
 exports.getBibleBookAbbreviatedName = getBibleBookAbbreviatedName;
 
-var getNormalizedPOSCode = function getNormalizedPOSCode(_ref5) {
-  var morphLang = _ref5.morphLang,
-      morphPos = _ref5.morphPos;
+var getNormalizedPOSCode = function getNormalizedPOSCode(_ref6) {
+  var morphLang = _ref6.morphLang,
+      morphPos = _ref6.morphPos;
   return ['He', 'Ar'].includes(morphLang) ? morphPos : (0, _greekMorph.getNormalizedGreekPOSCode)(morphPos);
 };
 
 exports.getNormalizedPOSCode = getNormalizedPOSCode;
 
-var getPOSTerm = function getPOSTerm(_ref6) {
-  var languageId = _ref6.languageId,
-      posCode = _ref6.posCode;
+var getPOSTerm = function getPOSTerm(_ref7) {
+  var languageId = _ref7.languageId,
+      posCode = _ref7.posCode;
   return languageId === 'heb' ? (0, _hebrewMorph.getHebrewPOSTerm)(posCode) : (0, _greekMorph.getGreekPOSTerm)(posCode);
 };
 
 exports.getPOSTerm = getPOSTerm;
 
-var getMorphPartDisplayInfo = function getMorphPartDisplayInfo(_ref7) {
-  var morphLang = _ref7.morphLang,
-      morphPart = _ref7.morphPart,
-      isPrefixOrSuffix = _ref7.isPrefixOrSuffix,
-      wordIsMultiPart = _ref7.wordIsMultiPart;
+var getMorphPartDisplayInfo = function getMorphPartDisplayInfo(_ref8) {
+  var morphLang = _ref8.morphLang,
+      morphPart = _ref8.morphPart,
+      isPrefixOrSuffix = _ref8.isPrefixOrSuffix,
+      wordIsMultiPart = _ref8.wordIsMultiPart;
   return ['He', 'Ar'].includes(morphLang) ? (0, _hebrewMorph.getHebrewMorphPartDisplayInfo)({
     morphLang: morphLang,
     morphPart: morphPart,
@@ -675,14 +684,14 @@ var hash64 = function hash64(str) {
 
 exports.hash64 = hash64;
 
-var getWordsHash = function getWordsHash(_ref8) {
-  var usfm = _ref8.usfm,
-      wordDividerRegex = _ref8.wordDividerRegex;
+var getWordsHash = function getWordsHash(_ref9) {
+  var usfm = _ref9.usfm,
+      wordDividerRegex = _ref9.wordDividerRegex;
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
-  }).map(function (_ref9) {
-    var text = _ref9.text;
+  }).map(function (_ref10) {
+    var text = _ref10.text;
     return text.toLowerCase();
   }); // After importing the full ESV, I found only 1 redundancy in the 
   // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).
@@ -694,14 +703,14 @@ var getWordsHash = function getWordsHash(_ref8) {
 
 exports.getWordsHash = getWordsHash;
 
-var getWordHashes = function getWordHashes(_ref10) {
-  var usfm = _ref10.usfm,
-      wordDividerRegex = _ref10.wordDividerRegex;
+var getWordHashes = function getWordHashes(_ref11) {
+  var usfm = _ref11.usfm,
+      wordDividerRegex = _ref11.wordDividerRegex;
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
-  }).map(function (_ref11) {
-    var text = _ref11.text;
+  }).map(function (_ref12) {
+    var text = _ref12.text;
     return text.toLowerCase();
   }); // After importing the full ESV, I found only 1 redundancy in the 
   // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).

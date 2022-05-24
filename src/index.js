@@ -174,12 +174,29 @@ export const getRefsFromPassageStr = passageStr => {
     suggestedQuery: book,
     bookId,
   })
-  const bookSuggestionOptions = (
+  let bookSuggestionOptions = (
     [
       ...getBibleBookNames().map(indicateBookId),
       ...getBibleBookAbbreviatedNames().map(indicateBookId),
     ].filter(({ suggestedQuery }) => suggestedQuery)
   )
+
+  const digitWithSpaceAfterRegex = /^([1-4]) /
+  bookSuggestionOptions = [
+    ...bookSuggestionOptions,
+    ...(
+      bookSuggestionOptions
+        .map(({ suggestedQuery, bookId }) => (
+          digitWithSpaceAfterRegex.test(suggestedQuery)
+            ? {
+              suggestedQuery: suggestedQuery.replace(digitWithSpaceAfterRegex, '$1'),
+              bookId,
+            }
+            : null
+        ))
+        .filter(Boolean)
+    ),
+  ]
 
   // split off potential versionId
 
