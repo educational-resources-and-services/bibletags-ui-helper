@@ -52,7 +52,7 @@ export const getPartialUHBWordRowFromUsfmWord = ({ w, id, lemma, strong, morph }
     v: prefixParts.includes("c") ? 1 : 0,
     h1: /^(?:He,|Ar,)(?:[^:]*:)*Td/.test(morph) ? 1 : 0,
     h2: /^(?:He,|Ar,)(?:[^:]*:)*Rd/.test(morph) ? 1 : 0,
-    h3: /^(?:He,|Ar,)(?:[^:]*:)*Ti/.test(morph) ? 1 : 0,
+    h3: prefixParts.includes("i") ? 1 : 0,
     pos,
     h4: /^(?:He,|Ar,)(?:[^:]*:)*Sd/.test(morph) ? 1 : 0,
     h5: /^(?:He,|Ar,)(?:[^:]*:)*Sh/.test(morph) ? 1 : 0,

@@ -153,13 +153,13 @@ export const hebrewPrefixSearchHitMap = {
   m: 'm',
   sh: 's',
   v: 'c',
+  "h?": 'i',
 }
 
 export const hebrewHeyNunSearchHitRegexes = {
   "h": /^(?:He,|Ar,)(?:[^:]*:)*[TR]d/,
   "h!": /^(?:He,|Ar,)(?:[^:]*:)*Td/,
   "h'": /^(?:He,|Ar,)(?:[^:]*:)*Rd/,
-  "h?": /^(?:He,|Ar,)(?:[^:]*:)*Ti/,
   "h->": /^(?:He,|Ar,)(?:[^:]*:)*Sd/,
   "h^": /^(?:He,|Ar,)(?:[^:]*:)*Sh/,
   "n^": /^(?:He,|Ar,)(?:[^:]*:)*Sn/,
