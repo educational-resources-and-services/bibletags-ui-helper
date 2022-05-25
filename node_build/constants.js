@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.maxVerseNumberByBookId = exports.hebrewPrefixSuffixMap = exports.grammaticalDetailMap = exports.defaultWordDividerRegex = exports.bibleSearchScopes = exports.bibleSearchScopeKeysByTestament = exports.bibleSearchFlagMap = exports.allVerseNumberScopeKeysByBookId = void 0;
+exports.maxVerseNumberByBookId = exports.hebrewPrefixSuffixMap = exports.hebrewPrefixSearchHitMap = exports.hebrewHeyNunSearchHitRegexes = exports.grammaticalDetailMap = exports.defaultWordDividerRegex = exports.bibleSearchScopes = exports.bibleSearchScopeKeysByTestament = exports.bibleSearchFlagMap = exports.allVerseNumberScopeKeysByBookId = void 0;
 
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
@@ -177,6 +177,25 @@ var hebrewPrefixSuffixMap = {
 
 };
 exports.hebrewPrefixSuffixMap = hebrewPrefixSuffixMap;
+var hebrewPrefixSearchHitMap = {
+  b: 'b',
+  l: 'l',
+  k: 'k',
+  m: 'm',
+  sh: 's',
+  v: 'c'
+};
+exports.hebrewPrefixSearchHitMap = hebrewPrefixSearchHitMap;
+var hebrewHeyNunSearchHitRegexes = {
+  "h": /^(?:He,|Ar,)(?:[^:]*:)*[TR]d/,
+  "h!": /^(?:He,|Ar,)(?:[^:]*:)*Td/,
+  "h'": /^(?:He,|Ar,)(?:[^:]*:)*Rd/,
+  "h?": /^(?:He,|Ar,)(?:[^:]*:)*Ti/,
+  "h->": /^(?:He,|Ar,)(?:[^:]*:)*Sd/,
+  "h^": /^(?:He,|Ar,)(?:[^:]*:)*Sh/,
+  "n^": /^(?:He,|Ar,)(?:[^:]*:)*Sn/
+};
+exports.hebrewHeyNunSearchHitRegexes = hebrewHeyNunSearchHitRegexes;
 
 var getGrammaticalDetailMapValue = function getGrammaticalDetailMapValue(type, typeIndex, requiredLanguageChar, value, avgRowSizeInKB) {
   var values = value instanceof Array ? value : [value];

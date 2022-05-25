@@ -2,8 +2,10 @@ import usfmJS from 'usfm-js'
 // import rewritePattern  from 'regexpu-core'
 
 import i18n from './i18n'
-import { defaultWordDividerRegex } from './constants'
+import { defaultWordDividerRegex, bibleSearchFlagMap, hebrewHeyNunSearchHitRegexes, hebrewPrefixSearchHitMap, grammaticalDetailMap } from './constants'
 import { getMainWordPartIndex, getIsEntirelyPrefixAndSuffix, getMorphPartDisplayInfo } from './index'
+import { getQueryAndFlagInfo, stripHebrewVowelsEtc, stripGreekAccents, escapeRegex } from './bibleSearchUtils'
+import { getQueryArrayAndWords } from './utils'
 
 export const wordPartDividerRegex = /\u2060/g
 
@@ -748,7 +750,24 @@ const removeInvalidNewlines = unitObjs => {
   })
 }
 
-export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex, splitIntoWords }) => {
+export const getIsHebrew = unitObjs => {
+
+  const getHasHebrew = unitObjs => (
+    unitObjs.some(unitObj => {
+      const { strong=``, children } = unitObj
+
+      if(/(?:^|:)H/.test(strong)) {
+        return true
+      } else if(children) {
+        return getHasHebrew(children)
+      }
+    })
+  )
+
+  return getHasHebrew(unitObjs)
+}
+
+export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex, splitIntoWords, searchText }) => {
 
   // Put the chapter tag before everything, or assume chapter 1 if there is not one
   const chapterTagSwapRegex = /^((?:[^\\]|\\[^v])+?)(\\c [0-9]+\n)/
@@ -847,37 +866,149 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     modifiedVerseObjects = wrapVerseObjects(modifiedVerseObjects)
   }
 
-  if(!splitIntoWords) {
-    return modifiedVerseObjects
+  if(splitIntoWords) {
+
+    const regexes = {
+      wordDividerInGroupGlobal: new RegExp(`((?:${wordDividerRegex || defaultWordDividerRegex})+)`, 'g'),
+      wordDividerStartToEnd: new RegExp(`^(?:${wordDividerRegex || defaultWordDividerRegex})+$`),
+    }
+
+    // previous attempts below (in case the above doesn't always pan out)
+    // try {
+    //   regexes = {
+    //     wordDividerInGroupGlobal: new RegExp(`(${wordDividerRegex || '[\\P{Letter}]+'})`, 'gu'),
+    //     wordDividerStartToEnd: new RegExp(`^${wordDividerRegex || '[\\P{Letter}]+'}$`, 'u'),
+    //   }
+    // } catch(e) {
+    //   regexes = {
+    //     wordDividerInGroupGlobal: new RegExp(rewritePattern(`(${wordDividerRegex || '[\\P{L}]+'})`, 'u', {
+    //       unicodePropertyEscape: true,
+    //     }), 'g'),
+    //     wordDividerStartToEnd: new RegExp(rewritePattern(`^${wordDividerRegex || '[\\P{L}]+'}$`, 'u', {
+    //       unicodePropertyEscape: true,
+    //     })),
+    //   }
+    // }
+
+    modifiedVerseObjects = getGroupedVerseObjects({
+      verseObjects: modifiedVerseObjects,
+      regexes,
+    })
+
   }
 
-  const regexes = {
-    wordDividerInGroupGlobal: new RegExp(`((?:${wordDividerRegex || defaultWordDividerRegex})+)`, 'g'),
-    wordDividerStartToEnd: new RegExp(`^(?:${wordDividerRegex || defaultWordDividerRegex})+$`),
+  if(searchText) {
+
+    const { query } = getQueryAndFlagInfo({ query: searchText, FLAG_MAP: bibleSearchFlagMap })
+    const { queryWords } = getQueryArrayAndWords(query)
+    const isHebrew = getIsHebrew(modifiedVerseObjects)
+
+    const markSearchWordHits = pieces => {
+
+      const getWordText = unitObj => {
+        const { text, children } = unitObj
+        return text || (children && children.map(child => getWordText(child)).join("")) || ""
+      }
+
+      pieces.forEach(unitObj => {
+        const { type, children, tag, lemma, morph, strong } = unitObj
+        const text = getWordText(unitObj)
+
+        if(tag === "w") {
+
+          if(
+            queryWords.some(queryWord => {
+              if(queryWord[0] === '#') {
+                return (
+                  queryWord
+                    .slice(1)
+                    .split('#')
+                    .filter(rawDetails => !/^not:/.test(rawDetails))
+                    .every(rawDetails => {
+
+                      const [ x, colonDetailType ] = rawDetails.match(/^([^:]+):/) || []
+                      return rawDetails.replace(/^[^:]+:/, '').split('/').some(rawDetail => {
+
+                        if(colonDetailType === 'lemma') {
+                          return rawDetail === lemma
+                        }
+
+                        if(colonDetailType === 'form') {
+                          return stripHebrewVowelsEtc(stripGreekAccents(rawDetail).toLowerCase()) === stripHebrewVowelsEtc(stripGreekAccents(text).toLowerCase())
+                        }
+
+                        if((colonDetailType || rawDetail) === 'suffix') {
+                          const morphSuffixes = morph.match(/:Sp.{3}$/g) || []
+                          if(rawDetail === 'suffix') {
+                            return morphSuffixes.length > 0
+                          } else {
+                            const suffixDetails = rawDetail.split("")
+                            const indexAndDetailSets = [
+                              [ 3, suffixDetails.filter(detail => "123".includes(detail)) ],
+                              [ 4, suffixDetails.filter(detail => "mfbc".includes(detail)) ],
+                              [ 5, suffixDetails.filter(detail => "spd".includes(detail)) ],
+                            ]
+                            return indexAndDetailSets.every(([ morphSuffixIdx, details ]) => (
+                              details.length === 0
+                              || morphSuffixes.some(morphSuffix => details.includes(morphSuffix[morphSuffixIdx]))
+                            ))
+                          }
+                        }
+
+                        if(/^[GH][0-9]{5}$/.test(rawDetail)) {
+                          return strong.split(':').includes(rawDetail)
+                        }
+
+                        if(hebrewPrefixSearchHitMap[rawDetail]) {
+                          return strong.split(':').includes(hebrewPrefixSearchHitMap[rawDetail])
+                        }
+
+                        if(hebrewHeyNunSearchHitRegexes[rawDetail]) {
+                          return hebrewHeyNunSearchHitRegexes[rawDetail].test(morph)
+                        }
+
+                        if(grammaticalDetailMap[rawDetail]) {
+                          return false  // TODO
+                        }
+
+                        return false  // shouldn't get here
+
+                      })
+
+                    })
+                )
+              }
+            })
+          ) {
+            unitObj.isHit = true
+          }
+
+        } else if(type === "word") {
+
+          if(
+            queryWords.some(queryWord => {
+              const isHitRegex = new RegExp(`^${escapeRegex(queryWord).replace(/\\\*$/, '.*')}$`, 'i')
+              return isHitRegex.test(text)
+            })
+          ) {
+            unitObj.isHit = true
+          }
+
+        } else if(children) {
+
+          markSearchWordHits(children)
+
+        }
+      })
+
+    }
+
+    markSearchWordHits(modifiedVerseObjects)
+
   }
 
-  // previous attempts below (in case the above doesn't always pan out)
-  // try {
-  //   regexes = {
-  //     wordDividerInGroupGlobal: new RegExp(`(${wordDividerRegex || '[\\P{Letter}]+'})`, 'gu'),
-  //     wordDividerStartToEnd: new RegExp(`^${wordDividerRegex || '[\\P{Letter}]+'}$`, 'u'),
-  //   }
-  // } catch(e) {
-  //   regexes = {
-  //     wordDividerInGroupGlobal: new RegExp(rewritePattern(`(${wordDividerRegex || '[\\P{L}]+'})`, 'u', {
-  //       unicodePropertyEscape: true,
-  //     }), 'g'),
-  //     wordDividerStartToEnd: new RegExp(rewritePattern(`^${wordDividerRegex || '[\\P{L}]+'}$`, 'u', {
-  //       unicodePropertyEscape: true,
-  //     })),
-  //   }
-  // }
-
-  return getGroupedVerseObjects({
-    verseObjects: modifiedVerseObjects,
-    regexes,
-  })
-
+  return modifiedVerseObjects
+    
 }
 
 export const splitVerseIntoWords = ({ usfm, wordDividerRegex, pieces }={}) => {

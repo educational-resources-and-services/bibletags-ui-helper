@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.wordPartDividerRegex = exports.tagInList = exports.splitVerseIntoWords = exports.specialUsfmMarkers = exports.inlineUsfmMarkers = exports.headingBlockUsfmMarkers = exports.getPiecesFromUSFM = exports.blockUsfmMarkers = void 0;
+exports.wordPartDividerRegex = exports.tagInList = exports.splitVerseIntoWords = exports.specialUsfmMarkers = exports.inlineUsfmMarkers = exports.headingBlockUsfmMarkers = exports.getPiecesFromUSFM = exports.getIsHebrew = exports.blockUsfmMarkers = void 0;
 
 var _usfmJs = _interopRequireDefault(require("usfm-js"));
 
@@ -13,9 +13,21 @@ var _constants = require("./constants");
 
 var _index = require("./index");
 
+var _bibleSearchUtils = require("./bibleSearchUtils");
+
+var _utils = require("./utils");
+
 var _excluded = ["text", "content"];
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
@@ -682,12 +694,33 @@ var removeInvalidNewlines = function removeInvalidNewlines(unitObjs) {
   });
 };
 
+var getIsHebrew = function getIsHebrew(unitObjs) {
+  var getHasHebrew = function getHasHebrew(unitObjs) {
+    return unitObjs.some(function (unitObj) {
+      var _unitObj$strong = unitObj.strong,
+          strong = _unitObj$strong === void 0 ? "" : _unitObj$strong,
+          children = unitObj.children;
+
+      if (/(?:^|:)H/.test(strong)) {
+        return true;
+      } else if (children) {
+        return getHasHebrew(children);
+      }
+    });
+  };
+
+  return getHasHebrew(unitObjs);
+};
+
+exports.getIsHebrew = getIsHebrew;
+
 var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
   var _ref9$usfm = _ref9.usfm,
       usfm = _ref9$usfm === void 0 ? '' : _ref9$usfm,
       inlineMarkersOnly = _ref9.inlineMarkersOnly,
       wordDividerRegex = _ref9.wordDividerRegex,
-      splitIntoWords = _ref9.splitIntoWords;
+      splitIntoWords = _ref9.splitIntoWords,
+      searchText = _ref9.searchText;
   // Put the chapter tag before everything, or assume chapter 1 if there is not one
   var chapterTagSwapRegex = /^((?:[^\\]|\\[^v])+?)(\\c [0-9]+\n)/;
   var addedPseudoChapter = false;
@@ -793,43 +826,158 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
     modifiedVerseObjects = wrapVerseObjects(modifiedVerseObjects);
   }
 
-  if (!splitIntoWords) {
-    return modifiedVerseObjects;
+  if (splitIntoWords) {
+    var regexes = {
+      wordDividerInGroupGlobal: new RegExp("((?:".concat(wordDividerRegex || _constants.defaultWordDividerRegex, ")+)"), 'g'),
+      wordDividerStartToEnd: new RegExp("^(?:".concat(wordDividerRegex || _constants.defaultWordDividerRegex, ")+$"))
+    }; // previous attempts below (in case the above doesn't always pan out)
+    // try {
+    //   regexes = {
+    //     wordDividerInGroupGlobal: new RegExp(`(${wordDividerRegex || '[\\P{Letter}]+'})`, 'gu'),
+    //     wordDividerStartToEnd: new RegExp(`^${wordDividerRegex || '[\\P{Letter}]+'}$`, 'u'),
+    //   }
+    // } catch(e) {
+    //   regexes = {
+    //     wordDividerInGroupGlobal: new RegExp(rewritePattern(`(${wordDividerRegex || '[\\P{L}]+'})`, 'u', {
+    //       unicodePropertyEscape: true,
+    //     }), 'g'),
+    //     wordDividerStartToEnd: new RegExp(rewritePattern(`^${wordDividerRegex || '[\\P{L}]+'}$`, 'u', {
+    //       unicodePropertyEscape: true,
+    //     })),
+    //   }
+    // }
+
+    modifiedVerseObjects = getGroupedVerseObjects({
+      verseObjects: modifiedVerseObjects,
+      regexes: regexes
+    });
   }
 
-  var regexes = {
-    wordDividerInGroupGlobal: new RegExp("((?:".concat(wordDividerRegex || _constants.defaultWordDividerRegex, ")+)"), 'g'),
-    wordDividerStartToEnd: new RegExp("^(?:".concat(wordDividerRegex || _constants.defaultWordDividerRegex, ")+$"))
-  }; // previous attempts below (in case the above doesn't always pan out)
-  // try {
-  //   regexes = {
-  //     wordDividerInGroupGlobal: new RegExp(`(${wordDividerRegex || '[\\P{Letter}]+'})`, 'gu'),
-  //     wordDividerStartToEnd: new RegExp(`^${wordDividerRegex || '[\\P{Letter}]+'}$`, 'u'),
-  //   }
-  // } catch(e) {
-  //   regexes = {
-  //     wordDividerInGroupGlobal: new RegExp(rewritePattern(`(${wordDividerRegex || '[\\P{L}]+'})`, 'u', {
-  //       unicodePropertyEscape: true,
-  //     }), 'g'),
-  //     wordDividerStartToEnd: new RegExp(rewritePattern(`^${wordDividerRegex || '[\\P{L}]+'}$`, 'u', {
-  //       unicodePropertyEscape: true,
-  //     })),
-  //   }
-  // }
+  if (searchText) {
+    var _getQueryAndFlagInfo = (0, _bibleSearchUtils.getQueryAndFlagInfo)({
+      query: searchText,
+      FLAG_MAP: _constants.bibleSearchFlagMap
+    }),
+        query = _getQueryAndFlagInfo.query;
 
-  return getGroupedVerseObjects({
-    verseObjects: modifiedVerseObjects,
-    regexes: regexes
-  });
+    var _getQueryArrayAndWord = (0, _utils.getQueryArrayAndWords)(query),
+        queryWords = _getQueryArrayAndWord.queryWords;
+
+    var isHebrew = getIsHebrew(modifiedVerseObjects);
+
+    var markSearchWordHits = function markSearchWordHits(pieces) {
+      var getWordText = function getWordText(unitObj) {
+        var text = unitObj.text,
+            children = unitObj.children;
+        return text || children && children.map(function (child) {
+          return getWordText(child);
+        }).join("") || "";
+      };
+
+      pieces.forEach(function (unitObj) {
+        var type = unitObj.type,
+            children = unitObj.children,
+            tag = unitObj.tag,
+            lemma = unitObj.lemma,
+            morph = unitObj.morph,
+            strong = unitObj.strong;
+        var text = getWordText(unitObj);
+
+        if (tag === "w") {
+          if (queryWords.some(function (queryWord) {
+            if (queryWord[0] === '#') {
+              return queryWord.slice(1).split('#').filter(function (rawDetails) {
+                return !/^not:/.test(rawDetails);
+              }).every(function (rawDetails) {
+                var _ref10 = rawDetails.match(/^([^:]+):/) || [],
+                    _ref11 = _slicedToArray(_ref10, 2),
+                    x = _ref11[0],
+                    colonDetailType = _ref11[1];
+
+                return rawDetails.replace(/^[^:]+:/, '').split('/').some(function (rawDetail) {
+                  if (colonDetailType === 'lemma') {
+                    return rawDetail === lemma;
+                  }
+
+                  if (colonDetailType === 'form') {
+                    return (0, _bibleSearchUtils.stripHebrewVowelsEtc)((0, _bibleSearchUtils.stripGreekAccents)(rawDetail).toLowerCase()) === (0, _bibleSearchUtils.stripHebrewVowelsEtc)((0, _bibleSearchUtils.stripGreekAccents)(text).toLowerCase());
+                  }
+
+                  if ((colonDetailType || rawDetail) === 'suffix') {
+                    var morphSuffixes = morph.match(/:Sp.{3}$/g) || [];
+
+                    if (rawDetail === 'suffix') {
+                      return morphSuffixes.length > 0;
+                    } else {
+                      var suffixDetails = rawDetail.split("");
+                      var indexAndDetailSets = [[3, suffixDetails.filter(function (detail) {
+                        return "123".includes(detail);
+                      })], [4, suffixDetails.filter(function (detail) {
+                        return "mfbc".includes(detail);
+                      })], [5, suffixDetails.filter(function (detail) {
+                        return "spd".includes(detail);
+                      })]];
+                      return indexAndDetailSets.every(function (_ref12) {
+                        var _ref13 = _slicedToArray(_ref12, 2),
+                            morphSuffixIdx = _ref13[0],
+                            details = _ref13[1];
+
+                        return details.length === 0 || morphSuffixes.some(function (morphSuffix) {
+                          return details.includes(morphSuffix[morphSuffixIdx]);
+                        });
+                      });
+                    }
+                  }
+
+                  if (/^[GH][0-9]{5}$/.test(rawDetail)) {
+                    return strong.split(':').includes(rawDetail);
+                  }
+
+                  if (_constants.hebrewPrefixSearchHitMap[rawDetail]) {
+                    return strong.split(':').includes(_constants.hebrewPrefixSearchHitMap[rawDetail]);
+                  }
+
+                  if (_constants.hebrewHeyNunSearchHitRegexes[rawDetail]) {
+                    return _constants.hebrewHeyNunSearchHitRegexes[rawDetail].test(morph);
+                  }
+
+                  if (_constants.grammaticalDetailMap[rawDetail]) {
+                    return false; // TODO
+                  }
+
+                  return false; // shouldn't get here
+                });
+              });
+            }
+          })) {
+            unitObj.isHit = true;
+          }
+        } else if (type === "word") {
+          if (queryWords.some(function (queryWord) {
+            var isHitRegex = new RegExp("^".concat((0, _bibleSearchUtils.escapeRegex)(queryWord).replace(/\\\*$/, '.*'), "$"), 'i');
+            return isHitRegex.test(text);
+          })) {
+            unitObj.isHit = true;
+          }
+        } else if (children) {
+          markSearchWordHits(children);
+        }
+      });
+    };
+
+    markSearchWordHits(modifiedVerseObjects);
+  }
+
+  return modifiedVerseObjects;
 };
 
 exports.getPiecesFromUSFM = getPiecesFromUSFM;
 
 var splitVerseIntoWords = function splitVerseIntoWords() {
-  var _ref10 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      usfm = _ref10.usfm,
-      wordDividerRegex = _ref10.wordDividerRegex,
-      pieces = _ref10.pieces;
+  var _ref14 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      usfm = _ref14.usfm,
+      wordDividerRegex = _ref14.wordDividerRegex,
+      pieces = _ref14.pieces;
 
   pieces = pieces || getPiecesFromUSFM({
     usfm: usfm,
@@ -875,8 +1023,8 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
 
   var wordsWithNumber = getWordsWithNumber(pieces);
 
-  if (wordsWithNumber.some(function (_ref11, idx) {
-    var wordNumberInVerse = _ref11.wordNumberInVerse;
+  if (wordsWithNumber.some(function (_ref15, idx) {
+    var wordNumberInVerse = _ref15.wordNumberInVerse;
     return wordNumberInVerse !== idx + 1;
   })) {
     throw "error in splitVerseIntoWords: ".concat(JSON.stringify({
