@@ -6,6 +6,7 @@ import { defaultWordDividerRegex, bibleSearchFlagMap, hebrewHeyNunSearchHitRegex
 import { getMainWordPartIndex, getIsEntirelyPrefixAndSuffix, getMorphPartDisplayInfo } from './index'
 import { getQueryAndFlagInfo, stripHebrewVowelsEtc, stripGreekAccents, escapeRegex } from './bibleSearchUtils'
 import { getQueryArrayAndWords } from './utils'
+import { getWordInfoFromUsfmWord } from './originalWordConversion'
 
 export const wordPartDividerRegex = /\u2060/g
 
@@ -968,7 +969,8 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
                         }
 
                         if(grammaticalDetailMap[rawDetail]) {
-                          return false  // TODO
+                          const wordInfo = getWordInfoFromUsfmWord({ ...unitObj, w: text, id: unitObj[`x-id`] })
+                          return grammaticalDetailMap[rawDetail].matches(wordInfo)
                         }
 
                         return false  // shouldn't get here

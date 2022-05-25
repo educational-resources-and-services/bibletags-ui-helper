@@ -17,6 +17,8 @@ var _bibleSearchUtils = require("./bibleSearchUtils");
 
 var _utils = require("./utils");
 
+var _originalWordConversion = require("./originalWordConversion");
+
 var _excluded = ["text", "content"];
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -942,7 +944,11 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
                   }
 
                   if (_constants.grammaticalDetailMap[rawDetail]) {
-                    return false; // TODO
+                    var wordInfo = (0, _originalWordConversion.getWordInfoFromUsfmWord)(_objectSpread(_objectSpread({}, unitObj), {}, {
+                      w: text,
+                      id: unitObj["x-id"]
+                    }));
+                    return _constants.grammaticalDetailMap[rawDetail].matches(wordInfo);
                   }
 
                   return false; // shouldn't get here

@@ -15,6 +15,7 @@ export * from './i18n'
 export * from './constants'
 export * from './bibleSearch'
 export * from './bibleSearchUtils'
+export * from './originalWordConversion'
 
 export const getOrigLangVersionIdFromRef = ref => ref.bookId <= 39 ? 'uhb' : 'ugnt'
 
