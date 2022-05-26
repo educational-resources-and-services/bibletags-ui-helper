@@ -7,6 +7,8 @@ exports.wordPartDividerRegex = exports.tagInList = exports.splitVerseIntoWords =
 
 var _usfmJs = _interopRequireDefault(require("usfm-js"));
 
+var _bibletagsVersification = require("@bibletags/bibletags-versification");
+
 var _i18n = _interopRequireDefault(require("./i18n"));
 
 var _constants = require("./constants");
@@ -19,7 +21,9 @@ var _utils = require("./utils");
 
 var _originalWordConversion = require("./originalWordConversion");
 
-var _excluded = ["text", "content"];
+var _excluded = ["text", "content"],
+    _excluded2 = ["pieces"],
+    _excluded3 = ["children"];
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -722,7 +726,9 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
       inlineMarkersOnly = _ref9.inlineMarkersOnly,
       wordDividerRegex = _ref9.wordDividerRegex,
       splitIntoWords = _ref9.splitIntoWords,
-      searchText = _ref9.searchText;
+      searchText = _ref9.searchText,
+      wordNumberInVerseOfHitsByLoc = _ref9.wordNumberInVerseOfHitsByLoc,
+      startRef = _ref9.startRef;
   // Put the chapter tag before everything, or assume chapter 1 if there is not one
   var chapterTagSwapRegex = /^((?:[^\\]|\\[^v])+?)(\\c [0-9]+\n)/;
   var addedPseudoChapter = false;
@@ -865,8 +871,6 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
     var _getQueryArrayAndWord = (0, _utils.getQueryArrayAndWords)(query),
         queryWords = _getQueryArrayAndWord.queryWords;
 
-    var isHebrew = getIsHebrew(modifiedVerseObjects);
-
     var markSearchWordHits = function markSearchWordHits(pieces) {
       var getWordText = function getWordText(unitObj) {
         var text = unitObj.text,
@@ -974,6 +978,36 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
     markSearchWordHits(modifiedVerseObjects);
   }
 
+  if (Object.values(wordNumberInVerseOfHitsByLoc || {}).length > 0) {
+    var currentRef = _objectSpread({}, startRef);
+
+    var markCorrespondingHits = function markCorrespondingHits(pieces) {
+      pieces.forEach(function (unitObj) {
+        var content = unitObj.content,
+            children = unitObj.children,
+            tag = unitObj.tag,
+            lemma = unitObj.lemma,
+            morph = unitObj.morph,
+            strong = unitObj.strong,
+            wordNumberInVerse = unitObj.wordNumberInVerse;
+
+        if (tag === 'c') {
+          currentRef.chapter = parseInt(content, 10);
+        } else if (tag === 'v') {
+          currentRef.verse = parseInt(content, 10);
+        }
+
+        if (wordNumberInVerseOfHitsByLoc[(0, _bibletagsVersification.getLocFromRef)(currentRef)].includes(wordNumberInVerse)) {
+          unitObj.isHit = true;
+        } else if (children) {
+          markCorrespondingHits(children);
+        }
+      });
+    };
+
+    markCorrespondingHits(modifiedVerseObjects);
+  }
+
   return modifiedVerseObjects;
 };
 
@@ -981,16 +1015,13 @@ exports.getPiecesFromUSFM = getPiecesFromUSFM;
 
 var splitVerseIntoWords = function splitVerseIntoWords() {
   var _ref14 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      usfm = _ref14.usfm,
-      wordDividerRegex = _ref14.wordDividerRegex,
-      pieces = _ref14.pieces;
+      pieces = _ref14.pieces,
+      otherParams = _objectWithoutProperties(_ref14, _excluded2);
 
-  pieces = pieces || getPiecesFromUSFM({
-    usfm: usfm,
-    wordDividerRegex: wordDividerRegex,
+  pieces = pieces || getPiecesFromUSFM(_objectSpread(_objectSpread({}, otherParams), {}, {
     inlineMarkersOnly: true,
     splitIntoWords: true
-  });
+  }));
 
   var getWordsWithNumber = function getWordsWithNumber(pieces) {
     var words = [];
@@ -1004,8 +1035,10 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
     };
 
     pieces.forEach(function (unitObj) {
+      var children = unitObj.children,
+          unitObjWithoutChildren = _objectWithoutProperties(unitObj, _excluded3);
+
       var type = unitObj.type,
-          children = unitObj.children,
           wordNumberInVerse = unitObj.wordNumberInVerse,
           tag = unitObj.tag;
 
@@ -1016,10 +1049,9 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
           text = text.toUpperCase();
         }
 
-        words.push({
-          wordNumberInVerse: wordNumberInVerse,
+        words.push(_objectSpread(_objectSpread({}, unitObjWithoutChildren), {}, {
           text: text
-        });
+        }));
       } else if (children) {
         words = [].concat(_toConsumableArray(words), _toConsumableArray(getWordsWithNumber(children)));
       }
@@ -1034,7 +1066,7 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
     return wordNumberInVerse !== idx + 1;
   })) {
     throw "error in splitVerseIntoWords: ".concat(JSON.stringify({
-      usfm: usfm,
+      otherParams: otherParams,
       pieces: pieces
     }));
   }

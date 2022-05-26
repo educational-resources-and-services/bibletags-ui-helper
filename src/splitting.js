@@ -1,5 +1,6 @@
 import usfmJS from 'usfm-js'
 // import rewritePattern  from 'regexpu-core'
+import { getLocFromRef } from '@bibletags/bibletags-versification'
 
 import i18n from './i18n'
 import { defaultWordDividerRegex, bibleSearchFlagMap, hebrewHeyNunSearchHitRegexes, hebrewPrefixSearchHitMap, grammaticalDetailMap } from './constants'
@@ -768,7 +769,7 @@ export const getIsHebrew = unitObjs => {
   return getHasHebrew(unitObjs)
 }
 
-export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex, splitIntoWords, searchText }) => {
+export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex, splitIntoWords, searchText, wordNumberInVerseOfHitsByLoc, startRef }) => {
 
   // Put the chapter tag before everything, or assume chapter 1 if there is not one
   const chapterTagSwapRegex = /^((?:[^\\]|\\[^v])+?)(\\c [0-9]+\n)/
@@ -902,7 +903,6 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
 
     const { query } = getQueryAndFlagInfo({ query: searchText, FLAG_MAP: bibleSearchFlagMap })
     const { queryWords } = getQueryArrayAndWords(query)
-    const isHebrew = getIsHebrew(modifiedVerseObjects)
 
     const markSearchWordHits = pieces => {
 
@@ -1009,15 +1009,42 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
 
   }
 
+  if(Object.values(wordNumberInVerseOfHitsByLoc || {}).length > 0) {
+
+    const currentRef = { ...startRef }
+
+    const markCorrespondingHits = pieces => {
+
+      pieces.forEach(unitObj => {
+        const { content, children, tag, lemma, morph, strong, wordNumberInVerse } = unitObj
+
+        if(tag === 'c') {
+          currentRef.chapter = parseInt(content, 10)
+        } else if(tag === 'v') {
+          currentRef.verse = parseInt(content, 10)
+        }
+
+        if(wordNumberInVerseOfHitsByLoc[getLocFromRef(currentRef)].includes(wordNumberInVerse)) {
+          unitObj.isHit = true
+        } else if(children) {
+          markCorrespondingHits(children)
+        }
+      })
+
+    }
+
+    markCorrespondingHits(modifiedVerseObjects)
+
+  }
+
   return modifiedVerseObjects
     
 }
 
-export const splitVerseIntoWords = ({ usfm, wordDividerRegex, pieces }={}) => {
+export const splitVerseIntoWords = ({ pieces, ...otherParams }={}) => {
 
   pieces = pieces || getPiecesFromUSFM({
-    usfm,
-    wordDividerRegex,
+    ...otherParams,
     inlineMarkersOnly: true,
     splitIntoWords: true,
   })
@@ -1031,14 +1058,15 @@ export const splitVerseIntoWords = ({ usfm, wordDividerRegex, pieces }={}) => {
     }
 
     pieces.forEach(unitObj => {
-      const { type, children, wordNumberInVerse, tag } = unitObj
+      const { children, ...unitObjWithoutChildren } = unitObj
+      const { type, wordNumberInVerse, tag } = unitObj
 
       if(type === "word" && wordNumberInVerse) {
         let text = getWordText(unitObj)
         if([ 'nd', 'sc' ].includes(tag)) {
           text = text.toUpperCase()
         }
-        words.push({ wordNumberInVerse, text })
+        words.push({ ...unitObjWithoutChildren, text })
       } else if(children) {
         words = [
           ...words,
@@ -1053,7 +1081,7 @@ export const splitVerseIntoWords = ({ usfm, wordDividerRegex, pieces }={}) => {
   const wordsWithNumber = getWordsWithNumber(pieces)
 
   if(wordsWithNumber.some(({ wordNumberInVerse }, idx) => wordNumberInVerse !== idx+1)) {
-    throw `error in splitVerseIntoWords: ${JSON.stringify({ usfm, pieces })}`
+    throw `error in splitVerseIntoWords: ${JSON.stringify({ otherParams, pieces })}`
   }
 
   return wordsWithNumber
