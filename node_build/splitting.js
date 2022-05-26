@@ -997,7 +997,7 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
           currentRef.verse = parseInt(content, 10);
         }
 
-        if (wordNumberInVerseOfHitsByLoc[(0, _bibletagsVersification.getLocFromRef)(currentRef)].includes(wordNumberInVerse)) {
+        if ((wordNumberInVerseOfHitsByLoc[(0, _bibletagsVersification.getLocFromRef)(currentRef)] || []).includes(wordNumberInVerse)) {
           unitObj.isHit = true;
         } else if (children) {
           markCorrespondingHits(children);

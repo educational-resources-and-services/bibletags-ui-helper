@@ -1024,7 +1024,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
           currentRef.verse = parseInt(content, 10)
         }
 
-        if(wordNumberInVerseOfHitsByLoc[getLocFromRef(currentRef)].includes(wordNumberInVerse)) {
+        if((wordNumberInVerseOfHitsByLoc[getLocFromRef(currentRef)] || []).includes(wordNumberInVerse)) {
           unitObj.isHit = true
         } else if(children) {
           markCorrespondingHits(children)
