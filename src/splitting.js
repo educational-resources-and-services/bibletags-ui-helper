@@ -1033,7 +1033,7 @@ export const splitVerseIntoWords = ({ usfm, wordDividerRegex, pieces }={}) => {
     pieces.forEach(unitObj => {
       const { type, children, wordNumberInVerse, tag } = unitObj
 
-      if(type === "word") {
+      if(type === "word" && wordNumberInVerse) {
         let text = getWordText(unitObj)
         if([ 'nd', 'sc' ].includes(tag)) {
           text = text.toUpperCase()

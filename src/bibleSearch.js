@@ -3,6 +3,7 @@ import "regenerator-runtime/runtime.js"  // needed to build-for-node given async
 import { bibleSearchScopes, allVerseNumberScopeKeysByBookId } from './constants'
 import { mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock, getWordDetails, getLengthOfAllScopeMaps } from './utils'
 import { getInfoOnResultLocs } from './bibleSearchUtils'
+import { getWordsHash } from "./index"
 
 const WILD_CARD_LIMIT = 100
 
@@ -16,6 +17,7 @@ export const bibleSearch = async ({
   getUnitWords,
   getUnitRanges,
   getVerses,
+  getTagSetsByIds,
   maxNumVersion=5,
   doClocking=false,
 }) => {
@@ -66,7 +68,7 @@ export const bibleSearch = async ({
   const versionById = {}
   const resultCountByVersionId = {}
   const wordResultsByVersionId = {}
-  let totalHits = 0
+  let hitsByBookId = Array(1+66).fill(0)
 
   doClocking && clock(`Get words for all versions`)
 
@@ -375,6 +377,8 @@ export const bibleSearch = async ({
           : parseInt(scopeKey.split(':')[0], 10)
       )
 
+      hitsByBookId[bookId] += numHitsByScopeKey[scopeKey]
+
       resultCountByVersionId[versionId]++
 
       if(resultCountByVersionId[versionId] > offset + limit || stackedResultsIdxByScopeKey[scopeKey] === true) {  // this block solely for performance reasons
@@ -400,7 +404,10 @@ export const bibleSearch = async ({
 
     })
 
-    if(
+  })
+
+  if(
+    !(
       (
         versionIds.length === 1  // not stacked
         || isOriginalLanguageSearch
@@ -409,17 +416,14 @@ export const bibleSearch = async ({
         queryArray[0] === '"'  // exact phrase at base level
         || queryArray.length === 1  // only one unit at base level
       )
-    ) {
-      totalHits += Object.values(numHitsByScopeKey).reduce((a, b) => a + b, 0)
-    } else {
-      totalHits = null
-    }
-
-  })
+    )
+  ) {
+    hitsByBookId = null
+  }
 
   doClocking && clock(`Get count and arrange ordering`)
 
-  const countByBookId = stackedResultsByBookId.map(a => a.length)
+  const rowCountByBookId = stackedResultsByBookId.map(a => a.length)
 
   if(hebrewOrdering) {
     // TODO: reorder stackedResultsByBookId
@@ -490,16 +494,22 @@ export const bibleSearch = async ({
     resultsByVersionIdNeedingUsfm[versionId] = resultsByVersionIdNeedingUsfm[versionId] || []
     resultsByVersionIdNeedingUsfm[versionId].push(result)
   })
+  const tagSetIds = []
+  const versionResultsNeedingUsfmByVersionIdAndLoc = {}
 
   await Promise.all(Object.keys(resultsByVersionIdNeedingUsfm).map(async versionId => {
 
     const resultsNeedingUsfm = resultsByVersionIdNeedingUsfm[versionId]
     const { locs, versionResultsNeedingUsfmByLoc } = getInfoOnResultLocs({ resultsNeedingUsfm, lookupVersionInfo: versionById[versionId] })
+    versionResultsNeedingUsfmByVersionIdAndLoc[versionId] = versionResultsNeedingUsfmByLoc
 
     const verses = await getVerses({ versionId, locs })
 
     verses.forEach(({ loc, usfm }) => {
       versionResultsNeedingUsfmByLoc[loc][0].usfm.push(usfm)
+      if(!isOriginalLanguageSearch) {
+        tagSetIds.push(`${loc}-${versionId}-${getWordsHash({ usfm, wordDividerRegex: versionById[versionId].wordDividerRegex })}`)
+      }
     })
 
   }))
@@ -507,6 +517,21 @@ export const bibleSearch = async ({
   results.forEach(result => {
     result.versionResults[0].usfm = result.versionResults[0].usfm.join("\n")
   })
+
+  if(!isOriginalLanguageSearch && tagSetIds.length > 0) {
+
+    doClocking && clock(`Get tagSets for result being returned`)
+
+    const tagSets = await getTagSetsByIds(tagSetIds)
+
+    tagSets.forEach(tagSet => {
+      const [ loc, versionId ] = tagSet.id.split('-')
+      const resultObj = versionResultsNeedingUsfmByVersionIdAndLoc[versionId][loc][0]
+      resultObj.tagSets = resultObj.tagSets || []
+      resultObj.tagSets.push(tagSet)
+    })
+
+  }
 
   doClocking && clock(``)
 
@@ -521,8 +546,8 @@ export const bibleSearch = async ({
 
   return {
     results,
-    countByBookId,
-    totalHits,
+    rowCountByBookId,
+    hitsByBookId,
     otherSuggestedQueries: [],
   }
 
@@ -538,6 +563,9 @@ export const bibleSearch = async ({
         {
           versionId: "esv",
           usfm: "...",
+          tagSets: [
+            ...
+          ],
         },
         {
           versionId: "nasb",

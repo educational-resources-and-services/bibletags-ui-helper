@@ -1009,7 +1009,7 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
           wordNumberInVerse = unitObj.wordNumberInVerse,
           tag = unitObj.tag;
 
-      if (type === "word") {
+      if (type === "word" && wordNumberInVerse) {
         var text = getWordText(unitObj);
 
         if (['nd', 'sc'].includes(tag)) {
