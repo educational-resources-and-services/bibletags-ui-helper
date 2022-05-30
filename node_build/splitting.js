@@ -185,15 +185,14 @@ var inlineUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 // "sls",
 // "tl",
 "wj", // Character Styling
-"em", "bd", "it", "bdit", "no", "sc", "sup" // Special Features
+"em", "bd", "it", "bdit", "no", "sc", "sup", // Special Features
 // "rb",
 // "pro",
 // "wg",
 // "wh",
 // "wa",
 // Linking Attributes
-// "jmp",
-// Extended Study Content
+"jmp" // Extended Study Content
 // "ef",
 // "ex",
 // "cat",

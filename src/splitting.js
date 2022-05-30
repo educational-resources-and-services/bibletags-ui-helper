@@ -225,7 +225,7 @@ export const inlineUsfmMarkers = [
   // "wa",
 
   // Linking Attributes
-  // "jmp",
+  "jmp",
 
   // Extended Study Content
   // "ef",
