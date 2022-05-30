@@ -84,6 +84,9 @@ export const blockUsfmMarkers = [
   // "qm#",
   "qd",
 
+  // Footnotes
+  "fp",
+
   // Lists
   // "lh",
   // "li#",
@@ -167,11 +170,11 @@ export const inlineUsfmMarkers = [
   "fk",
   "fl",
   "fw",
-  "fp",
   "fv",
   "ft",
   // "fdc",
   // "fm",
+  "zFootnoteType",
 
   // Cross References
   "x",
