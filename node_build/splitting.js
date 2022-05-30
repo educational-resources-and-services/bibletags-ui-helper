@@ -112,7 +112,8 @@ var blockUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 // "ph#",
 "b", // Poetry
 "q#", "qr", "qc", "qa", // "qm#",
-"qd" // Lists
+"qd", // Footnotes
+"fp" // Lists
 // "lh",
 // "li#",
 // "lf",
@@ -158,9 +159,9 @@ var inlineUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 // "tcr#",
 // Footnotes
 "f", "fe", // "fr",
-"fq", "fqa", "fk", "fl", "fw", "fp", "fv", "ft", // "fdc",
+"fq", "fqa", "fk", "fl", "fw", "fv", "ft", // "fdc",
 // "fm",
-// Cross References
+"zFootnoteType", // Cross References
 "x", // "xo",
 // "xk",
 "xq", "xt", // "xta",
