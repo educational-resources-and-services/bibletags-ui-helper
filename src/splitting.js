@@ -45,15 +45,15 @@ export const blockUsfmMarkers = [
 
   // Titles, Headings, and Labels
   "mt#",
-  // "mte#",
+  "mte#",
   "ms#",
-  // "mr",
+  "mr",
   "s#",
-  // "sr",
-  // "r",
+  "sr",
+  "r",
   "d",
-  // "sp",
-  // "sd#",
+  "sp",
+  "sd#",
 
   // Chapters and Verses
   // "cl",
@@ -61,19 +61,19 @@ export const blockUsfmMarkers = [
 
   // Paragraphs
   "p",
-  // "m",
-  // "po",
-  // "pr",
-  // "cls",
-  // "pmo",
-  // "pm",
-  // "pmc",
-  // "pmr",
-  // "pi#",
-  // "mi",
+  "m",
+  "po",
+  "pr",
+  "cls",
+  "pmo",
+  "pm",
+  "pmc",
+  "pmr",
+  "pi#",
+  "mi",
   "nb",
-  // "pc",
-  // "ph#",
+  "pc",
+  "ph#",
   "b",
 
   // Poetry
@@ -81,7 +81,7 @@ export const blockUsfmMarkers = [
   "qr",
   "qc",
   "qa",
-  // "qm#",
+  "qm#",
   "qd",
 
   // Footnotes
@@ -139,7 +139,7 @@ export const inlineUsfmMarkers = [
   // "iqt",
 
   // Titles, Headings, and Labels
-  // "rq",
+  "rq",
 
   // Chapters and Verses
   "v",
@@ -147,8 +147,8 @@ export const inlineUsfmMarkers = [
   "vp",
 
   // Poetry
-  // "qs",
-  // "qac",
+  "qs",
+  "qac",
 
   // Lists
   // "litl",
@@ -179,33 +179,33 @@ export const inlineUsfmMarkers = [
   // Cross References
   "x",
   // "xo",
-  // "xk",
+  "xk",
   "xq",
   "xt",
-  // "xta",
+  "xta",
   // "xop",
   // "xot",
   // "xnt",
   // "xdc",
-  // "rq",
+  "rq",
 
   // Apparatus
   "zApparatusJson",
 
   // Special Text
-  // "add",
-  // "bk",
-  // "dc",
-  // "k",
+  "add",
+  "bk",
+  "dc",
+  "k",
   "nd",
-  // "ord",
-  // "pn",
-  // "png",
-  // "addpn",
-  // "qt",
-  // "sig",
-  // "sls",
-  // "tl",
+  "ord",
+  "pn",
+  "png",
+  "addpn",
+  "qt",
+  "sig",
+  "sls",
+  "tl",
   "wj",
 
   // Character Styling
@@ -220,9 +220,9 @@ export const inlineUsfmMarkers = [
   // Special Features
   // "rb",
   // "pro",
-  // "wg",
-  // "wh",
-  // "wa",
+  "wg",
+  "wh",
+  "wa",
 
   // Linking Attributes
   "jmp",
