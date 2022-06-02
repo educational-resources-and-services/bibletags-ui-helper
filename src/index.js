@@ -1,5 +1,5 @@
 import md5 from 'md5'
-import { getRefFromLoc } from "@bibletags/bibletags-versification"
+import { getRefFromLoc, getNumberOfChapters } from "@bibletags/bibletags-versification"
 import { Buffer } from 'buffer'
 
 import i18n, { i18nNumber } from './i18n'
@@ -451,11 +451,27 @@ export const getBookIdFromUsfmBibleBookAbbr = abbr => usfmBookAbbr.indexOf(abbr)
 export const getRefsFromUsfmRefStr = usfmRefStr => {
   const [ usfmBibleBookAbbr, chaptersAndVerses ] = usfmRefStr.split(' ')
   const [ startChapterAndVerse, endChapterAndVerse ] = chaptersAndVerses.split('-')
-  const [ startChapter, startVerse ] = startChapterAndVerse.split(':')
+  let [ startChapter, startVerse ] = startChapterAndVerse.split(':')
+
+  const bookId = getBookIdFromUsfmBibleBookAbbr(usfmBibleBookAbbr)
+
+  const isSingleChapterBook = (
+    getNumberOfChapters({
+      versionInfo: {
+        versificationModel: 'original',  // since single-chapter books are version specific, just use this
+      },
+      bookId,
+    }) === 1
+  )
+
+  if(isSingleChapterBook && startVerse === undefined) {
+    startVerse = startChapter
+    startChapter = 1
+  }
 
   const refs = [
     getRefFromLoc(
-      `${(`0${getBookIdFromUsfmBibleBookAbbr(usfmBibleBookAbbr)}`).substr(-2)}${(`00${startChapter}`).substr(-3)}${(`00${startVerse === undefined ? 1 : startVerse}`).substr(-3)}`
+      `${(`0${bookId}`).substr(-2)}${(`00${startChapter}`).substr(-3)}${(`00${startVerse === undefined ? 1 : startVerse}`).substr(-3)}`
     )
   ]
 
@@ -463,6 +479,10 @@ export const getRefsFromUsfmRefStr = usfmRefStr => {
 
   if(endChapterAndVerse) {
     const endChapterAndVerseSplit = endChapterAndVerse.split(':')
+
+    if(isSingleChapterBook && endChapterAndVerseSplit.length === 1) {
+      endChapterAndVerseSplit.unshift(1)
+    }
 
     if(startVerse === undefined) {
       endChapter = endChapterAndVerseSplit[0]

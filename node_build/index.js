@@ -545,11 +545,29 @@ var getRefsFromUsfmRefStr = function getRefsFromUsfmRefStr(usfmRefStr) {
       startChapter = _startChapterAndVerse2[0],
       startVerse = _startChapterAndVerse2[1];
 
-  var refs = [(0, _bibletagsVersification.getRefFromLoc)("".concat("0".concat(getBookIdFromUsfmBibleBookAbbr(usfmBibleBookAbbr)).substr(-2)).concat("00".concat(startChapter).substr(-3)).concat("00".concat(startVerse === undefined ? 1 : startVerse).substr(-3)))];
+  var bookId = getBookIdFromUsfmBibleBookAbbr(usfmBibleBookAbbr);
+  var isSingleChapterBook = (0, _bibletagsVersification.getNumberOfChapters)({
+    versionInfo: {
+      versificationModel: 'original' // since single-chapter books are version specific, just use this
+
+    },
+    bookId: bookId
+  }) === 1;
+
+  if (isSingleChapterBook && startVerse === undefined) {
+    startVerse = startChapter;
+    startChapter = 1;
+  }
+
+  var refs = [(0, _bibletagsVersification.getRefFromLoc)("".concat("0".concat(bookId).substr(-2)).concat("00".concat(startChapter).substr(-3)).concat("00".concat(startVerse === undefined ? 1 : startVerse).substr(-3)))];
   var endChapter, endVerse;
 
   if (endChapterAndVerse) {
     var endChapterAndVerseSplit = endChapterAndVerse.split(':');
+
+    if (isSingleChapterBook && endChapterAndVerseSplit.length === 1) {
+      endChapterAndVerseSplit.unshift(1);
+    }
 
     if (startVerse === undefined) {
       endChapter = endChapterAndVerseSplit[0];
