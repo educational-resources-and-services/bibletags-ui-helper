@@ -867,6 +867,23 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     }
   })
 
+  // Make fixes:
+  //  1. usfmJS marks \sp with a `text` attribute instead of a `content` attribute
+  //  2. additionally, if there is a footnote within a marker with `content`, then the content gets changed to `text`
+  let forceContentAttr = false
+  modifiedVerseObjects.forEach(vsObj => {
+    if(tagInList({ tag: vsObj.tag, list: headingBlockUsfmMarkers })) {
+      forceContentAttr = true
+    } else if(tagInList({ tag: vsObj.tag, list: blockUsfmMarkers })) {
+      forceContentAttr = false
+    }
+    if(forceContentAttr && vsObj.content === undefined && vsObj.text !== undefined) {
+      vsObj.content = vsObj.text
+      delete vsObj.text
+      delete vsObj.type
+    }
+  })
+
   if(!inlineMarkersOnly) {
     modifiedVerseObjects = wrapVerseObjects(modifiedVerseObjects)
   }
