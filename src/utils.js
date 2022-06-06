@@ -235,6 +235,29 @@ export const clock = descriptionOfNextSection => {
   descriptionOfCurrentClockTimeSection = descriptionOfNextSection
 }
 
+let cumulativeClockTimeByDescription = {}
+
+export const clockPromise = async (promise, desc, on) => {
+  const clockTime = on && Date.now()
+  const result = await promise
+  if(on) {
+    cumulativeClockTimeByDescription[desc] = cumulativeClockTimeByDescription[desc] || {
+      desc,
+      totalMs: 0,
+    }
+    cumulativeClockTimeByDescription[desc].totalMs += (Date.now() - clockTime)
+  }
+  return result
+}
+
+export const reportClockedPromiseTimes = () => {
+  const cumulativeClockTimes = Object.values(cumulativeClockTimeByDescription).sort((a,b) => a.totalMs > b.totalMs ? -1 : 1)
+  if(cumulativeClockTimes.length > 0) {
+    console.log(`Clocked:\n - ${cumulativeClockTimes.map(({ desc, totalMs }) => `${desc}=${totalMs}ms`).join('\n - ')}`, )
+    cumulativeClockTimeByDescription = {}
+  }
+}
+
 export const getWordDetails = ({ queryWords, isOriginalLanguageSearch }) => {
 
   let wordDetailsArray = []

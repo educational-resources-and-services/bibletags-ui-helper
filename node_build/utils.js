@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.mergeAndUniquifyArraysOfScopeKeys = exports.getWordDetails = exports.getQueryArrayAndWords = exports.getLengthOfAllScopeMaps = exports.clock = void 0;
+exports.reportClockedPromiseTimes = exports.mergeAndUniquifyArraysOfScopeKeys = exports.getWordDetails = exports.getQueryArrayAndWords = exports.getLengthOfAllScopeMaps = exports.clockPromise = exports.clock = void 0;
 
 var _constants = require("./constants");
 
@@ -12,6 +12,10 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
@@ -248,10 +252,67 @@ var clock = function clock(descriptionOfNextSection) {
 };
 
 exports.clock = clock;
+var cumulativeClockTimeByDescription = {};
 
-var getWordDetails = function getWordDetails(_ref) {
-  var queryWords = _ref.queryWords,
-      isOriginalLanguageSearch = _ref.isOriginalLanguageSearch;
+var clockPromise = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(promise, desc, on) {
+    var clockTime, result;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            clockTime = on && Date.now();
+            _context.next = 3;
+            return promise;
+
+          case 3:
+            result = _context.sent;
+
+            if (on) {
+              cumulativeClockTimeByDescription[desc] = cumulativeClockTimeByDescription[desc] || {
+                desc: desc,
+                totalMs: 0
+              };
+              cumulativeClockTimeByDescription[desc].totalMs += Date.now() - clockTime;
+            }
+
+            return _context.abrupt("return", result);
+
+          case 6:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+
+  return function clockPromise(_x, _x2, _x3) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+exports.clockPromise = clockPromise;
+
+var reportClockedPromiseTimes = function reportClockedPromiseTimes() {
+  var cumulativeClockTimes = Object.values(cumulativeClockTimeByDescription).sort(function (a, b) {
+    return a.totalMs > b.totalMs ? -1 : 1;
+  });
+
+  if (cumulativeClockTimes.length > 0) {
+    console.log("Clocked:\n - ".concat(cumulativeClockTimes.map(function (_ref2) {
+      var desc = _ref2.desc,
+          totalMs = _ref2.totalMs;
+      return "".concat(desc, "=").concat(totalMs, "ms");
+    }).join('\n - ')));
+    cumulativeClockTimeByDescription = {};
+  }
+};
+
+exports.reportClockedPromiseTimes = reportClockedPromiseTimes;
+
+var getWordDetails = function getWordDetails(_ref3) {
+  var queryWords = _ref3.queryWords,
+      isOriginalLanguageSearch = _ref3.isOriginalLanguageSearch;
   var wordDetailsArray = [];
   var getWordNumbersMatchingAllWordDetails;
 
@@ -265,10 +326,10 @@ var getWordDetails = function getWordDetails(_ref) {
           rawDetails = rawDetails.replace(/^not:/, '');
           rawDetails = rawDetails.replace(/^suffix$/, 'suffix:s/p');
 
-          var _ref2 = rawDetails.match(/^([^:]+):/) || [],
-              _ref3 = _slicedToArray(_ref2, 2),
-              x = _ref3[0],
-              colonDetailType = _ref3[1];
+          var _ref4 = rawDetails.match(/^([^:]+):/) || [],
+              _ref5 = _slicedToArray(_ref4, 2),
+              x = _ref5[0],
+              colonDetailType = _ref5[1];
 
           var returnObjs = rawDetails.replace(/^[^:]+:/, '').split('/').map(function (rawDetail) {
             if (colonDetailType === 'lemma') {
@@ -348,24 +409,24 @@ var getWordDetails = function getWordDetails(_ref) {
             });
           } else {
             return {
-              detail: returnObjs.map(function (_ref4) {
-                var detail = _ref4.detail;
+              detail: returnObjs.map(function (_ref6) {
+                var detail = _ref6.detail;
                 return detail;
               }).flat(),
               matches: function matches(wordInfo) {
-                return returnObjs.some(function (_ref5) {
-                  var matches = _ref5.matches;
+                return returnObjs.some(function (_ref7) {
+                  var matches = _ref7.matches;
                   return matches(wordInfo);
                 });
               },
-              avgRowSizeInKB: returnObjs.map(function (_ref6) {
-                var avgRowSizeInKB = _ref6.avgRowSizeInKB;
+              avgRowSizeInKB: returnObjs.map(function (_ref8) {
+                var avgRowSizeInKB = _ref8.avgRowSizeInKB;
                 return avgRowSizeInKB;
               }).reduce(function (a, b) {
                 return a + b;
               }, 0) / returnObjs.length,
-              forceMatchOnWordDetails: returnObjs.some(function (_ref7) {
-                var forceMatchOnWordDetails = _ref7.forceMatchOnWordDetails;
+              forceMatchOnWordDetails: returnObjs.some(function (_ref9) {
+                var forceMatchOnWordDetails = _ref9.forceMatchOnWordDetails;
                 return forceMatchOnWordDetails;
               }),
               isNot: isNot
@@ -385,9 +446,9 @@ var getWordDetails = function getWordDetails(_ref) {
         var wordDetailsToCheckLength = wordDetailsToCheck.length;
 
         matchesAddlDetailsByWord[word] = function (wordInfo) {
-          return wordDetailsToCheckLength > 1 ? wordDetailsToCheck.every(function (_ref8) {
-            var matches = _ref8.matches,
-                isNot = _ref8.isNot;
+          return wordDetailsToCheckLength > 1 ? wordDetailsToCheck.every(function (_ref10) {
+            var matches = _ref10.matches,
+                isNot = _ref10.isNot;
             return matches(wordInfo) === !isNot;
           }) : wordDetailsToCheckLength === 0 ? !wordDetails[0].isNot : wordDetailsToCheck[0].matches(wordInfo) === !wordDetailsToCheck[0].isNot;
         };
@@ -399,10 +460,10 @@ var getWordDetails = function getWordDetails(_ref) {
       }
     });
 
-    getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref9) {
-      var word = _ref9.word,
-          infoObjOrWordNumbers = _ref9.infoObjOrWordNumbers,
-          includeVariants = _ref9.includeVariants;
+    getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref11) {
+      var word = _ref11.word,
+          infoObjOrWordNumbers = _ref11.infoObjOrWordNumbers,
+          includeVariants = _ref11.includeVariants;
       return infoObjOrWordNumbers.filter(function (wordInfo) {
         return (includeVariants || wordInfo[0] !== null // i.e. it is not a variant
         ) && matchesAddlDetailsByWord[word](wordInfo);
@@ -419,8 +480,8 @@ var getWordDetails = function getWordDetails(_ref) {
       };
     });
 
-    getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref10) {
-      var infoObjOrWordNumbers = _ref10.infoObjOrWordNumbers;
+    getWordNumbersMatchingAllWordDetails = function getWordNumbersMatchingAllWordDetails(_ref12) {
+      var infoObjOrWordNumbers = _ref12.infoObjOrWordNumbers;
       return infoObjOrWordNumbers;
     };
   }
@@ -434,8 +495,8 @@ var getWordDetails = function getWordDetails(_ref) {
 exports.getWordDetails = getWordDetails;
 
 var getLengthOfAllScopeMaps = function getLengthOfAllScopeMaps(wordAlts, lookForIsNot) {
-  return ['*', '...'].includes(wordAlts) || lookForIsNot && (wordAlts[0] || {}).isNot ? Infinity : wordAlts.scopeKeys ? wordAlts.scopeKeys.length : wordAlts.reduce(function (total, _ref11) {
-    var scopeMap = _ref11.scopeMap;
+  return ['*', '...'].includes(wordAlts) || lookForIsNot && (wordAlts[0] || {}).isNot ? Infinity : wordAlts.scopeKeys ? wordAlts.scopeKeys.length : wordAlts.reduce(function (total, _ref13) {
+    var scopeMap = _ref13.scopeMap;
     return total + Object.values(scopeMap).length;
   }, 0);
 };
