@@ -34,11 +34,11 @@ Most modern languages separate words with spaces or other punctuation, but there
 
 To address this, a `word divider regex` will need to be provided for any text where the default `/[\\P{L}]+/gu` is not the valid regex for the split function.
 
-This will leave some languages without precise word dividers, resulting, at times, in smaller divisions than words (eg. syllables). While this is not ideal for these languages, it should nonetheless allow all aspects of the app and widget to function properly, and only require a bit more clicking/tapping when tagging these texts to the original languages.
+This will leave some languages without precise word dividers, resulting, at times, in smaller divisions than words (e.g. syllables). While this is not ideal for these languages, it should nonetheless allow all aspects of the app and widget to function properly, and only require a bit more clicking/tapping when tagging these texts to the original languages.
 
 Programmatic exceptions to this approach will be few. To date, the following exception(s) exist:
 
-* Possession and contractions in English using an apostraphe. Eg. `Balaam’s`, `shouldn’t`. Such apostraphes will be escaped before the `word divider regex` is used to split the verse.
+* Possession and contractions in English using an apostraphe. E.g. `Balaam’s`, `shouldn’t`. Such apostraphes will be escaped before the `word divider regex` is used to split the verse.
 
 *Please contact us to suggest any programmatic exceptions for other languages.*
 
@@ -67,15 +67,15 @@ getOrigLanguageText(languageId): String  // "Hebrew" or "Greek" in the proper la
 ```
 
 ```js
-getVersionStr(versionId): String  //eg. "Hebrew (UHB)" or "ESV"
+getVersionStr(versionId): String  //e.g. "Hebrew (UHB)" or "ESV"
 ```
 
 ```js
-getRefsInfo({ refs, skipBookName, abbreviated, usfmBookAbbr }): Object  // eg. { bookId: 1, chapter: 1, start_verse: 1, end_verse: 2 }
+getRefsInfo({ refs, skipBookName, abbreviated, usfmBookAbbr }): Object  // e.g. { bookId: 1, chapter: 1, start_verse: 1, end_verse: 2 }
 ```
 
 ```js
-getPassageStr(params): String  // eg. "Genesis 1:2–3"
+getPassageStr(params): String  // e.g. "Genesis 1:2–3"
 ```
 
 ```js
@@ -83,7 +83,7 @@ getBibleBookName(bookId): String  // in the proper language
 ```
 
 ```js
-getUsfmBibleBookAbbr(bookId): String  // eg. "GEN"
+getUsfmBibleBookAbbr(bookId): String  // e.g. "GEN"
 ```
 
 ```js
@@ -99,7 +99,7 @@ getUsfmRefStrFromLoc(loc): String
 ```
 
 ```js
-getBibleBookAbbreviatedName(bookId): String  // eg. "Gen"
+getBibleBookAbbreviatedName(bookId): String  // e.g. "Gen"
 ```
 
 ```js

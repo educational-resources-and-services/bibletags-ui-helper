@@ -341,7 +341,7 @@ export const getGrammarDetailsForAutoCompletionSuggestions = ({ currentWord, nor
   // TODO: set up with i18n for grammatical details
 
   // TODO: use currentWord to weed out items that are not really options
-    // eg. if it already has #noun in the word, then don't present aspect options
+    // e.g. if it already has #noun in the word, then don't present aspect options
 
   // TODO: use searchTextInComposition to see if we should only do Hebrew grammar or only do Greek grammar
 
