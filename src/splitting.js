@@ -1061,12 +1061,12 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     
 }
 
-export const splitVerseIntoWords = ({ pieces, ...otherParams }={}) => {
+export const splitVerseIntoWords = ({ pieces, isOriginal, ...otherParams }={}) => {
 
   pieces = pieces || getPiecesFromUSFM({
     ...otherParams,
     inlineMarkersOnly: true,
-    splitIntoWords: true,
+    splitIntoWords: !isOriginal,
   })
 
   const getWordsWithNumber = pieces => {
@@ -1081,12 +1081,12 @@ export const splitVerseIntoWords = ({ pieces, ...otherParams }={}) => {
       const { children, ...unitObjWithoutChildren } = unitObj
       const { type, wordNumberInVerse, tag } = unitObj
 
-      if(type === "word" && wordNumberInVerse) {
+      if(tag === "w" || (type === "word" && wordNumberInVerse)) {
         let text = getWordText(unitObj)
         if([ 'nd', 'sc' ].includes(tag)) {
           text = text.toUpperCase()
         }
-        words.push({ ...unitObjWithoutChildren, text })
+        words.push({ ...(isOriginal ? unitObj : unitObjWithoutChildren), text })
       } else if(children) {
         words = [
           ...words,

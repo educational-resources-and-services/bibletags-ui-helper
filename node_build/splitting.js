@@ -22,7 +22,7 @@ var _utils = require("./utils");
 var _originalWordConversion = require("./originalWordConversion");
 
 var _excluded = ["text", "content"],
-    _excluded2 = ["pieces"],
+    _excluded2 = ["pieces", "isOriginal"],
     _excluded3 = ["children"];
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -999,11 +999,12 @@ exports.getPiecesFromUSFM = getPiecesFromUSFM;
 var splitVerseIntoWords = function splitVerseIntoWords() {
   var _ref14 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       pieces = _ref14.pieces,
+      isOriginal = _ref14.isOriginal,
       otherParams = _objectWithoutProperties(_ref14, _excluded2);
 
   pieces = pieces || getPiecesFromUSFM(_objectSpread(_objectSpread({}, otherParams), {}, {
     inlineMarkersOnly: true,
-    splitIntoWords: true
+    splitIntoWords: !isOriginal
   }));
 
   var getWordsWithNumber = function getWordsWithNumber(pieces) {
@@ -1025,14 +1026,14 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
           wordNumberInVerse = unitObj.wordNumberInVerse,
           tag = unitObj.tag;
 
-      if (type === "word" && wordNumberInVerse) {
+      if (tag === "w" || type === "word" && wordNumberInVerse) {
         var text = getWordText(unitObj);
 
         if (['nd', 'sc'].includes(tag)) {
           text = text.toUpperCase();
         }
 
-        words.push(_objectSpread(_objectSpread({}, unitObjWithoutChildren), {}, {
+        words.push(_objectSpread(_objectSpread({}, isOriginal ? unitObj : unitObjWithoutChildren), {}, {
           text: text
         }));
       } else if (children) {

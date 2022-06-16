@@ -501,7 +501,7 @@ var getGrammarDetailsForAutoCompletionSuggestions = function getGrammarDetailsFo
       normalizedSearchText = _ref6.normalizedSearchText;
   // TODO: set up with i18n for grammatical details
   // TODO: use currentWord to weed out items that are not really options
-  // eg. if it already has #noun in the word, then don't present aspect options
+  // e.g. if it already has #noun in the word, then don't present aspect options
   // TODO: use searchTextInComposition to see if we should only do Hebrew grammar or only do Greek grammar
   var details = Object.keys(_constants.grammaticalDetailMap);
   details.push("#sh", "#h", "#h!", "#h'", "#h?", "#h->", "#h^", "#n^");
