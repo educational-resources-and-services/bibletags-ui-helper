@@ -179,7 +179,7 @@ getPiecesFromUSFM({ usfm='', inlineMarkersOnly, wordDividerRegex, splitIntoWords
 ```
 
 ```js
-splitVerseIntoWords({ usfm, wordDividerRegex, pieces }): Array
+splitVerseIntoWords({ usfm, wordDividerRegex, pieces, isOriginal }): Array
 ```
 
 ```js
