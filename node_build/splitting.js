@@ -1045,7 +1045,7 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
 
   var wordsWithNumber = getWordsWithNumber(pieces);
 
-  if (wordsWithNumber.some(function (_ref15, idx) {
+  if (!isOriginal && wordsWithNumber.some(function (_ref15, idx) {
     var wordNumberInVerse = _ref15.wordNumberInVerse;
     return wordNumberInVerse !== idx + 1;
   })) {

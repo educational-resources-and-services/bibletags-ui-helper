@@ -1100,7 +1100,7 @@ export const splitVerseIntoWords = ({ pieces, isOriginal, ...otherParams }={}) =
 
   const wordsWithNumber = getWordsWithNumber(pieces)
 
-  if(wordsWithNumber.some(({ wordNumberInVerse }, idx) => wordNumberInVerse !== idx+1)) {
+  if(!isOriginal && wordsWithNumber.some(({ wordNumberInVerse }, idx) => wordNumberInVerse !== idx+1)) {
     throw `error in splitVerseIntoWords: ${JSON.stringify({ otherParams, pieces })}`
   }
 
