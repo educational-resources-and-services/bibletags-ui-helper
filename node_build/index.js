@@ -32,9 +32,14 @@ var _exportNames = {
   getWordsHash: true,
   getWordHashes: true,
   isValidEmail: true,
-  isOriginalLanguageSearch: true
+  isOriginalLanguageSearch: true,
+  getTextLanguageId: true,
+  isRTLText: true,
+  getCopyVerseText: true,
+  getMorphInfo: true,
+  getColorWithOpacity: true
 };
-exports.toBase64 = exports.isValidEmail = exports.isOriginalLanguageSearch = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
+exports.toBase64 = exports.isValidEmail = exports.isRTLText = exports.isOriginalLanguageSearch = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getTextLanguageId = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMorphInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getCopyVerseText = exports.getColorWithOpacity = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
 
 var _md = _interopRequireDefault(require("md5"));
 
@@ -790,3 +795,95 @@ var isOriginalLanguageSearch = function isOriginalLanguageSearch(searchText) {
 };
 
 exports.isOriginalLanguageSearch = isOriginalLanguageSearch;
+
+var getTextLanguageId = function getTextLanguageId(_ref13) {
+  var languageId = _ref13.languageId,
+      bookId = _ref13.bookId;
+  return languageId === "heb+grk" ? bookId <= 39 ? 'heb' : 'grk' : languageId;
+};
+
+exports.getTextLanguageId = getTextLanguageId;
+
+var isRTLText = function isRTLText(_ref14) {
+  var languageId = _ref14.languageId,
+      bookId = _ref14.bookId,
+      searchString = _ref14.searchString;
+  return languageId === 'heb+grk' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'yid', 'ara', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd'].includes(languageId);
+};
+
+exports.isRTLText = isRTLText;
+
+var getCopyVerseText = function getCopyVerseText(_ref15) {
+  var pieces = _ref15.pieces,
+      ref = _ref15.ref,
+      versionAbbr = _ref15.versionAbbr;
+  var selectedTextContent = '';
+  pieces.forEach(function (_ref16) {
+    var tag = _ref16.tag,
+        text = _ref16.text,
+        nextChar = _ref16.nextChar;
+
+    if (!text) {
+      if (nextChar === ' ') {
+        selectedTextContent += nextChar;
+      }
+
+      return;
+    }
+
+    selectedTextContent += ['nd', 'sc'].includes(tag) ? text.toUpperCase() : text;
+  });
+  return (0, _i18n["default"])("{{verse}} ({{passage_reference}} {{version}})", {
+    verse: selectedTextContent.trim(),
+    passage_reference: getPassageStr({
+      refs: [ref]
+    }),
+    version: versionAbbr
+  });
+};
+
+exports.getCopyVerseText = getCopyVerseText;
+
+var getMorphInfo = function getMorphInfo(morph) {
+  var morphLang = morph.substr(0, 2);
+  var morphParts;
+  var mainPartIdx;
+  var morphPos;
+
+  if (['He', 'Ar'].includes(morphLang)) {
+    morphParts = morph.substr(3).split(':');
+    mainPartIdx = getMainWordPartIndex(morphParts);
+    morphPos = morphParts[mainPartIdx].substr(0, 1);
+  } else {
+    morphParts = [morph.substr(3)];
+    mainPartIdx = 0;
+    morphPos = getNormalizedPOSCode({
+      morphLang: morphLang,
+      morphPos: morph.substr(3, 2)
+    });
+  }
+
+  return {
+    morphLang: morphLang,
+    morphParts: morphParts,
+    mainPartIdx: mainPartIdx,
+    morphPos: morphPos
+  };
+};
+
+exports.getMorphInfo = getMorphInfo;
+
+var getColorWithOpacity = function getColorWithOpacity() {
+  var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'rgba(0,0,0,1)';
+  var opacity = arguments.length > 1 ? arguments[1] : undefined;
+  return color.replace(/^#([a-f\d])([a-f\d])([a-f\d])$/i, function (m, r, g, b) {
+    return r + r + g + g + b + b;
+  }) // if it is short form hex E.g. #CCC
+  .replace(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i, function (x, r, g, b) {
+    return "rgba(".concat(parseInt(r, 16), ",").concat(parseInt(g, 16), ",").concat(parseInt(b, 16), ",1)");
+  }) // if it is hex
+  .replace(/^rgb\( *([0-9]+) *, *([0-9]+) *, *([0-9]+) *\)$/i, "rgba($1,$2,$3,1)") // if it is rgb()
+  .replace(/^rgba\( *([0-9]+) *, *([0-9]+) *, *([0-9]+) *, *[0-9]+ *\)$/i, "rgba($1,$2,$3,".concat(opacity, ")"));
+};
+
+exports.getColorWithOpacity = getColorWithOpacity;

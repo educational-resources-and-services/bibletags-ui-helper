@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.stripGreekAccents = exports.isValidBibleSearch = exports.getQueryAndFlagInfo = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
+exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.stripGreekAccents = exports.removeCantillation = exports.normalizeGreek = exports.isValidBibleSearch = exports.getQueryAndFlagInfo = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
 
 require("regenerator-runtime/runtime.js");
 
@@ -85,14 +85,27 @@ var stripGreekAccents = function stripGreekAccents(str) {
 
 exports.stripGreekAccents = stripGreekAccents;
 
-var stripHebrewVowelsEtc = function stripHebrewVowelsEtc(str) {
-  return str.replace(/[\u05B0-\u05BC\u05C1\u05C2\u05C4]/g, '') // vowels
-  .replace(/[\u0591-\u05AF\u05A5\u05BD\u05BF\u05C5\u05C7]/g, '') // cantilation
-  .replace(/\u200D/g, '') // invalid character
-  ;
+var removeCantillation = function removeCantillation(usfm) {
+  return usfm.replace(/[\u0591-\u05AF\u05A5\u05BD\u05BF\u05C0\u05C5\u05C7]/g, '');
 };
 
+exports.removeCantillation = removeCantillation;
+
+var stripHebrewVowelsEtc = function stripHebrewVowelsEtc(str) {
+  return removeCantillation(str.replace(/[\u05B0-\u05BC\u05C1\u05C2\u05C4]/g, '') // vowels
+  .replace(/\u200D/g, '') // invalid character
+  );
+}; // See https://stackoverflow.com/questions/23346506/javascript-normalize-accented-greek-characters/45797754#45797754
+
+
 exports.stripHebrewVowelsEtc = stripHebrewVowelsEtc;
+
+var normalizeGreek = function normalizeGreek() {
+  var greekString = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+  return greekString.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+};
+
+exports.normalizeGreek = normalizeGreek;
 
 var stripVocalOfAccents = function stripVocalOfAccents(str) {
   var mappings = {

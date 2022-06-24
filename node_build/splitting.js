@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.wordPartDividerRegex = exports.tagInList = exports.splitVerseIntoWords = exports.specialUsfmMarkers = exports.inlineUsfmMarkers = exports.headingBlockUsfmMarkers = exports.getPiecesFromUSFM = exports.getIsHebrew = exports.blockUsfmMarkers = void 0;
+exports.wordPartDividerRegex = exports.tagInList = exports.splitVerseIntoWords = exports.specialUsfmMarkers = exports.inlineUsfmMarkers = exports.headingBlockUsfmMarkers = exports.getPiecesFromUSFM = exports.getIsHebrew = exports.blockUsfmMarkers = exports.adjustTextForSups = exports.adjustPiecesForSpecialHebrew = void 0;
 
 var _usfmJs = _interopRequireDefault(require("usfm-js"));
 
@@ -1059,3 +1059,70 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
 };
 
 exports.splitVerseIntoWords = splitVerseIntoWords;
+
+var adjustPiecesForSpecialHebrew = function adjustPiecesForSpecialHebrew(_ref16) {
+  var isOriginal = _ref16.isOriginal,
+      languageId = _ref16.languageId,
+      pieces = _ref16.pieces;
+
+  // For original Hebrew text, split off פ and ס chars that signal a break in flow.
+  if (isOriginal && languageId.split('+').includes('heb')) {
+    return pieces.map(function (piece) {
+      if (!piece.lemma && /^[ ׃]*פ$/.test(piece.text || "")) {
+        return [_objectSpread(_objectSpread({}, piece), {}, {
+          text: piece.text.slice(0, -1)
+        }), {
+          endTag: "peh*",
+          tag: "peh",
+          text: ' פ'
+        }];
+      } else if (!piece.lemma && /^[ ׃]*ס$/.test(piece.text || "")) {
+        return [_objectSpread(_objectSpread({}, piece), {}, {
+          text: piece.text.slice(0, -1)
+        }), {
+          endTag: "samech*",
+          tag: "samech",
+          text: ' ס   '
+        }];
+      } else if (piece.lemma === 'סֶלָה' && !piece.parentTagIsSelah) {
+        return [{
+          endTag: "selah*",
+          tag: "selah",
+          children: [_objectSpread(_objectSpread({}, piece), {}, {
+            parentTagIsSelah: true
+          })]
+        }];
+      } else {
+        return [piece];
+      }
+    }).flat();
+  }
+
+  return pieces;
+};
+
+exports.adjustPiecesForSpecialHebrew = adjustPiecesForSpecialHebrew;
+
+var adjustTextForSups = function adjustTextForSups(_ref17) {
+  var tag = _ref17.tag,
+      text = _ref17.text,
+      pieces = _ref17.pieces,
+      idx = _ref17.idx;
+
+  if (["f", "fe", "x", "zApparatusJson"].includes(tag)) {
+    // footnote or cross ref
+    text = " \u25CF "; // or ✱
+  }
+
+  if ((text || "").match(/ +$/) && !["f", "fe", "x", "zApparatusJson"].includes(tag) && ["f", "fe", "x", "zApparatusJson"].includes((pieces[idx + 1] || {}).tag)) {
+    text = text.replace(/ +$/, '');
+  }
+
+  if ((text || "").match(/^ +/) && ["f", "fe", "x", "zApparatusJson"].includes((pieces[idx - 1] || {}).tag)) {
+    text = text.replace(/^ +/, '');
+  }
+
+  return text;
+};
+
+exports.adjustTextForSups = adjustTextForSups;

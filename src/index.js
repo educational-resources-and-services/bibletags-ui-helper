@@ -696,3 +696,87 @@ export const isValidEmail = email => {
 }
 
 export const isOriginalLanguageSearch = searchText => /^\(?"?[#=]/.test(searchText)
+
+export const getTextLanguageId = ({ languageId, bookId }) => (
+  languageId === `heb+grk`
+    ? (bookId <= 39 ? 'heb' : 'grk')
+    : languageId
+)
+
+export const isRTLText = ({ languageId, bookId, searchString }) => (
+  languageId === 'heb+grk'
+    ? (
+      bookId
+        ? bookId <= 39 ? true : false
+        : /^[\u0590-\u05FF ]*$/g.test(searchString)
+    )
+    : [
+      'heb',
+      'yid',
+      'ara',
+      'per',
+      'fas',
+      'urd',
+      'pus',
+      'syc',
+      'syr',
+      'sam',
+      'snd',
+    ].includes(languageId)
+)
+
+export const getCopyVerseText = ({ pieces, ref, versionAbbr }) => {
+  let selectedTextContent = ''
+
+  pieces.forEach(({ tag, text, nextChar }) => {
+    if(!text) {
+      if(nextChar === ' ') {
+        selectedTextContent += nextChar
+      }
+      return
+    }
+
+    selectedTextContent += [ 'nd', 'sc' ].includes(tag) ? text.toUpperCase() : text
+  })
+
+  return i18n("{{verse}} ({{passage_reference}} {{version}})", {
+    verse: selectedTextContent.trim(),
+    passage_reference: getPassageStr({
+      refs: [ ref ],
+    }),
+    version: versionAbbr,
+  })
+}
+
+export const getMorphInfo = morph => {
+
+  const morphLang = morph.substr(0,2)
+  let morphParts
+  let mainPartIdx
+  let morphPos
+
+  if(['He','Ar'].includes(morphLang)) {
+    morphParts = morph.substr(3).split(':')
+    mainPartIdx = getMainWordPartIndex(morphParts)
+    morphPos = morphParts[mainPartIdx].substr(0,1)
+  } else {
+    morphParts = [ morph.substr(3) ]
+    mainPartIdx = 0
+    morphPos = getNormalizedPOSCode({ morphLang, morphPos: morph.substr(3,2) })
+  }
+
+  return {
+    morphLang,
+    morphParts,
+    mainPartIdx,
+    morphPos,
+  }
+}
+
+export const getColorWithOpacity = (color='rgba(0,0,0,1)', opacity) => (
+  color
+    .replace(/^#([a-f\d])([a-f\d])([a-f\d])$/i, (m, r, g, b) => r + r + g + g + b + b)  // if it is short form hex E.g. #CCC
+    .replace(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i, (x, r, g, b) => `rgba(${parseInt(r, 16)},${parseInt(g, 16)},${parseInt(b, 16)},1)`)  // if it is hex
+    .replace(/^rgb\( *([0-9]+) *, *([0-9]+) *, *([0-9]+) *\)$/i, `rgba($1,$2,$3,1)`)  // if it is rgb()
+    .replace(/^rgba\( *([0-9]+) *, *([0-9]+) *, *([0-9]+) *, *[0-9]+ *\)$/i, `rgba($1,$2,$3,${opacity})`)
+)

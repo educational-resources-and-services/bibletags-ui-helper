@@ -143,6 +143,30 @@ isValidEmail(email): Boolean
 ```
 
 ```js
+isOriginalLanguageSearch(searchText): String
+```
+
+```js
+getTextLanguageId({ languageId, bookId }): String
+```
+
+```js
+isRTLText({ languageId, bookId, searchString }): Boolean
+```
+
+```js
+getCopyVerseText({ pieces, ref, versionAbbr }): String | undefined
+```
+
+```js
+getMorphInfo(morph): Object
+```
+
+```js
+getColorWithOpacity(color='rgba(0,0,0,1)', opacity): String
+```
+
+```js
 passOverI18n(i18nFunc): null
 ```
 
@@ -180,6 +204,14 @@ getPiecesFromUSFM({ usfm='', inlineMarkersOnly, wordDividerRegex, splitIntoWords
 
 ```js
 splitVerseIntoWords({ usfm, wordDividerRegex, pieces, isOriginal }): Array
+```
+
+```js
+adjustPiecesForSpecialHebrew({ isOriginal, languageId, pieces }): Array
+```
+
+```js
+adjustTextForSups({ tag, text, pieces, idx }): String
 ```
 
 ```js
@@ -239,7 +271,15 @@ stripGreekAccents(str): String
 ```
 
 ```js
+removeCantillation(usfm): String
+```
+
+```js
 stripHebrewVowelsEtc(str): String
+```
+
+```js
+normalizeGreek(greekString=""): String
 ```
 
 ```js

@@ -36,12 +36,18 @@ export const stripGreekAccents = str => {
   return str
 }
 
+export const removeCantillation = usfm => usfm.replace(/[\u0591-\u05AF\u05A5\u05BD\u05BF\u05C0\u05C5\u05C7]/g,'')
+
 export const stripHebrewVowelsEtc = str => (
-  str
-    .replace(/[\u05B0-\u05BC\u05C1\u05C2\u05C4]/g,'')  // vowels
-    .replace(/[\u0591-\u05AF\u05A5\u05BD\u05BF\u05C5\u05C7]/g,'')  // cantilation
-    .replace(/\u200D/g,'')  // invalid character
+  removeCantillation(
+    str
+      .replace(/[\u05B0-\u05BC\u05C1\u05C2\u05C4]/g,'')  // vowels
+      .replace(/\u200D/g,'')  // invalid character
+  )
 )
+
+// See https://stackoverflow.com/questions/23346506/javascript-normalize-accented-greek-characters/45797754#45797754
+export const normalizeGreek = (greekString="") => greekString.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
 
 export const stripVocalOfAccents = str => {
   const mappings = {
