@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.stripGreekAccents = exports.removeCantillation = exports.normalizeGreek = exports.isValidBibleSearch = exports.getQueryAndFlagInfo = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
+exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.stripGreekAccents = exports.removeCantillation = exports.normalizeGreek = exports.isValidBibleSearch = exports.getQueryAndFlagInfo = exports.getNakedWord = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
 
 require("regenerator-runtime/runtime.js");
 
@@ -534,3 +534,18 @@ var escapeRegex = function escapeRegex(str) {
 };
 
 exports.escapeRegex = escapeRegex;
+
+var getNakedWord = function getNakedWord(_ref7) {
+  var word = _ref7.word,
+      languageId = _ref7.languageId;
+  // TODO: adjust per language
+  var nakedWord = word;
+
+  if (languageId === 'eng') {
+    nakedWord = nakedWord.replace(/[^a-z0-9 ]/g, '');
+  }
+
+  return nakedWord;
+};
+
+exports.getNakedWord = getNakedWord;

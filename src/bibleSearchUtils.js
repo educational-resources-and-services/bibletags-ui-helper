@@ -376,3 +376,14 @@ export const getGrammarDetailsForAutoCompletionSuggestions = ({ currentWord, nor
 }
 
 export const escapeRegex = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+export const getNakedWord = ({ word, languageId }) => {
+  // TODO: adjust per language
+  let nakedWord = word
+
+  if(languageId === 'eng') {
+    nakedWord = nakedWord.replace(/[^a-z0-9 ]/g, '')
+  }
+
+  return nakedWord
+}
