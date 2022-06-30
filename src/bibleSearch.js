@@ -490,6 +490,7 @@ export const bibleSearch = async ({
 
   const resultsByVersionIdNeedingUsfm = []
   results.forEach(result => {
+    // If the next line errors out, it might be that the scopeMap obj is out of order
     const { versionId } = result.versionResults[0]
     resultsByVersionIdNeedingUsfm[versionId] = resultsByVersionIdNeedingUsfm[versionId] || []
     resultsByVersionIdNeedingUsfm[versionId].push(result)
