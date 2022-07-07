@@ -588,6 +588,7 @@ var bibleSearch = /*#__PURE__*/function () {
             doClocking && (0, _utils.clock)("Get usfm for result being returned");
             resultsByVersionIdNeedingUsfm = [];
             results.forEach(function (result) {
+              // If the next line errors out, it might be that the scopeMap obj is out of order
               var versionId = result.versionResults[0].versionId;
               resultsByVersionIdNeedingUsfm[versionId] = resultsByVersionIdNeedingUsfm[versionId] || [];
               resultsByVersionIdNeedingUsfm[versionId].push(result);
