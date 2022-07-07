@@ -29,7 +29,7 @@
     "url": "https://gofundme.com/f/yarn4-bible-tags"
   },
   "dependencies": {
-    "@bibletags/bibletags-versification": "^0.2.8",
+    "@bibletags/bibletags-versification": "^0.2.12",
     "md5": "2.2.1",
     "regenerator-runtime": "^0.13.9",
     "usfm-js": "github:unfoldingWord/usfm-js#abe6833688b10b202e4b848715eca883fce7b89a"

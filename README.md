@@ -10,7 +10,7 @@ For more information on this project, see the [Bible Tags website](https://bible
 
 ## Repos
 
-* [bibletags-data](https://github.com/educational-resources-and-services/bibletags-data) **(Contains general information on project design and contributing.)**
+* [bibletags-data](https://github.com/educational-resources-and-services/bibletags-data)
 * [bibletags-react-native-app](https://github.com/educational-resources-and-services/bibletags-react-native-app)
 * [bibletags-ui-helper](https://github.com/educational-resources-and-services/bibletags-ui-helper)
 * [bibletags-versification](https://github.com/educational-resources-and-services/bibletags-versification)
@@ -20,13 +20,11 @@ For more information on this project, see the [Bible Tags website](https://bible
 
 ## Bugs
 
-* See [here](https://github.com/educational-resources-and-services/bibletags-data/issues).
-* Please first check if your bug report / feature request already exists before submitting a new issue.
-* For bug reports, please provide a clear description of the problem and step-by-step explanation of how to reproduce it.
+* Report [here](https://github.com/educational-resources-and-services/bibletags-data/issues).
 
 # bibletags-ui-helper
 
-This repo provides functions used in both [bibletags-react-native-app](https://github.com/educational-resources-and-services/bibletags-react-native-app) and [bibletags-widget](https://github.com/educational-resources-and-services/bibletags-widget).
+This repo provides functions used in [bibletags-react-native-app](https://github.com/educational-resources-and-services/bibletags-react-native-app), [bibletags-widget](https://github.com/educational-resources-and-services/bibletags-widget), and [bibletags-data](https://github.com/educational-resources-and-services/bibletags-data).
 
 ## Special notes on word divisions
 
@@ -40,7 +38,7 @@ Programmatic exceptions to this approach will be few. To date, the following exc
 
 * Possession and contractions in English using an apostraphe. E.g. `Balaam’s`, `shouldn’t`. Such apostraphes will be escaped before the `word divider regex` is used to split the verse.
 
-*Please contact us to suggest any programmatic exceptions for other languages.*
+*Please [contact us](https://bibletags.org/contact) to suggest any programmatic exceptions for other languages.*
 
 Known examples of languages without precise word dividers:
 
