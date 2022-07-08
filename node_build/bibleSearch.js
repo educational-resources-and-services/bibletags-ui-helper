@@ -124,7 +124,7 @@ var bibleSearch = /*#__PURE__*/function () {
             throw "forbidden to search multiple versions when not using same:verse for the range";
 
           case 23:
-            _getQueryArrayAndWord = (0, _utils.getQueryArrayAndWords)(query), queryArray = _getQueryArrayAndWord.queryArray, queryWords = _getQueryArrayAndWord.queryWords;
+            _getQueryArrayAndWord = (0, _utils.getQueryArrayAndWords)((0, _index.searchWordToLowerCase)(query)), queryArray = _getQueryArrayAndWord.queryArray, queryWords = _getQueryArrayAndWord.queryWords;
             stackedResultsByBookId = Array(1 + 66).fill().map(function () {
               return [];
             });
