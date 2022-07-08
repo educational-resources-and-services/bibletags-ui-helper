@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.stripGreekAccents = exports.removeCantillation = exports.normalizeGreek = exports.isValidBibleSearch = exports.getQueryAndFlagInfo = exports.getNakedWord = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
+exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.stripGreekAccents = exports.searchWordToLowerCase = exports.removeCantillation = exports.normalizeGreek = exports.isValidBibleSearch = exports.getQueryAndFlagInfo = exports.getNakedWord = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
 
 require("regenerator-runtime/runtime.js");
 
@@ -106,6 +106,16 @@ var normalizeGreek = function normalizeGreek() {
 };
 
 exports.normalizeGreek = normalizeGreek;
+
+var searchWordToLowerCase = function searchWordToLowerCase(str) {
+  return str // Next line for languages with two i letters--one dotted and one
+  // undotted (https://en.wikipedia.org/wiki/%C4%B0)--causing an issue
+  // when considering the lowercase value of a word; solution: show
+  // results for all i's.
+  .replace(/İ/g, 'i').toLowerCase();
+};
+
+exports.searchWordToLowerCase = searchWordToLowerCase;
 
 var stripVocalOfAccents = function stripVocalOfAccents(str) {
   var mappings = {
@@ -223,7 +233,7 @@ var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
       suggestionOptions = _ref4.suggestionOptions,
       max = _ref4.max;
   var matchingSuggestions = [];
-  var lowerCaseStr = str.toLowerCase();
+  var lowerCaseStr = searchWordToLowerCase(str);
 
   var _lowerCaseStr$match = lowerCaseStr.match(/^(.*?[#:]?)([^#:]*)$/),
       _lowerCaseStr$match2 = _slicedToArray(_lowerCaseStr$match, 3),
@@ -240,7 +250,7 @@ var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
     for (_iterator.s(); !(_step = _iterator.n()).done;) {
       var suggestionOption = _step.value;
 
-      if (suggestionOption.suggestedQuery.toLowerCase().indexOf(lowerCaseStr) === 0) {
+      if (searchWordToLowerCase(suggestionOption.suggestedQuery).indexOf(lowerCaseStr) === 0) {
         matchingSuggestions.push(suggestionOption);
       }
 
@@ -265,11 +275,11 @@ var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
       var _loop = function _loop() {
         var suggestionOption = _step2.value;
 
-        var _suggestionOption$sug = suggestionOption.suggestedQuery.toLowerCase().match(/^(.*?[#:]?)([^#:]*)$/),
-            _suggestionOption$sug2 = _slicedToArray(_suggestionOption$sug, 3),
-            x = _suggestionOption$sug2[0],
-            suggestionOptionBase = _suggestionOption$sug2[1],
-            suggestionOptionFinalDetail = _suggestionOption$sug2[2];
+        var _searchWordToLowerCas = searchWordToLowerCase(suggestionOption.suggestedQuery).match(/^(.*?[#:]?)([^#:]*)$/),
+            _searchWordToLowerCas2 = _slicedToArray(_searchWordToLowerCas, 3),
+            x = _searchWordToLowerCas2[0],
+            suggestionOptionBase = _searchWordToLowerCas2[1],
+            suggestionOptionFinalDetail = _searchWordToLowerCas2[2];
 
         var suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g);
 
@@ -309,11 +319,11 @@ var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
       var _loop2 = function _loop2() {
         var suggestionOption = _step3.value;
 
-        var _suggestionOption$sug3 = suggestionOption.suggestedQuery.toLowerCase().match(/^(.*?[#:]?)([^#:]*)$/),
-            _suggestionOption$sug4 = _slicedToArray(_suggestionOption$sug3, 3),
-            x = _suggestionOption$sug4[0],
-            suggestionOptionBase = _suggestionOption$sug4[1],
-            suggestionOptionFinalDetail = _suggestionOption$sug4[2];
+        var _searchWordToLowerCas3 = searchWordToLowerCase(suggestionOption.suggestedQuery).match(/^(.*?[#:]?)([^#:]*)$/),
+            _searchWordToLowerCas4 = _slicedToArray(_searchWordToLowerCas3, 3),
+            x = _searchWordToLowerCas4[0],
+            suggestionOptionBase = _searchWordToLowerCas4[1],
+            suggestionOptionFinalDetail = _searchWordToLowerCas4[2];
 
         var suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g);
         var finalWordInFinalDetail = lowerCaseStrFinalDetailWords[lowerCaseStrFinalDetailWords.length - 1];

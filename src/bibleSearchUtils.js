@@ -49,6 +49,16 @@ export const stripHebrewVowelsEtc = str => (
 // See https://stackoverflow.com/questions/23346506/javascript-normalize-accented-greek-characters/45797754#45797754
 export const normalizeGreek = (greekString="") => greekString.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
 
+export const searchWordToLowerCase = str => (
+  str
+    // Next line for languages with two i letters--one dotted and one
+    // undotted (https://en.wikipedia.org/wiki/%C4%B0)--causing an issue
+    // when considering the lowercase value of a word; solution: show
+    // results for all i's.
+    .replace(/İ/g, 'i')
+    .toLowerCase()
+)
+
 export const stripVocalOfAccents = str => {
   const mappings = {
     "a": /[âăáà]/g,
@@ -167,13 +177,13 @@ export const getQueryAndFlagInfo = ({ query, FLAG_MAP={} }) => {
 export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => {
 
   const matchingSuggestions = []
-  const lowerCaseStr = str.toLowerCase()
+  const lowerCaseStr = searchWordToLowerCase(str)
   const [ x, lowerCaseStrBase, lowerCaseStrFinalDetail ] = lowerCaseStr.match(/^(.*?[#:]?)([^#:]*)$/)
   const lowerCaseStrFinalDetailWords = lowerCaseStrFinalDetail.split(/[-–— ]/g)
 
   // no mistakes, same order first
   for(let suggestionOption of suggestionOptions) {
-    if(suggestionOption.suggestedQuery.toLowerCase().indexOf(lowerCaseStr) === 0) {
+    if(searchWordToLowerCase(suggestionOption.suggestedQuery).indexOf(lowerCaseStr) === 0) {
       matchingSuggestions.push(suggestionOption)
     }
     if(matchingSuggestions.length >= max) break
@@ -183,7 +193,7 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
   if(matchingSuggestions.length < max) {
     const remainingSuggestionOptions = suggestionOptions.filter(suggestionOption => !matchingSuggestions.includes(suggestionOption))
     for(let suggestionOption of remainingSuggestionOptions) {
-      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = suggestionOption.suggestedQuery.toLowerCase().match(/^(.*?[#:]?)([^#:]*)$/)
+      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = searchWordToLowerCase(suggestionOption.suggestedQuery).match(/^(.*?[#:]?)([^#:]*)$/)
       const suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g)
       if(
         lowerCaseStrBase === suggestionOptionBase
@@ -199,7 +209,7 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
   if(matchingSuggestions.length < max) {
     const remainingSuggestionOptions = suggestionOptions.filter(suggestionOption => !matchingSuggestions.includes(suggestionOption))
     for(let suggestionOption of remainingSuggestionOptions) {
-      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = suggestionOption.suggestedQuery.toLowerCase().match(/^(.*?[#:]?)([^#:]*)$/)
+      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = searchWordToLowerCase(suggestionOption.suggestedQuery).match(/^(.*?[#:]?)([^#:]*)$/)
       const suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g)
       const finalWordInFinalDetail = lowerCaseStrFinalDetailWords[lowerCaseStrFinalDetailWords.length - 1]
       if(
