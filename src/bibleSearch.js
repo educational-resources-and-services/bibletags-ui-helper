@@ -61,7 +61,8 @@ export const bibleSearch = async ({
 
   if(!isOriginalLanguageSearch && versionIds.length > 1 && same !== "verse") throw `forbidden to search multiple versions when not using same:verse for the range`
 
-  const { queryArray, queryWords } = getQueryArrayAndWords(searchWordToLowerCase(query))
+  const preppedQuery = isOriginalLanguageSearch ? query : searchWordToLowerCase(query)
+  const { queryArray, queryWords } = getQueryArrayAndWords(preppedQuery)
 
   const stackedResultsByBookId = Array(1+66).fill().map(() => [])
   const stackedResultsIdxByScopeKey = {}
