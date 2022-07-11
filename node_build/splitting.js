@@ -889,7 +889,11 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
                   }
 
                   if (colonDetailType === 'form') {
-                    return (0, _bibleSearchUtils.stripHebrewVowelsEtc)((0, _bibleSearchUtils.stripGreekAccents)(rawDetail).toLowerCase()) === (0, _bibleSearchUtils.stripHebrewVowelsEtc)((0, _bibleSearchUtils.stripGreekAccents)(text).toLowerCase());
+                    return (0, _bibleSearchUtils.normalizeSearchStr)({
+                      str: rawDetail
+                    }) === (0, _bibleSearchUtils.normalizeSearchStr)({
+                      str: text
+                    });
                   }
 
                   if ((colonDetailType || rawDetail) === 'suffix') {

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.stripGreekAccents = exports.searchWordToLowerCase = exports.removeCantillation = exports.normalizeGreek = exports.isValidBibleSearch = exports.getQueryAndFlagInfo = exports.getNakedWord = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
+exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.removeCantillation = exports.normalizeSearchStr = exports.isValidBibleSearch = exports.getQueryAndFlagInfo = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
 
 require("regenerator-runtime/runtime.js");
 
@@ -57,34 +57,6 @@ var containsGreekChars = function containsGreekChars(text) {
 
 exports.containsGreekChars = containsGreekChars;
 
-var stripGreekAccents = function stripGreekAccents(str) {
-  var mappings = {
-    "α": /[ἀἁἂἃἄἅἆἇάὰάᾀᾁᾂᾃᾄᾅᾆᾇᾰᾱᾲᾳᾴᾶᾷ]/g,
-    "Α": /[ἈἉἊἋἌἍἎἏΆᾈᾉᾊᾋᾌᾍᾎᾏᾸᾹᾺΆᾼ]/g,
-    "ε": /[ἐἑἒἓἔἕέὲέ]/g,
-    "Ε": /[ἘἙἚἛἜἝῈΈΈ]/g,
-    "η": /[ἠἡἢἣἤἥἦἧὴήᾐᾑᾒᾓᾔᾕᾖᾗῂῃῄῆῇή]/g,
-    "Η": /[ἨἩἪἫἬἭἮἯᾘᾙᾚᾛᾜᾝᾞᾟῊΉῌΉ]/g,
-    "ι": /[ἰἱἲἳἴἵἶἷὶίῐῑῒΐῖῗΐίϊ]/g,
-    "Ι": /[ἸἹἺἻἼἽἾἿῚΊῘῙΊΪ]/g,
-    "ο": /[ὀὁὂὃὄὅὸόό]/g,
-    "Ο": /[ὈὉὊὋὌὍῸΌΌ]/g,
-    "υ": /[ὐὑὒὓὔὕὖὗὺύῠῡῢΰῦῧΰύϋ]/g,
-    "Υ": /[ὙὛὝὟῨῩῪΎΎΫ]/g,
-    "ω": /[ὠὡὢὣὤὥὦὧὼώᾠᾡᾢᾣᾤᾥᾦᾧῲῳῴῶῷώ]/g,
-    "Ω": /[ὨὩὪὫὬὭὮὯᾨᾩᾪᾫᾬᾭᾮᾯῺΏῼΏ]/g,
-    "ρ": /[ῤῥ]/g,
-    "Ρ": /[Ῥ]/g,
-    "": /[῞ʹ͵΄᾽᾿῍῎῏῝῞῟῭΅`΅´῾῀῁]/g
-  };
-  Object.keys(mappings).forEach(function (_char) {
-    str = str.replace(mappings[_char], _char);
-  });
-  return str;
-};
-
-exports.stripGreekAccents = stripGreekAccents;
-
 var removeCantillation = function removeCantillation(usfm) {
   return usfm.replace(/[\u0591-\u05AF\u05A5\u05BD\u05BF\u05C0\u05C5\u05C7]/g, '');
 };
@@ -95,27 +67,34 @@ var stripHebrewVowelsEtc = function stripHebrewVowelsEtc(str) {
   return removeCantillation(str.replace(/[\u05B0-\u05BC\u05C1\u05C2\u05C4]/g, '') // vowels
   .replace(/\u200D/g, '') // invalid character
   );
-}; // See https://stackoverflow.com/questions/23346506/javascript-normalize-accented-greek-characters/45797754#45797754
-
+};
 
 exports.stripHebrewVowelsEtc = stripHebrewVowelsEtc;
 
-var normalizeGreek = function normalizeGreek() {
-  var greekString = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-  return greekString.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+var normalizeSearchStr = function normalizeSearchStr(_ref) {
+  var _ref$str = _ref.str,
+      str = _ref$str === void 0 ? "" : _ref$str,
+      languageId = _ref.languageId;
+  // languageId should NOT be set when (1) this is an original language search, or (2) this is a non-version-specific search (e.g. common queries, projects, etc)
+  // see the "Languages with letters containing diacritics" heading here: https://en.wikipedia.org/wiki/Diacritic
+  // see also https://www.liquisearch.com/diacritic/languages_with_letters_containing_diacritics
+  // see also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+  // IMPORTANT: when making changes to this, be sure to only use composed characters by running each array through ary.map(a => a.normalize('NFC'))
+  var distinctCharsByLanguageId = {
+    lav: ['ā', 'ē', 'ī', 'ū', 'č', 'ģ', 'ķ', 'ļ', 'ņ', 'š', 'ž'],
+    lit: ['č', 'š', 'ž', 'ą', 'ę', 'į', 'ų', 'ū', 'ė']
+  };
+  var distinctChars = distinctCharsByLanguageId[languageId] || [];
+  return stripHebrewVowelsEtc(str) // normalize
+  .normalize('NFC') // split in order to remove all diacritics expect those in distinctChar, then rejoin
+  .split(distinctChars.length === 0 ? /(.*)/g : new RegExp("(".concat(distinctChars.join('|'), ")"), 'gi')).map(function (partialStr) {
+    return distinctChars.includes(partialStr) ? partialStr : partialStr.normalize('NFD').replace(/[\u0300-\u036f]/g, "").normalize('NFC') // remove diacritics
+    ;
+  }).join('') // Next line uses toLocaleLowerCase (and not toLowerCase) for languages with two i letters--one dotted and one undotted (https://en.wikipedia.org/wiki/%C4%B0)
+  .toLocaleLowerCase(languageId);
 };
 
-exports.normalizeGreek = normalizeGreek;
-
-var searchWordToLowerCase = function searchWordToLowerCase(str) {
-  return str // Next line for languages with two i letters--one dotted and one
-  // undotted (https://en.wikipedia.org/wiki/%C4%B0)--causing an issue
-  // when considering the lowercase value of a word; solution: show
-  // results for all i's.
-  .replace(/İ/g, 'i').toLowerCase();
-};
-
-exports.searchWordToLowerCase = searchWordToLowerCase;
+exports.normalizeSearchStr = normalizeSearchStr;
 
 var stripVocalOfAccents = function stripVocalOfAccents(str) {
   var mappings = {
@@ -130,21 +109,21 @@ var stripVocalOfAccents = function stripVocalOfAccents(str) {
     "": /[ʻʼʻ]/g
   };
   str = str.toLowerCase();
-  Object.keys(mappings).forEach(function (_char2) {
-    str = str.replace(mappings[_char2], _char2);
+  Object.keys(mappings).forEach(function (_char) {
+    str = str.replace(mappings[_char], _char);
   });
   return str;
 };
 
 exports.stripVocalOfAccents = stripVocalOfAccents;
 
-var getInfoOnResultLocs = function getInfoOnResultLocs(_ref) {
-  var resultsNeedingUsfm = _ref.resultsNeedingUsfm,
-      lookupVersionInfo = _ref.lookupVersionInfo;
+var getInfoOnResultLocs = function getInfoOnResultLocs(_ref2) {
+  var resultsNeedingUsfm = _ref2.resultsNeedingUsfm,
+      lookupVersionInfo = _ref2.lookupVersionInfo;
   var versionResultsNeedingUsfmByLoc = {};
-  var locs = resultsNeedingUsfm.map(function (_ref2) {
-    var originalLoc = _ref2.originalLoc,
-        versionResults = _ref2.versionResults;
+  var locs = resultsNeedingUsfm.map(function (_ref3) {
+    var originalLoc = _ref3.originalLoc,
+        versionResults = _ref3.versionResults;
 
     var _originalLoc$split = originalLoc.split('-'),
         _originalLoc$split2 = _slicedToArray(_originalLoc$split, 2),
@@ -180,10 +159,10 @@ var getInfoOnResultLocs = function getInfoOnResultLocs(_ref) {
 
 exports.getInfoOnResultLocs = getInfoOnResultLocs;
 
-var getQueryAndFlagInfo = function getQueryAndFlagInfo(_ref3) {
-  var query = _ref3.query,
-      _ref3$FLAG_MAP = _ref3.FLAG_MAP,
-      FLAG_MAP = _ref3$FLAG_MAP === void 0 ? {} : _ref3$FLAG_MAP;
+var getQueryAndFlagInfo = function getQueryAndFlagInfo(_ref4) {
+  var query = _ref4.query,
+      _ref4$FLAG_MAP = _ref4.FLAG_MAP,
+      FLAG_MAP = _ref4$FLAG_MAP === void 0 ? {} : _ref4$FLAG_MAP;
   // extract special query flags
   var flags = {};
   var flagRegex = /(\s|^)([-a-z]+:(?:[:-\w,/]+))(?=\s|$)/i;
@@ -228,20 +207,22 @@ var getQueryAndFlagInfo = function getQueryAndFlagInfo(_ref3) {
 
 exports.getQueryAndFlagInfo = getQueryAndFlagInfo;
 
-var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
-  var str = _ref4.str,
-      suggestionOptions = _ref4.suggestionOptions,
-      max = _ref4.max;
+var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref5) {
+  var str = _ref5.str,
+      suggestionOptions = _ref5.suggestionOptions,
+      max = _ref5.max;
   var matchingSuggestions = [];
-  var lowerCaseStr = searchWordToLowerCase(str);
+  var normalizedStr = normalizeSearchStr({
+    str: str
+  });
 
-  var _lowerCaseStr$match = lowerCaseStr.match(/^(.*?[#:]?)([^#:]*)$/),
-      _lowerCaseStr$match2 = _slicedToArray(_lowerCaseStr$match, 3),
-      x = _lowerCaseStr$match2[0],
-      lowerCaseStrBase = _lowerCaseStr$match2[1],
-      lowerCaseStrFinalDetail = _lowerCaseStr$match2[2];
+  var _normalizedStr$match = normalizedStr.match(/^(.*?[#:]?)([^#:]*)$/),
+      _normalizedStr$match2 = _slicedToArray(_normalizedStr$match, 3),
+      x = _normalizedStr$match2[0],
+      normalizedStrBase = _normalizedStr$match2[1],
+      normalizedStrFinalDetail = _normalizedStr$match2[2];
 
-  var lowerCaseStrFinalDetailWords = lowerCaseStrFinalDetail.split(/[-–— ]/g); // no mistakes, same order first
+  var normalizedStrFinalDetailWords = normalizedStrFinalDetail.split(/[-–— ]/g); // no mistakes, same order first
 
   var _iterator = _createForOfIteratorHelper(suggestionOptions),
       _step;
@@ -250,7 +231,9 @@ var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
     for (_iterator.s(); !(_step = _iterator.n()).done;) {
       var suggestionOption = _step.value;
 
-      if (searchWordToLowerCase(suggestionOption.suggestedQuery).indexOf(lowerCaseStr) === 0) {
+      if (normalizeSearchStr({
+        str: suggestionOption.suggestedQuery
+      }).indexOf(normalizedStr) === 0) {
         matchingSuggestions.push(suggestionOption);
       }
 
@@ -275,15 +258,17 @@ var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
       var _loop = function _loop() {
         var suggestionOption = _step2.value;
 
-        var _searchWordToLowerCas = searchWordToLowerCase(suggestionOption.suggestedQuery).match(/^(.*?[#:]?)([^#:]*)$/),
-            _searchWordToLowerCas2 = _slicedToArray(_searchWordToLowerCas, 3),
-            x = _searchWordToLowerCas2[0],
-            suggestionOptionBase = _searchWordToLowerCas2[1],
-            suggestionOptionFinalDetail = _searchWordToLowerCas2[2];
+        var _normalizeSearchStr$m = normalizeSearchStr({
+          str: suggestionOption.suggestedQuery
+        }).match(/^(.*?[#:]?)([^#:]*)$/),
+            _normalizeSearchStr$m2 = _slicedToArray(_normalizeSearchStr$m, 3),
+            x = _normalizeSearchStr$m2[0],
+            suggestionOptionBase = _normalizeSearchStr$m2[1],
+            suggestionOptionFinalDetail = _normalizeSearchStr$m2[2];
 
         var suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g);
 
-        if (lowerCaseStrBase === suggestionOptionBase && lowerCaseStrFinalDetailWords.every(function (strWord) {
+        if (normalizedStrBase === suggestionOptionBase && normalizedStrFinalDetailWords.every(function (strWord) {
           return suggestionOptionFinalDetailWords.some(function (optWord) {
             return optWord.indexOf(strWord) === 0;
           });
@@ -319,16 +304,18 @@ var findAutoCompleteSuggestions = function findAutoCompleteSuggestions(_ref4) {
       var _loop2 = function _loop2() {
         var suggestionOption = _step3.value;
 
-        var _searchWordToLowerCas3 = searchWordToLowerCase(suggestionOption.suggestedQuery).match(/^(.*?[#:]?)([^#:]*)$/),
-            _searchWordToLowerCas4 = _slicedToArray(_searchWordToLowerCas3, 3),
-            x = _searchWordToLowerCas4[0],
-            suggestionOptionBase = _searchWordToLowerCas4[1],
-            suggestionOptionFinalDetail = _searchWordToLowerCas4[2];
+        var _normalizeSearchStr$m3 = normalizeSearchStr({
+          str: suggestionOption.suggestedQuery
+        }).match(/^(.*?[#:]?)([^#:]*)$/),
+            _normalizeSearchStr$m4 = _slicedToArray(_normalizeSearchStr$m3, 3),
+            x = _normalizeSearchStr$m4[0],
+            suggestionOptionBase = _normalizeSearchStr$m4[1],
+            suggestionOptionFinalDetail = _normalizeSearchStr$m4[2];
 
         var suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g);
-        var finalWordInFinalDetail = lowerCaseStrFinalDetailWords[lowerCaseStrFinalDetailWords.length - 1];
+        var finalWordInFinalDetail = normalizedStrFinalDetailWords[normalizedStrFinalDetailWords.length - 1];
 
-        if (lowerCaseStrBase === suggestionOptionBase && lowerCaseStrFinalDetailWords.slice(0, -1).every(function (strWord) {
+        if (normalizedStrBase === suggestionOptionBase && normalizedStrFinalDetailWords.slice(0, -1).every(function (strWord) {
           return suggestionOptionFinalDetailWords.some(function (optWord) {
             return optWord.indexOf(strWord) === 0;
           });
@@ -436,14 +423,14 @@ var completeQueryGroupings = function completeQueryGroupings(query) {
 
 exports.completeQueryGroupings = completeQueryGroupings;
 
-var getFlagSuggestions = function getFlagSuggestions(_ref5) {
-  var searchTextInComposition = _ref5.searchTextInComposition,
-      _ref5$versionAbbrsFor = _ref5.versionAbbrsForIn,
-      versionAbbrsForIn = _ref5$versionAbbrsFor === void 0 ? [] : _ref5$versionAbbrsFor,
-      _ref5$versionAbbrsFor2 = _ref5.versionAbbrsForInclude,
-      versionAbbrsForInclude = _ref5$versionAbbrsFor2 === void 0 ? [] : _ref5$versionAbbrsFor2,
-      _ref5$max = _ref5.max,
-      max = _ref5$max === void 0 ? 3 : _ref5$max;
+var getFlagSuggestions = function getFlagSuggestions(_ref6) {
+  var searchTextInComposition = _ref6.searchTextInComposition,
+      _ref6$versionAbbrsFor = _ref6.versionAbbrsForIn,
+      versionAbbrsForIn = _ref6$versionAbbrsFor === void 0 ? [] : _ref6$versionAbbrsFor,
+      _ref6$versionAbbrsFor2 = _ref6.versionAbbrsForInclude,
+      versionAbbrsForInclude = _ref6$versionAbbrsFor2 === void 0 ? [] : _ref6$versionAbbrsFor2,
+      _ref6$max = _ref6.max,
+      max = _ref6$max === void 0 ? 3 : _ref6$max;
   var normalizedSearchText = searchTextInComposition.replace(/  +/g, ' ').replace(/^ /g, '');
   var searchTextPieces = normalizedSearchText.split(' ');
   var currentPiece = searchTextPieces.pop();
@@ -519,9 +506,9 @@ var getFlagSuggestions = function getFlagSuggestions(_ref5) {
 
 exports.getFlagSuggestions = getFlagSuggestions;
 
-var getGrammarDetailsForAutoCompletionSuggestions = function getGrammarDetailsForAutoCompletionSuggestions(_ref6) {
-  var currentWord = _ref6.currentWord,
-      normalizedSearchText = _ref6.normalizedSearchText;
+var getGrammarDetailsForAutoCompletionSuggestions = function getGrammarDetailsForAutoCompletionSuggestions(_ref7) {
+  var currentWord = _ref7.currentWord,
+      normalizedSearchText = _ref7.normalizedSearchText;
   // TODO: set up with i18n for grammatical details
   // TODO: use currentWord to weed out items that are not really options
   // e.g. if it already has #noun in the word, then don't present aspect options
@@ -544,18 +531,3 @@ var escapeRegex = function escapeRegex(str) {
 };
 
 exports.escapeRegex = escapeRegex;
-
-var getNakedWord = function getNakedWord(_ref7) {
-  var word = _ref7.word,
-      languageId = _ref7.languageId;
-  // TODO: adjust per language
-  var nakedWord = word;
-
-  if (languageId === 'eng') {
-    nakedWord = nakedWord.replace(/[^a-z0-9 ]/g, '');
-  }
-
-  return nakedWord;
-};
-
-exports.getNakedWord = getNakedWord;

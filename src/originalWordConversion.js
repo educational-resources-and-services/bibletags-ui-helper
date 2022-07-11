@@ -1,6 +1,6 @@
 import "regenerator-runtime/runtime.js"  // needed to build-for-node given async functions
 
-import { stripGreekAccents, stripHebrewVowelsEtc } from './bibleSearchUtils'
+import { normalizeSearchStr } from './bibleSearchUtils'
 import { getMainWordPartIndex } from './index'
 
 const posMapping = {
@@ -24,7 +24,7 @@ export const getPartialUHBWordRowFromUsfmWord = ({ w, id, lemma, strong, morph }
 
   const definitionId = (strong.match(/H[0-9]{5}/) || [])[0]
   const prefixParts = (strong.match(/[^"H]*/) || [])[0].split(':').filter(Boolean)
-  const form = stripHebrewVowelsEtc(w)
+  const form = normalizeSearchStr({ str: w })
   const isAramaic = /^Ar,/.test(morph) ? 1 : 0
 
   if(!id || !morph || !form || (!!definitionId !== !!lemma)) {
@@ -135,7 +135,7 @@ export const getPartialUHBWordRowFromUsfmWord = ({ w, id, lemma, strong, morph }
 export const getPartialUGNTWordRowFromUsfmWord = ({ w, id, lemma, strong, morph }) => {
 
   const definitionId = (strong.match(/G[0-9]{5}/) || [])[0]
-  const form = stripGreekAccents(w).toLowerCase()
+  const form = normalizeSearchStr({ str: w })
 
   if(!id || !lemma || !definitionId || !morph || !form) {
     console.log('word with missing info', wordUsfm)

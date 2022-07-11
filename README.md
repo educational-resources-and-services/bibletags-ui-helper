@@ -265,10 +265,6 @@ containsGreekChars(str): Boolean
 ```
 
 ```js
-stripGreekAccents(str): String
-```
-
-```js
 removeCantillation(usfm): String
 ```
 
@@ -277,7 +273,7 @@ stripHebrewVowelsEtc(str): String
 ```
 
 ```js
-normalizeGreek(greekString=""): String
+normalizeSearchStr({ str, languageId }): String
 ```
 
 ```js

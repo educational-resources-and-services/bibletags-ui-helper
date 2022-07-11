@@ -8,34 +8,6 @@ import { getQueryArrayAndWords } from './utils'
 export const containsHebrewChars = text => /[\u0590-\u05FF]/.test(text)
 export const containsGreekChars = text => /[\u0370-\u03FF\u1F00-\u1FFF]/.test(text)
 
-export const stripGreekAccents = str => {
-  const mappings = {
-    "α": /[ἀἁἂἃἄἅἆἇάὰάᾀᾁᾂᾃᾄᾅᾆᾇᾰᾱᾲᾳᾴᾶᾷ]/g,
-    "Α": /[ἈἉἊἋἌἍἎἏΆᾈᾉᾊᾋᾌᾍᾎᾏᾸᾹᾺΆᾼ]/g,
-    "ε": /[ἐἑἒἓἔἕέὲέ]/g,
-    "Ε": /[ἘἙἚἛἜἝῈΈΈ]/g,
-    "η": /[ἠἡἢἣἤἥἦἧὴήᾐᾑᾒᾓᾔᾕᾖᾗῂῃῄῆῇή]/g,
-    "Η": /[ἨἩἪἫἬἭἮἯᾘᾙᾚᾛᾜᾝᾞᾟῊΉῌΉ]/g,
-    "ι": /[ἰἱἲἳἴἵἶἷὶίῐῑῒΐῖῗΐίϊ]/g,
-    "Ι": /[ἸἹἺἻἼἽἾἿῚΊῘῙΊΪ]/g,
-    "ο": /[ὀὁὂὃὄὅὸόό]/g,
-    "Ο": /[ὈὉὊὋὌὍῸΌΌ]/g,
-    "υ": /[ὐὑὒὓὔὕὖὗὺύῠῡῢΰῦῧΰύϋ]/g,
-    "Υ": /[ὙὛὝὟῨῩῪΎΎΫ]/g,
-    "ω": /[ὠὡὢὣὤὥὦὧὼώᾠᾡᾢᾣᾤᾥᾦᾧῲῳῴῶῷώ]/g,
-    "Ω": /[ὨὩὪὫὬὭὮὯᾨᾩᾪᾫᾬᾭᾮᾯῺΏῼΏ]/g,
-    "ρ": /[ῤῥ]/g,
-    "Ρ": /[Ῥ]/g,
-    "": /[῞ʹ͵΄᾽᾿῍῎῏῝῞῟῭΅`΅´῾῀῁]/g,
-  }
-
-  Object.keys(mappings).forEach(char => {
-    str = str.replace(mappings[char], char)
-  })
-
-  return str
-}
-
 export const removeCantillation = usfm => usfm.replace(/[\u0591-\u05AF\u05A5\u05BD\u05BF\u05C0\u05C5\u05C7]/g,'')
 
 export const stripHebrewVowelsEtc = str => (
@@ -46,18 +18,41 @@ export const stripHebrewVowelsEtc = str => (
   )
 )
 
-// See https://stackoverflow.com/questions/23346506/javascript-normalize-accented-greek-characters/45797754#45797754
-export const normalizeGreek = (greekString="") => greekString.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+export const normalizeSearchStr = ({ str="", languageId }) => {
+  // languageId should NOT be set when (1) this is an original language search, or (2) this is a non-version-specific search (e.g. common queries, projects, etc)
 
-export const searchWordToLowerCase = str => (
-  str
-    // Next line for languages with two i letters--one dotted and one
-    // undotted (https://en.wikipedia.org/wiki/%C4%B0)--causing an issue
-    // when considering the lowercase value of a word; solution: show
-    // results for all i's.
-    .replace(/İ/g, 'i')
-    .toLowerCase()
-)
+  // see the "Languages with letters containing diacritics" heading here: https://en.wikipedia.org/wiki/Diacritic
+  // see also https://www.liquisearch.com/diacritic/languages_with_letters_containing_diacritics
+  // see also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+  // IMPORTANT: when making changes to this, be sure to only use composed characters by running each array through ary.map(a => a.normalize('NFC'))
+  const distinctCharsByLanguageId = {
+    lav: [ 'ā', 'ē', 'ī', 'ū', 'č', 'ģ', 'ķ', 'ļ', 'ņ', 'š', 'ž' ],
+    lit: [ 'č', 'š', 'ž', 'ą', 'ę', 'į', 'ų', 'ū', 'ė' ],
+  }
+
+  const distinctChars = distinctCharsByLanguageId[languageId] || []
+
+  return (
+
+    stripHebrewVowelsEtc(str)
+
+      // normalize
+      .normalize('NFC')
+
+      // split in order to remove all diacritics expect those in distinctChar, then rejoin
+      .split(distinctChars.length === 0 ? /(.*)/g : new RegExp(`(${distinctChars.join('|')})`, 'gi'))
+      .map(partialStr => (
+        distinctChars.includes(partialStr)
+          ? partialStr
+          : partialStr.normalize('NFD').replace(/[\u0300-\u036f]/g, "").normalize('NFC')  // remove diacritics
+      ))
+      .join('')
+
+      // Next line uses toLocaleLowerCase (and not toLowerCase) for languages with two i letters--one dotted and one undotted (https://en.wikipedia.org/wiki/%C4%B0)
+      .toLocaleLowerCase(languageId)
+
+  )
+}
 
 export const stripVocalOfAccents = str => {
   const mappings = {
@@ -177,13 +172,13 @@ export const getQueryAndFlagInfo = ({ query, FLAG_MAP={} }) => {
 export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => {
 
   const matchingSuggestions = []
-  const lowerCaseStr = searchWordToLowerCase(str)
-  const [ x, lowerCaseStrBase, lowerCaseStrFinalDetail ] = lowerCaseStr.match(/^(.*?[#:]?)([^#:]*)$/)
-  const lowerCaseStrFinalDetailWords = lowerCaseStrFinalDetail.split(/[-–— ]/g)
+  const normalizedStr = normalizeSearchStr({ str })
+  const [ x, normalizedStrBase, normalizedStrFinalDetail ] = normalizedStr.match(/^(.*?[#:]?)([^#:]*)$/)
+  const normalizedStrFinalDetailWords = normalizedStrFinalDetail.split(/[-–— ]/g)
 
   // no mistakes, same order first
   for(let suggestionOption of suggestionOptions) {
-    if(searchWordToLowerCase(suggestionOption.suggestedQuery).indexOf(lowerCaseStr) === 0) {
+    if(normalizeSearchStr({ str: suggestionOption.suggestedQuery }).indexOf(normalizedStr) === 0) {
       matchingSuggestions.push(suggestionOption)
     }
     if(matchingSuggestions.length >= max) break
@@ -193,11 +188,11 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
   if(matchingSuggestions.length < max) {
     const remainingSuggestionOptions = suggestionOptions.filter(suggestionOption => !matchingSuggestions.includes(suggestionOption))
     for(let suggestionOption of remainingSuggestionOptions) {
-      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = searchWordToLowerCase(suggestionOption.suggestedQuery).match(/^(.*?[#:]?)([^#:]*)$/)
+      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = normalizeSearchStr({ str: suggestionOption.suggestedQuery }).match(/^(.*?[#:]?)([^#:]*)$/)
       const suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g)
       if(
-        lowerCaseStrBase === suggestionOptionBase
-        && lowerCaseStrFinalDetailWords.every(strWord => suggestionOptionFinalDetailWords.some(optWord => optWord.indexOf(strWord) === 0))
+        normalizedStrBase === suggestionOptionBase
+        && normalizedStrFinalDetailWords.every(strWord => suggestionOptionFinalDetailWords.some(optWord => optWord.indexOf(strWord) === 0))
       ) {
         matchingSuggestions.push(suggestionOption)
       }
@@ -209,12 +204,12 @@ export const findAutoCompleteSuggestions = ({ str, suggestionOptions, max }) => 
   if(matchingSuggestions.length < max) {
     const remainingSuggestionOptions = suggestionOptions.filter(suggestionOption => !matchingSuggestions.includes(suggestionOption))
     for(let suggestionOption of remainingSuggestionOptions) {
-      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = searchWordToLowerCase(suggestionOption.suggestedQuery).match(/^(.*?[#:]?)([^#:]*)$/)
+      const [ x, suggestionOptionBase, suggestionOptionFinalDetail ] = normalizeSearchStr({ str: suggestionOption.suggestedQuery }).match(/^(.*?[#:]?)([^#:]*)$/)
       const suggestionOptionFinalDetailWords = suggestionOptionFinalDetail.split(/[-–— ]/g)
-      const finalWordInFinalDetail = lowerCaseStrFinalDetailWords[lowerCaseStrFinalDetailWords.length - 1]
+      const finalWordInFinalDetail = normalizedStrFinalDetailWords[normalizedStrFinalDetailWords.length - 1]
       if(
-        lowerCaseStrBase === suggestionOptionBase
-        && lowerCaseStrFinalDetailWords.slice(0,-1).every(strWord => suggestionOptionFinalDetailWords.some(optWord => optWord.indexOf(strWord) === 0))
+        normalizedStrBase === suggestionOptionBase
+        && normalizedStrFinalDetailWords.slice(0,-1).every(strWord => suggestionOptionFinalDetailWords.some(optWord => optWord.indexOf(strWord) === 0))
         && suggestionOptionFinalDetailWords.some(optWord => {
           if(optWord[0] !== finalWordInFinalDetail[0]) return false
           let i1 = 1
@@ -386,14 +381,3 @@ export const getGrammarDetailsForAutoCompletionSuggestions = ({ currentWord, nor
 }
 
 export const escapeRegex = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-export const getNakedWord = ({ word, languageId }) => {
-  // TODO: adjust per language
-  let nakedWord = word
-
-  if(languageId === 'eng') {
-    nakedWord = nakedWord.replace(/[^a-z0-9 ]/g, '')
-  }
-
-  return nakedWord
-}

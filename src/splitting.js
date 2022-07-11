@@ -5,7 +5,7 @@ import { getLocFromRef } from '@bibletags/bibletags-versification'
 import i18n from './i18n'
 import { defaultWordDividerRegex, bibleSearchFlagMap, hebrewHeyNunSearchHitRegexes, hebrewPrefixSearchHitMap, grammaticalDetailMap } from './constants'
 import { getMainWordPartIndex, getIsEntirelyPrefixAndSuffix, getMorphPartDisplayInfo } from './index'
-import { getQueryAndFlagInfo, stripHebrewVowelsEtc, stripGreekAccents, escapeRegex } from './bibleSearchUtils'
+import { getQueryAndFlagInfo, normalizeSearchStr, escapeRegex } from './bibleSearchUtils'
 import { getQueryArrayAndWords } from './utils'
 import { getWordInfoFromUsfmWord } from './originalWordConversion'
 
@@ -955,7 +955,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
                         }
 
                         if(colonDetailType === 'form') {
-                          return stripHebrewVowelsEtc(stripGreekAccents(rawDetail).toLowerCase()) === stripHebrewVowelsEtc(stripGreekAccents(text).toLowerCase())
+                          return normalizeSearchStr({ str: rawDetail }) === normalizeSearchStr({ str: text })
                         }
 
                         if((colonDetailType || rawDetail) === 'suffix') {

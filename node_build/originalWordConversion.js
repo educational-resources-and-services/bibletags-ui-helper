@@ -54,7 +54,9 @@ var getPartialUHBWordRowFromUsfmWord = function getPartialUHBWordRowFromUsfmWord
       morph = _ref.morph;
   var definitionId = (strong.match(/H[0-9]{5}/) || [])[0];
   var prefixParts = (strong.match(/[^"H]*/) || [])[0].split(':').filter(Boolean);
-  var form = (0, _bibleSearchUtils.stripHebrewVowelsEtc)(w);
+  var form = (0, _bibleSearchUtils.normalizeSearchStr)({
+    str: w
+  });
   var isAramaic = /^Ar,/.test(morph) ? 1 : 0;
 
   if (!id || !morph || !form || !!definitionId !== !!lemma) {
@@ -177,7 +179,9 @@ var getPartialUGNTWordRowFromUsfmWord = function getPartialUGNTWordRowFromUsfmWo
       strong = _ref4.strong,
       morph = _ref4.morph;
   var definitionId = (strong.match(/G[0-9]{5}/) || [])[0];
-  var form = (0, _bibleSearchUtils.stripGreekAccents)(w).toLowerCase();
+  var form = (0, _bibleSearchUtils.normalizeSearchStr)({
+    str: w
+  });
 
   if (!id || !lemma || !definitionId || !morph || !form) {
     console.log('word with missing info', wordUsfm);

@@ -2,8 +2,8 @@ import "regenerator-runtime/runtime.js"  // needed to build-for-node given async
 
 import { bibleSearchScopes, allVerseNumberScopeKeysByBookId } from './constants'
 import { mergeAndUniquifyArraysOfScopeKeys, getQueryArrayAndWords, clock, getWordDetails, getLengthOfAllScopeMaps } from './utils'
-import { getInfoOnResultLocs } from './bibleSearchUtils'
-import { getWordsHash, searchWordToLowerCase } from "./index"
+import { getInfoOnResultLocs, normalizeSearchStr } from './bibleSearchUtils'
+import { getWordsHash } from "./index"
 
 const WILD_CARD_LIMIT = 100
 
@@ -61,8 +61,7 @@ export const bibleSearch = async ({
 
   if(!isOriginalLanguageSearch && versionIds.length > 1 && same !== "verse") throw `forbidden to search multiple versions when not using same:verse for the range`
 
-  const preppedQuery = isOriginalLanguageSearch ? query : searchWordToLowerCase(query)
-  const { queryArray, queryWords } = getQueryArrayAndWords(preppedQuery)
+  const { queryArray, queryWords } = getQueryArrayAndWords(query)
 
   const stackedResultsByBookId = Array(1+66).fill().map(() => [])
   const stackedResultsIdxByScopeKey = {}
@@ -85,13 +84,19 @@ export const bibleSearch = async ({
     wordResultsByVersionId[version.id] = {}
     await Promise.all(wordDetailsArray.map(async ({ word, primaryDetail, isNot }) => {
 
+      let id = (
+        primaryDetail instanceof Array
+          ? primaryDetail.map(detail => `${same}:${detail}`)
+          : `${same}:${primaryDetail}`
+      )
+
+      if(!isOriginalLanguageSearch) {
+        id = normalizeSearchStr({ str: id, languageId: version.languageId })
+      }
+
       const unitWordRows = await getUnitWords({
         versionId: version.id,
-        id: (
-          primaryDetail instanceof Array
-            ? primaryDetail.map(detail => `${same}:${detail}`)
-            : `${same}:${primaryDetail}`
-        ),
+        id,
         limit: WILD_CARD_LIMIT,
       })
 
