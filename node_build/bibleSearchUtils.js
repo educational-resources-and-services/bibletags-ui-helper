@@ -91,7 +91,8 @@ var normalizeSearchStr = function normalizeSearchStr(_ref) {
     return distinctChars.includes(partialStr) ? partialStr : partialStr.normalize('NFD').replace(/[\u0300-\u036f]/g, "").normalize('NFC') // remove diacritics
     ;
   }).join('') // Next line uses toLocaleLowerCase (and not toLowerCase) for languages with two i letters--one dotted and one undotted (https://en.wikipedia.org/wiki/%C4%B0)
-  .toLocaleLowerCase(languageId);
+  .toLocaleLowerCase(languageId) // clean up
+  .replace(/  +/g, ' ').trim();
 };
 
 exports.normalizeSearchStr = normalizeSearchStr;

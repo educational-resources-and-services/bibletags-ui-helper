@@ -51,6 +51,10 @@ export const normalizeSearchStr = ({ str="", languageId }) => {
       // Next line uses toLocaleLowerCase (and not toLowerCase) for languages with two i letters--one dotted and one undotted (https://en.wikipedia.org/wiki/%C4%B0)
       .toLocaleLowerCase(languageId)
 
+      // clean up
+      .replace(/  +/g, ' ')
+      .trim()
+
   )
 }
 
