@@ -951,8 +951,12 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
           }
         } else if (type === "word") {
           if (queryWords.some(function (queryWord) {
-            var isHitRegex = new RegExp("^".concat((0, _bibleSearchUtils.escapeRegex)(queryWord).replace(/\\\*$/, '.*'), "$"), 'i');
-            return isHitRegex.test(text);
+            var isHitRegex = new RegExp("^".concat((0, _bibleSearchUtils.escapeRegex)((0, _bibleSearchUtils.normalizeSearchStr)({
+              str: queryWord
+            })).replace(/\\\*$/, '.*'), "$"), 'i');
+            return isHitRegex.test((0, _bibleSearchUtils.normalizeSearchStr)({
+              str: text
+            }));
           })) {
             unitObj.isHit = true;
           }

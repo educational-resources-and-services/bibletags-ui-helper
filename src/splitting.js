@@ -1009,8 +1009,8 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
 
           if(
             queryWords.some(queryWord => {
-              const isHitRegex = new RegExp(`^${escapeRegex(queryWord).replace(/\\\*$/, '.*')}$`, 'i')
-              return isHitRegex.test(text)
+              const isHitRegex = new RegExp(`^${escapeRegex(normalizeSearchStr({ str: queryWord })).replace(/\\\*$/, '.*')}$`, 'i')
+              return isHitRegex.test(normalizeSearchStr({ str: text }))
             })
           ) {
             unitObj.isHit = true
