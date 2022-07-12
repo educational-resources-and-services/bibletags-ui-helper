@@ -14,6 +14,7 @@ export const stripHebrewVowelsEtc = str => (
   removeCantillation(
     str
       .replace(/[\u05B0-\u05BC\u05C1\u05C2\u05C4]/g,'')  // vowels
+      .replace(/(?:שׁ|שׂ|שׁ|שׂ)/g, 'ש')  // sin an shin
       .replace(/\u200D/g,'')  // invalid character
   )
 )
