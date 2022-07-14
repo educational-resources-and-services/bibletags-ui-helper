@@ -64,3 +64,12 @@ export const getLanguageInfo = iso6393 => {
     sentenceDividerRegex,
   }
 }
+
+export const getAllLanguages = () => (
+  iso6393Info
+    .map(info => ({
+      englishName: info[0],
+      iso6393: info[1],
+      nativeName: info[5] || info[0],
+    }))
+)

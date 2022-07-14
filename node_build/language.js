@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getLanguageInfo = exports.findLanguage = void 0;
+exports.getLanguageInfo = exports.getAllLanguages = exports.findLanguage = void 0;
 
 var _iso6393Info = _interopRequireDefault(require("./iso6393Info"));
 
@@ -108,3 +108,15 @@ var getLanguageInfo = function getLanguageInfo(iso6393) {
 };
 
 exports.getLanguageInfo = getLanguageInfo;
+
+var getAllLanguages = function getAllLanguages() {
+  return _iso6393Info["default"].map(function (info) {
+    return {
+      englishName: info[0],
+      iso6393: info[1],
+      nativeName: info[5] || info[0]
+    };
+  });
+};
+
+exports.getAllLanguages = getAllLanguages;
