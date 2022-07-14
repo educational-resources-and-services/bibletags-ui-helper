@@ -7,6 +7,8 @@ exports.getLanguageInfo = exports.findLanguage = void 0;
 
 var _iso6393Info = _interopRequireDefault(require("./iso6393Info"));
 
+var _bibleSearchUtils = require("./bibleSearchUtils");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -34,7 +36,7 @@ var findLanguage = function findLanguage(_ref) {
       _ref$maxNumHits = _ref.maxNumHits,
       maxNumHits = _ref$maxNumHits === void 0 ? 10 : _ref$maxNumHits;
   var wordSplitRegex = / \(| |-/g;
-  var normalizedSearchStrArray = normalizeSearchStr({
+  var normalizedSearchStrArray = (0, _bibleSearchUtils.normalizeSearchStr)({
     str: searchStr
   }).split(wordSplitRegex);
   var hits = [];
@@ -44,7 +46,7 @@ var findLanguage = function findLanguage(_ref) {
       var nameWords = [].concat(_toConsumableArray(info[0].split(wordSplitRegex)), _toConsumableArray((info[5] || '').split(wordSplitRegex))).filter(Boolean);
       return normalizedSearchStrArray.every(function (searchWord) {
         return nameWords.some(function (nameWord) {
-          return normalizeSearchStr({
+          return (0, _bibleSearchUtils.normalizeSearchStr)({
             str: nameWord
           }).indexOf(searchWord) === 0;
         });

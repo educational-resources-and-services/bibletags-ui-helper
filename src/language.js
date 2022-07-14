@@ -1,4 +1,5 @@
 import iso6393Info from './iso6393Info'
+import { normalizeSearchStr } from './bibleSearchUtils'
 
 export const findLanguage = ({ searchStr, maxNumHits=10 }) => {
   const wordSplitRegex = / \(| |-/g
