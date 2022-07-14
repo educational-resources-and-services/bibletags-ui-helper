@@ -280,6 +280,14 @@ normalizeSearchStr({ str, languageId }): String
 stripVocalOfAccents(str): String
 ```
 
+```js
+findLanguage({ searchStr, maxNumHits }): [Object]
+```
+
+```js
+getLanguageInfo(iso6393): Object
+```
+
 ## Constants exposed
 
 ```js

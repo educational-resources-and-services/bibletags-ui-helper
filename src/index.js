@@ -17,6 +17,7 @@ export * from './utils'
 export * from './bibleSearch'
 export * from './bibleSearchUtils'
 export * from './originalWordConversion'
+export * from './language'
 
 export const getOrigLangVersionIdFromRef = ref => ref.bookId <= 39 ? 'uhb' : 'ugnt'
 
@@ -698,13 +699,13 @@ export const isValidEmail = email => {
 export const isOriginalLanguageSearch = searchText => /^\(?"?[#=]/.test(searchText)
 
 export const getTextLanguageId = ({ languageId, bookId }) => (
-  languageId === `heb+grk`
-    ? (bookId <= 39 ? 'heb' : 'grk')
+  languageId === `heb+grc`
+    ? (bookId <= 39 ? 'heb' : 'grc')
     : languageId
 )
 
 export const isRTLText = ({ languageId, bookId, searchString }) => (
-  languageId === 'heb+grk'
+  languageId === 'heb+grc'
     ? (
       bookId
         ? bookId <= 39 ? true : false

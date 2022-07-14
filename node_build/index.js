@@ -173,6 +173,20 @@ Object.keys(_originalWordConversion).forEach(function (key) {
   });
 });
 
+var _language = require("./language");
+
+Object.keys(_language).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _language[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _language[key];
+    }
+  });
+});
+
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -799,7 +813,7 @@ exports.isOriginalLanguageSearch = isOriginalLanguageSearch;
 var getTextLanguageId = function getTextLanguageId(_ref13) {
   var languageId = _ref13.languageId,
       bookId = _ref13.bookId;
-  return languageId === "heb+grk" ? bookId <= 39 ? 'heb' : 'grk' : languageId;
+  return languageId === "heb+grc" ? bookId <= 39 ? 'heb' : 'grc' : languageId;
 };
 
 exports.getTextLanguageId = getTextLanguageId;
@@ -808,7 +822,7 @@ var isRTLText = function isRTLText(_ref14) {
   var languageId = _ref14.languageId,
       bookId = _ref14.bookId,
       searchString = _ref14.searchString;
-  return languageId === 'heb+grk' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'yid', 'ara', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd'].includes(languageId);
+  return languageId === 'heb+grc' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'yid', 'ara', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd'].includes(languageId);
 };
 
 exports.isRTLText = isRTLText;
