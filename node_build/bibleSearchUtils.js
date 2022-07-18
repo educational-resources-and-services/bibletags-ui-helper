@@ -143,6 +143,7 @@ var getInfoOnResultLocs = function getInfoOnResultLocs(_ref2) {
         },
         lookupVersionInfo: lookupVersionInfo
       });
+      if (!refs) return [];
       var locs = refs.map(function (ref) {
         return (0, _bibletagsVersification.getLocFromRef)(ref).split(':')[0];
       });

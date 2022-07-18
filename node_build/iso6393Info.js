@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+// The first five array items for each language from www.iso639-3.sil.org
 var iso6393Info = [// [
 //   English name
 //   ISO-639-3

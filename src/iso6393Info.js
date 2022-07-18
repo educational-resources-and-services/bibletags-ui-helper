@@ -1,3 +1,5 @@
+// The first five array items for each language from www.iso639-3.sil.org
+
 const iso6393Info = [
   // [
   //   English name

@@ -107,6 +107,9 @@ export const getInfoOnResultLocs = ({ resultsNeedingUsfm, lookupVersionInfo }) =
               },
               lookupVersionInfo,
             })
+
+            if(!refs) return []
+
             const locs = refs.map(ref => getLocFromRef(ref).split(':')[0])
 
             locs.forEach(loc => {
