@@ -9273,10 +9273,12 @@ const iso6393Info = [
     "grb"
   ],
   [
-    "Ancient Greek (to 1453)",
+    "Greek",
     "grc",
     "grc",
-    "grc"
+    "grc",
+    undefined,
+    "Ελληνικά",
   ],
   [
     "Guruntum-Mbaaru",
