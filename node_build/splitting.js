@@ -1018,12 +1018,25 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
   var getWordsWithNumber = function getWordsWithNumber(pieces) {
     var words = [];
 
-    var getWordText = function getWordText(unitObj) {
-      var text = unitObj.text,
-          children = unitObj.children;
-      return text || children && children.map(function (child) {
-        return getWordText(child);
-      }).join("") || "";
+    var getWordTextAndTags = function getWordTextAndTags(unitObj) {
+      var tags = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      var _unitObj$text = unitObj.text,
+          text = _unitObj$text === void 0 ? "" : _unitObj$text,
+          children = unitObj.children,
+          tag = unitObj.tag;
+      if (tag) tags.push(tag);
+      if (text) return [text, tags];
+
+      if (children) {
+        children.forEach(function (child) {
+          text += getWordTextAndTags(child, tags).text;
+        });
+      }
+
+      return {
+        text: text,
+        tags: tags
+      };
     };
 
     pieces.forEach(function (unitObj) {
@@ -1035,9 +1048,13 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
           tag = unitObj.tag;
 
       if (tag === "w" || type === "word" && wordNumberInVerse) {
-        var text = getWordText(unitObj);
+        var _getWordTextAndTags = getWordTextAndTags(unitObj),
+            text = _getWordTextAndTags.text,
+            tags = _getWordTextAndTags.tags;
 
-        if (['nd', 'sc'].includes(tag)) {
+        if (['nd', 'sc'].some(function (tag) {
+          return tags.includes(tag);
+        })) {
           text = text.toUpperCase();
         }
 

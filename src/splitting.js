@@ -1072,9 +1072,16 @@ export const splitVerseIntoWords = ({ pieces, isOriginal, ...otherParams }={}) =
   const getWordsWithNumber = pieces => {
     let words = []
 
-    const getWordText = unitObj => {
-      const { text, children } = unitObj
-      return text || (children && children.map(child => getWordText(child)).join("")) || ""
+    const getWordTextAndTags = (unitObj, tags=[]) => {
+      let { text=``, children, tag } = unitObj
+      if(tag) tags.push(tag)
+      if(text) return [ text, tags ]
+      if(children) {
+        children.forEach(child => {
+          text += getWordTextAndTags(child, tags).text
+        })
+      }
+      return { text, tags }
     }
 
     pieces.forEach(unitObj => {
@@ -1082,8 +1089,8 @@ export const splitVerseIntoWords = ({ pieces, isOriginal, ...otherParams }={}) =
       const { type, wordNumberInVerse, tag } = unitObj
 
       if(tag === "w" || (type === "word" && wordNumberInVerse)) {
-        let text = getWordText(unitObj)
-        if([ 'nd', 'sc' ].includes(tag)) {
+        let { text, tags } = getWordTextAndTags(unitObj)
+        if([ 'nd', 'sc' ].some(tag => tags.includes(tag))) {
           text = text.toUpperCase()
         }
         words.push({ ...(isOriginal ? unitObj : unitObjWithoutChildren), text })
