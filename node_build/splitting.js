@@ -1016,19 +1016,21 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
   }));
 
   var getWordsWithNumber = function getWordsWithNumber(pieces) {
+    var parentTags = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
     var words = [];
 
-    var getWordTextAndTags = function getWordTextAndTags(unitObj) {
-      var tags = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    var getWordTextAndTags = function getWordTextAndTags(unitObj, pTags) {
       var _unitObj$text = unitObj.text,
           text = _unitObj$text === void 0 ? "" : _unitObj$text,
           children = unitObj.children,
           tag = unitObj.tag;
-      if (tag) tags.push(tag);
+      var tags = [].concat(_toConsumableArray(pTags), [tag]).filter(Boolean);
 
       if (!text && children) {
         children.forEach(function (child) {
-          text += getWordTextAndTags(child, tags).text;
+          var childInfo = getWordTextAndTags(child, tags).text;
+          text += childInfo.text;
+          tags = _toConsumableArray(new Set([].concat(_toConsumableArray(tags), _toConsumableArray(childInfo.tags))));
         });
       }
 
@@ -1047,7 +1049,7 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
           tag = unitObj.tag;
 
       if (tag === "w" || type === "word" && wordNumberInVerse) {
-        var _getWordTextAndTags = getWordTextAndTags(unitObj),
+        var _getWordTextAndTags = getWordTextAndTags(unitObj, parentTags),
             text = _getWordTextAndTags.text,
             tags = _getWordTextAndTags.tags;
 
@@ -1061,7 +1063,7 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
           text: text
         }));
       } else if (children) {
-        words = [].concat(_toConsumableArray(words), _toConsumableArray(getWordsWithNumber(children)));
+        words = [].concat(_toConsumableArray(words), _toConsumableArray(getWordsWithNumber(children, [].concat(_toConsumableArray(parentTags), [tag]).filter(Boolean))));
       }
     });
     return words;

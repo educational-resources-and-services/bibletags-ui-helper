@@ -1069,15 +1069,17 @@ export const splitVerseIntoWords = ({ pieces, isOriginal, ...otherParams }={}) =
     splitIntoWords: !isOriginal,
   })
 
-  const getWordsWithNumber = pieces => {
+  const getWordsWithNumber = (pieces, parentTags=[]) => {
     let words = []
 
-    const getWordTextAndTags = (unitObj, tags=[]) => {
+    const getWordTextAndTags = (unitObj, pTags) => {
       let { text=``, children, tag } = unitObj
-      if(tag) tags.push(tag)
+      let tags = [ ...pTags, tag ].filter(Boolean)
       if(!text && children) {
         children.forEach(child => {
-          text += getWordTextAndTags(child, tags).text
+          const childInfo = getWordTextAndTags(child, tags).text
+          text += childInfo.text
+          tags = [ ...new Set([ ...tags, ...childInfo.tags ]) ]
         })
       }
       return { text, tags }
@@ -1088,7 +1090,7 @@ export const splitVerseIntoWords = ({ pieces, isOriginal, ...otherParams }={}) =
       const { type, wordNumberInVerse, tag } = unitObj
 
       if(tag === "w" || (type === "word" && wordNumberInVerse)) {
-        let { text, tags } = getWordTextAndTags(unitObj)
+        let { text, tags } = getWordTextAndTags(unitObj, parentTags)
         if([ 'nd', 'sc' ].some(tag => tags.includes(tag))) {
           text = text.toUpperCase()
         }
@@ -1096,7 +1098,7 @@ export const splitVerseIntoWords = ({ pieces, isOriginal, ...otherParams }={}) =
       } else if(children) {
         words = [
           ...words,
-          ...getWordsWithNumber(children),
+          ...getWordsWithNumber(children, [ ...parentTags, tag ].filter(Boolean)),
         ]
       }
     })
