@@ -1025,9 +1025,8 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
           children = unitObj.children,
           tag = unitObj.tag;
       if (tag) tags.push(tag);
-      if (text) return [text, tags];
 
-      if (children) {
+      if (!text && children) {
         children.forEach(function (child) {
           text += getWordTextAndTags(child, tags).text;
         });

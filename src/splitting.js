@@ -1075,8 +1075,7 @@ export const splitVerseIntoWords = ({ pieces, isOriginal, ...otherParams }={}) =
     const getWordTextAndTags = (unitObj, tags=[]) => {
       let { text=``, children, tag } = unitObj
       if(tag) tags.push(tag)
-      if(text) return [ text, tags ]
-      if(children) {
+      if(!text && children) {
         children.forEach(child => {
           text += getWordTextAndTags(child, tags).text
         })
