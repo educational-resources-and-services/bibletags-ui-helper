@@ -1028,7 +1028,7 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
 
       if (!text && children) {
         children.forEach(function (child) {
-          var childInfo = getWordTextAndTags(child, tags).text;
+          var childInfo = getWordTextAndTags(child, tags);
           text += childInfo.text;
           tags = _toConsumableArray(new Set([].concat(_toConsumableArray(tags), _toConsumableArray(childInfo.tags))));
         });
