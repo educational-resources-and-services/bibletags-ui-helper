@@ -90,20 +90,14 @@ var blockUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 // Titles, Headings, and Labels
 "mt#", "mte#", "ms#", "mr", "s#", "sr", "r", "d", "sp", "sd#", // Chapters and Verses
 // "cl",
-// "cd",
-// Paragraphs
+"cd", // Paragraphs
 "p", "m", "po", "pr", "cls", "pmo", "pm", "pmc", "pmr", "pi#", "mi", "nb", "pc", "ph#", "b", // Poetry
 "q#", "qr", "qc", "qa", "qm#", "qd", // Footnotes
-"fp" // Lists
-// "lh",
-// "li#",
-// "lf",
-// "lim#",
-// Tables
+"fp", // Lists
+"lh", "li#", "lf", "lim#", // Tables
 // "tr",
 // Special Text
-// "lit",
-// Special Features
+"lit" // Special Features
 // "fig",
 // Milestones
 // "qt#-s",
@@ -127,31 +121,19 @@ var inlineUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 "v", // "va",
 "vp", // Poetry
 "qs", "qac", // Lists
-// "litl",
-// "lik",
-// "liv#",
-// Tables
+"litl", "lik", "liv#", // Tables
 // "th#",
 // "thr#",
 // "tc#",
 // "tcr#",
 // Footnotes
-"f", "fe", // "fr",
-"fq", "fqa", "fk", "fl", "fw", "fv", "ft", // "fdc",
-// "fm",
-"zFootnoteType", // Cross References
-"x", // "xo",
-"xk", "xq", "xt", "xta", // "xop",
-// "xot",
-// "xnt",
-// "xdc",
-"rq", // Apparatus
+"f", "fe", "fr", "fq", "fqa", "fk", "fl", "fw", "fv", "ft", "fdc", "fm", "zFootnoteType", // Cross References
+"x", "xo", "xk", "xq", "xt", "xta", "xop", "xot", "xnt", "xdc", "rq", // Apparatus
 "zApparatusJson", // Special Text
 "add", "bk", "dc", "k", "nd", "ord", "pn", "png", "addpn", "qt", "sig", "sls", "tl", "wj", // Character Styling
 "em", "bd", "it", "bdit", "no", "sc", "sup", // Special Features
 // "rb",
-// "pro",
-"wg", "wh", "wa", // Linking Attributes
+"pro", "wg", "wh", "wa", // Linking Attributes
 "jmp" // Extended Study Content
 // "ef",
 // "ex",

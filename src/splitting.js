@@ -57,7 +57,7 @@ export const blockUsfmMarkers = [
 
   // Chapters and Verses
   // "cl",
-  // "cd",
+  "cd",
 
   // Paragraphs
   "p",
@@ -88,16 +88,16 @@ export const blockUsfmMarkers = [
   "fp",
 
   // Lists
-  // "lh",
-  // "li#",
-  // "lf",
-  // "lim#",
+  "lh",
+  "li#",
+  "lf",
+  "lim#",
 
   // Tables
   // "tr",
 
   // Special Text
-  // "lit",
+  "lit",
 
   // Special Features
   // "fig",
@@ -151,9 +151,9 @@ export const inlineUsfmMarkers = [
   "qac",
 
   // Lists
-  // "litl",
-  // "lik",
-  // "liv#",
+  "litl",
+  "lik",
+  "liv#",
 
   // Tables
   // "th#",
@@ -164,7 +164,7 @@ export const inlineUsfmMarkers = [
   // Footnotes
   "f",
   "fe",
-  // "fr",
+  "fr",
   "fq",
   "fqa",
   "fk",
@@ -172,21 +172,21 @@ export const inlineUsfmMarkers = [
   "fw",
   "fv",
   "ft",
-  // "fdc",
-  // "fm",
+  "fdc",
+  "fm",
   "zFootnoteType",
 
   // Cross References
   "x",
-  // "xo",
+  "xo",
   "xk",
   "xq",
   "xt",
   "xta",
-  // "xop",
-  // "xot",
-  // "xnt",
-  // "xdc",
+  "xop",
+  "xot",
+  "xnt",
+  "xdc",
   "rq",
 
   // Apparatus
@@ -219,7 +219,7 @@ export const inlineUsfmMarkers = [
 
   // Special Features
   // "rb",
-  // "pro",
+  "pro",
   "wg",
   "wh",
   "wa",
