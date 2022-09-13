@@ -822,7 +822,8 @@ var isRTLText = function isRTLText(_ref14) {
   var languageId = _ref14.languageId,
       bookId = _ref14.bookId,
       searchString = _ref14.searchString;
-  return languageId === 'heb+grc' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'yid', 'ara', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd'].includes(languageId);
+  return languageId === 'heb+grc' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'hbo', 'yid', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd', 'prs', 'prd', 'gbz', 'ckb', 'kmr', 'kur', 'sdh', // Arabic + its dialects follow
+  'ara', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'aeb', 'aec', 'afb', 'ajp', 'aju', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'jrb', 'jye', 'mxi', 'pga', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud'].includes(languageId);
 };
 
 exports.isRTLText = isRTLText;

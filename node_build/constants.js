@@ -5,6 +5,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.maxVerseNumberByBookId = exports.hebrewPrefixSuffixMap = exports.hebrewPrefixSearchHitMap = exports.hebrewHeyNunSearchHitRegexes = exports.grammaticalDetailMap = exports.defaultWordDividerRegex = exports.bibleSearchScopes = exports.bibleSearchScopeKeysByTestament = exports.bibleSearchFlagMap = exports.allVerseNumberScopeKeysByBookId = void 0;
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -520,11 +528,76 @@ var allVerseNumberScopeKeysByBookId = maxVerseNumberByBookId.map(function (maxVe
   return Array(maxVerseNumber).fill().map(function (x, idx) {
     return "".concat(bookId, ":").concat(idx + 1);
   });
-}); // based off of [\P{Letter}] encoded here: https://mothereff.in/regexpu
-//   NOTES:
-//     > removed digits as those can function as words
-//     > also, change "\\u064B-\\u066D\\u0670" -> "\\u066D" since the rest appears to be part of Arabic words and not punctuation
+}); // Export of defaultWordDividerRegex previously based off of [\P{Letter}] encoded here (https://mothereff.in/regexpu).
+// But that caused unwanted breaks. Thus, I went through the unicode charts at https://unicodeplus.com to come up with 
+// the results below.
 
 exports.allVerseNumberScopeKeysByBookId = allVerseNumberScopeKeysByBookId;
-var defaultWordDividerRegex = "(?:[\\0-\\/:-@\\[-`\\{-\\xA9\\xAB-\\xB4\\xB6-\\xB9\\xBB-\\xBF\\xD7\\xF7\\u02C2-\\u02C5\\u02D2-\\u02DF\\u02E5-\\u02EB\\u02ED\\u02EF-\\u036F\\u0375\\u0378\\u0379\\u037E\\u0380-\\u0385\\u0387\\u038B\\u038D\\u03A2\\u03F6\\u0482-\\u0489\\u0530\\u0557\\u0558\\u055A-\\u055F\\u0589-\\u0590\\u05BE\\u05C3\\u05C6\\u05C8-\\u05CF\\u05EB-\\u05EE\\u05F3-\\u061F\\u066D\\u06D4\\u06D6-\\u06E4\\u06E7-\\u06ED\\u06F0-\\u06F9\\u06FD\\u06FE\\u0700-\\u070F\\u0711\\u0730-\\u074C\\u07A6-\\u07B0\\u07B2-\\u07C9\\u07EB-\\u07F3\\u07F6-\\u07F9\\u07FB-\\u07FF\\u0816-\\u0819\\u081B-\\u0823\\u0825-\\u0827\\u0829-\\u083F\\u0859-\\u085F\\u086B-\\u089F\\u08B5\\u08BE-\\u0903\\u093A-\\u093C\\u093E-\\u094F\\u0951-\\u0957\\u0962-\\u0970\\u0981-\\u0984\\u098D\\u098E\\u0991\\u0992\\u09A9\\u09B1\\u09B3-\\u09B5\\u09BA-\\u09BC\\u09BE-\\u09CD\\u09CF-\\u09DB\\u09DE\\u09E2-\\u09EF\\u09F2-\\u09FB\\u09FD-\\u0A04\\u0A0B-\\u0A0E\\u0A11\\u0A12\\u0A29\\u0A31\\u0A34-\\u0A37\\u0A3A-\\u0A58\\u0A5D\\u0A5F-\\u0A71\\u0A75-\\u0A84\\u0A8E\\u0A92\\u0AA9\\u0AB1\\u0AB4\\u0ABA-\\u0ABC\\u0ABE-\\u0ACF\\u0AD1-\\u0ADF\\u0AE2-\\u0AF8\\u0AFA-\\u0B04\\u0B0D\\u0B0E\\u0B11\\u0B12\\u0B29\\u0B31\\u0B34\\u0B3A-\\u0B3C\\u0B3E-\\u0B5B\\u0B5E\\u0B62-\\u0B70\\u0B72-\\u0B82\\u0B84\\u0B8B-\\u0B8D\\u0B91\\u0B96-\\u0B98\\u0B9B\\u0B9D\\u0BA0-\\u0BA2\\u0BA5-\\u0BA7\\u0BAB-\\u0BAD\\u0BBA-\\u0BCF\\u0BD1-\\u0C04\\u0C0D\\u0C11\\u0C29\\u0C3A-\\u0C3C\\u0C3E-\\u0C57\\u0C5B-\\u0C5F\\u0C62-\\u0C7F\\u0C81-\\u0C84\\u0C8D\\u0C91\\u0CA9\\u0CB4\\u0CBA-\\u0CBC\\u0CBE-\\u0CDD\\u0CDF\\u0CE2-\\u0CF0\\u0CF3-\\u0D04\\u0D0D\\u0D11\\u0D3B\\u0D3C\\u0D3E-\\u0D4D\\u0D4F-\\u0D53\\u0D57-\\u0D5E\\u0D62-\\u0D79\\u0D80-\\u0D84\\u0D97-\\u0D99\\u0DB2\\u0DBC\\u0DBE\\u0DBF\\u0DC7-\\u0E00\\u0E31-\\u0E3F\\u0E47-\\u0E80\\u0E83\\u0E85\\u0E8B\\u0EA4\\u0EA6\\u0EB1\\u0EB4-\\u0EBC\\u0EBE\\u0EBF\\u0EC5\\u0EC7-\\u0EDB\\u0EE0-\\u0EFF\\u0F01-\\u0F3F\\u0F48\\u0F6D-\\u0F87\\u0F8D-\\u0FFF\\u102B-\\u103E\\u1040-\\u104F\\u1056-\\u1059\\u105E-\\u1060\\u1062-\\u1064\\u1067-\\u106D\\u1071-\\u1074\\u1082-\\u108D\\u108F-\\u109F\\u10C6\\u10C8-\\u10CC\\u10CE\\u10CF\\u10FB\\u1249\\u124E\\u124F\\u1257\\u1259\\u125E\\u125F\\u1289\\u128E\\u128F\\u12B1\\u12B6\\u12B7\\u12BF\\u12C1\\u12C6\\u12C7\\u12D7\\u1311\\u1316\\u1317\\u135B-\\u137F\\u1390-\\u139F\\u13F6\\u13F7\\u13FE-\\u1400\\u166D\\u166E\\u1680\\u169B-\\u169F\\u16EB-\\u16F0\\u16F9-\\u16FF\\u170D\\u1712-\\u171F\\u1732-\\u173F\\u1752-\\u175F\\u176D\\u1771-\\u177F\\u17B4-\\u17D6\\u17D8-\\u17DB\\u17DD-\\u181F\\u1879-\\u187F\\u1885-\\u18A9\\u18AB-\\u18AF\\u18F6-\\u18FF\\u191F-\\u194F\\u196E\\u196F\\u1975-\\u197F\\u19AC-\\u19AF\\u19CA-\\u19FF\\u1A17-\\u1A1F\\u1A55-\\u1AA6\\u1AA8-\\u1B04\\u1B34-\\u1B44\\u1B4C-\\u1B82\\u1BA1-\\u1BAD\\u1BB0-\\u1BB9\\u1BE6-\\u1BFF\\u1C24-\\u1C4C\\u1C50-\\u1C59\\u1C7E\\u1C7F\\u1C89-\\u1C8F\\u1CBB\\u1CBC\\u1CC0-\\u1CE8\\u1CED\\u1CF4\\u1CF7-\\u1CF9\\u1CFB-\\u1CFF\\u1DC0-\\u1DFF\\u1F16\\u1F17\\u1F1E\\u1F1F\\u1F46\\u1F47\\u1F4E\\u1F4F\\u1F58\\u1F5A\\u1F5C\\u1F5E\\u1F7E\\u1F7F\\u1FB5\\u1FBD\\u1FBF-\\u1FC1\\u1FC5\\u1FCD-\\u1FCF\\u1FD4\\u1FD5\\u1FDC-\\u1FDF\\u1FED-\\u1FF1\\u1FF5\\u1FFD-\\u2059\\u2061-\\u2070\\u2072-\\u207E\\u2080-\\u208F\\u209D-\\u2101\\u2103-\\u2106\\u2108\\u2109\\u2114\\u2116-\\u2118\\u211E-\\u2123\\u2125\\u2127\\u2129\\u212E\\u213A\\u213B\\u2140-\\u2144\\u214A-\\u214D\\u214F-\\u2182\\u2185-\\u2BFF\\u2C2F\\u2C5F\\u2CE5-\\u2CEA\\u2CEF-\\u2CFF\\u2D26\\u2D28-\\u2D2C\\u2D2E\\u2D2F\\u2D68-\\u2D6E\\u2D70-\\u2D7F\\u2D97-\\u2D9F\\u2DA7\\u2DAF\\u2DB7\\u2DBF\\u2DC7\\u2DCF\\u2DD7\\u2DDF-\\u2E2E\\u2E30-\\u3004\\u3007-\\u3030\\u3036-\\u303A\\u303D-\\u3040\\u3097-\\u309C\\u30A0\\u30FB\\u3100-\\u3104\\u3130\\u318F-\\u319F\\u31BB-\\u31EF\\u3200-\\u33FF\\u4DB6-\\u4DFF\\u9FF0-\\u9FFF\\uA48D-\\uA4CF\\uA4FE\\uA4FF\\uA60D-\\uA60F\\uA620-\\uA629\\uA62C-\\uA63F\\uA66F-\\uA67E\\uA69E\\uA69F\\uA6E6-\\uA716\\uA720\\uA721\\uA789\\uA78A\\uA7C0\\uA7C1\\uA7C7-\\uA7F6\\uA802\\uA806\\uA80B\\uA823-\\uA83F\\uA874-\\uA881\\uA8B4-\\uA8F1\\uA8F8-\\uA8FA\\uA8FC\\uA8FF-\\uA909\\uA926-\\uA92F\\uA947-\\uA95F\\uA97D-\\uA983\\uA9B3-\\uA9CE\\uA9D0-\\uA9DF\\uA9E5\\uA9F0-\\uA9FF\\uAA29-\\uAA3F\\uAA43\\uAA4C-\\uAA5F\\uAA77-\\uAA79\\uAA7B-\\uAA7D\\uAAB0\\uAAB2-\\uAAB4\\uAAB7\\uAAB8\\uAABE\\uAABF\\uAAC1\\uAAC3-\\uAADA\\uAADE\\uAADF\\uAAEB-\\uAAF1\\uAAF5-\\uAB00\\uAB07\\uAB08\\uAB0F\\uAB10\\uAB17-\\uAB1F\\uAB27\\uAB2F\\uAB5B\\uAB68-\\uAB6F\\uABE3-\\uABFF\\uD7A4-\\uD7AF\\uD7C7-\\uD7CA\\uD7FC-\\uD7FF\\uE000-\\uF8FF\\uFA6E\\uFA6F\\uFADA-\\uFAFF\\uFB07-\\uFB12\\uFB18-\\uFB1C\\uFB1E\\uFB29\\uFB37\\uFB3D\\uFB3F\\uFB42\\uFB45\\uFBB2-\\uFBD2\\uFD3E-\\uFD4F\\uFD90\\uFD91\\uFDC8-\\uFDEF\\uFDFC-\\uFE6F\\uFE75\\uFEFD-\\uFF20\\uFF3B-\\uFF40\\uFF5B-\\uFF65\\uFFBF-\\uFFC1\\uFFC8\\uFFC9\\uFFD0\\uFFD1\\uFFD8\\uFFD9\\uFFDD-\\uFFFF]|\\uD800[\\uDC0C\\uDC27\\uDC3B\\uDC3E\\uDC4E\\uDC4F\\uDC5E-\\uDE7F\\uDE9D-\\uDE9F\\uDED1-\\uDEFF\\uDF20-\\uDF2C\\uDF41\\uDF4A-\\uDF4F\\uDF76-\\uDF7F\\uDF9E\\uDF9F\\uDFC4-\\uDFC7\\uDFD0-\\uDFFF]|\\uD801[\\uDC9E-\\uDCAF\\uDCD4-\\uDCD7\\uDCFC-\\uDCFF\\uDD28-\\uDD2F\\uDD64-\\uDDFF\\uDF37-\\uDF3F\\uDF56-\\uDF5F\\uDF68-\\uDFFF]|\\uD802[\\uDC06\\uDC07\\uDC09\\uDC36\\uDC39-\\uDC3B\\uDC3D\\uDC3E\\uDC56-\\uDC5F\\uDC77-\\uDC7F\\uDC9F-\\uDCDF\\uDCF3\\uDCF6-\\uDCFF\\uDD16-\\uDD1F\\uDD3A-\\uDD7F\\uDDB8-\\uDDBD\\uDDC0-\\uDDFF\\uDE01-\\uDE0F\\uDE14\\uDE18\\uDE36-\\uDE5F\\uDE7D-\\uDE7F\\uDE9D-\\uDEBF\\uDEC8\\uDEE5-\\uDEFF\\uDF36-\\uDF3F\\uDF56-\\uDF5F\\uDF73-\\uDF7F\\uDF92-\\uDFFF]|\\uD803[\\uDC49-\\uDC7F\\uDCB3-\\uDCBF\\uDCF3-\\uDCFF\\uDD24-\\uDEFF\\uDF1D-\\uDF26\\uDF28-\\uDF2F\\uDF46-\\uDFDF\\uDFF7-\\uDFFF]|\\uD804[\\uDC00-\\uDC02\\uDC38-\\uDC82\\uDCB0-\\uDCCF\\uDCE9-\\uDD43\\uDD45-\\uDD4F\\uDD73-\\uDD75\\uDD77-\\uDD82\\uDDB3-\\uDDC0\\uDDC5-\\uDDD9\\uDDDB\\uDDDD-\\uDDFF\\uDE12\\uDE2C-\\uDE7F\\uDE87\\uDE89\\uDE8E\\uDE9E\\uDEA9-\\uDEAF\\uDEDF-\\uDF04\\uDF0D\\uDF0E\\uDF11\\uDF12\\uDF29\\uDF31\\uDF34\\uDF3A-\\uDF3C\\uDF3E-\\uDF4F\\uDF51-\\uDF5C\\uDF62-\\uDFFF]|\\uD805[\\uDC35-\\uDC46\\uDC4B-\\uDC5E\\uDC60-\\uDC7F\\uDCB0-\\uDCC3\\uDCC6\\uDCC8-\\uDD7F\\uDDAF-\\uDDD7\\uDDDC-\\uDDFF\\uDE30-\\uDE43\\uDE45-\\uDE7F\\uDEAB-\\uDEB7\\uDEB9-\\uDEFF\\uDF1B-\\uDFFF]|\\uD806[\\uDC2C-\\uDC9F\\uDCE0-\\uDCFE\\uDD00-\\uDD9F\\uDDA8\\uDDA9\\uDDD1-\\uDDE0\\uDDE2\\uDDE4-\\uDDFF\\uDE01-\\uDE0A\\uDE33-\\uDE39\\uDE3B-\\uDE4F\\uDE51-\\uDE5B\\uDE8A-\\uDE9C\\uDE9E-\\uDEBF\\uDEF9-\\uDFFF]|\\uD807[\\uDC09\\uDC2F-\\uDC3F\\uDC41-\\uDC71\\uDC90-\\uDCFF\\uDD07\\uDD0A\\uDD31-\\uDD45\\uDD47-\\uDD5F\\uDD66\\uDD69\\uDD8A-\\uDD97\\uDD99-\\uDEDF\\uDEF3-\\uDFFF]|\\uD808[\\uDF9A-\\uDFFF]|\\uD809[\\uDC00-\\uDC7F\\uDD44-\\uDFFF]|[\\uD80A\\uD80B\\uD80E-\\uD810\\uD812-\\uD819\\uD823-\\uD82B\\uD82D\\uD82E\\uD830-\\uD834\\uD836\\uD837\\uD839\\uD83C-\\uD83F\\uD87B-\\uD87D\\uD87F-\\uDBFF][\\uDC00-\\uDFFF]|\\uD80D[\\uDC2F-\\uDFFF]|\\uD811[\\uDE47-\\uDFFF]|\\uD81A[\\uDE39-\\uDE3F\\uDE5F-\\uDECF\\uDEEE-\\uDF3F\\uDF44-\\uDF62\\uDF78-\\uDF7C\\uDF90-\\uDFFF]|\\uD81B[\\uDC00-\\uDE3F\\uDE80-\\uDEFF\\uDF4B-\\uDF4F\\uDF51-\\uDF92\\uDFA0-\\uDFDF\\uDFE2\\uDFE4-\\uDFFF]|\\uD821[\\uDFF8-\\uDFFF]|\\uD822[\\uDEF3-\\uDFFF]|\\uD82C[\\uDD1F-\\uDD4F\\uDD53-\\uDD63\\uDD68-\\uDD6F\\uDEFC-\\uDFFF]|\\uD82F[\\uDC6B-\\uDC6F\\uDC7D-\\uDC7F\\uDC89-\\uDC8F\\uDC9A-\\uDFFF]|\\uD835[\\uDC55\\uDC9D\\uDCA0\\uDCA1\\uDCA3\\uDCA4\\uDCA7\\uDCA8\\uDCAD\\uDCBA\\uDCBC\\uDCC4\\uDD06\\uDD0B\\uDD0C\\uDD15\\uDD1D\\uDD3A\\uDD3F\\uDD45\\uDD47-\\uDD49\\uDD51\\uDEA6\\uDEA7\\uDEC1\\uDEDB\\uDEFB\\uDF15\\uDF35\\uDF4F\\uDF6F\\uDF89\\uDFA9\\uDFC3\\uDFCC-\\uDFFF]|\\uD838[\\uDC00-\\uDCFF\\uDD2D-\\uDD36\\uDD3E-\\uDD4D\\uDD4F-\\uDEBF\\uDEEC-\\uDFFF]|\\uD83A[\\uDCC5-\\uDCFF\\uDD44-\\uDD4A\\uDD4C-\\uDFFF]|\\uD83B[\\uDC00-\\uDDFF\\uDE04-\\uDE20\\uDE23\\uDE25\\uDE26\\uDE28\\uDE33\\uDE38\\uDE3A\\uDE3C-\\uDE41\\uDE43-\\uDE46\\uDE48\\uDE4A\\uDE4C\\uDE50\\uDE53\\uDE55\\uDE56\\uDE58\\uDE5A\\uDE5C\\uDE5E\\uDE60\\uDE63\\uDE65\\uDE66\\uDE6B\\uDE73\\uDE78\\uDE7D\\uDE7F\\uDE8A\\uDE9C-\\uDEA0\\uDEA4\\uDEAA\\uDEBC-\\uDFFF]|\\uD869[\\uDED7-\\uDEFF]|\\uD86D[\\uDF35-\\uDF3F]|\\uD86E[\\uDC1E\\uDC1F]|\\uD873[\\uDEA2-\\uDEAF]|\\uD87A[\\uDFE1-\\uDFFF]|\\uD87E[\\uDE1E-\\uDFFF]|[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?:[^\\uD800-\\uDBFF]|^)[\\uDC00-\\uDFFF])";
+var defaultWordDividerUnicodeRanges = [// Control (https://unicodeplus.com/category/Cc)
+[0x0000, 0x001F], [0x007F, 0x009F], // Format (https://unicodeplus.com/category/Cf)
+[0x200B, 0x200C], [0x200E, 0x200F], [0x202A, 0x202E], 0x2061, [0x2066, 0x206F], [0xFFF9, 0xFFFB], [0x13432, 0x13438], 0xE0001, [0xE0020, 0xE002F], [0xE003A, 0xE0040], [0xE005B, 0xE005D], [0xE007B, 0xE007F], // Dash Punctuation (https://unicodeplus.com/category/Pd)
+0x002D, 0x058A, 0x05BE, 0x1400, 0x1806, 0x2010, [0x2012, 0x2015], 0x2E17, 0x2E1A, [0x2E3A, 0x2E3B], 0x2E40, 0x2E5D, 0x301C, 0x3030, 0x30A0, [0xFE31, 0xFE32], 0xFE58, 0xFE63, 0xFF0D, 0x10EAD, // Close Punctuation (https://unicodeplus.com/category/Pe)
+0x0029, 0x005D, 0x007D, 0x0F3B, 0x0F3D, 0x169C, 0x2046, 0x207E, 0x208E, 0x2309, 0x230B, 0x232A, 0x2769, 0x276B, 0x276D, 0x276F, 0x2771, 0x2773, 0x2775, 0x27C6, 0x27E7, 0x27E9, 0x27EB, 0x27ED, 0x27EF, 0x2984, 0x2986, 0x2988, 0x298A, 0x298C, 0x298E, 0x2990, 0x2992, 0x2994, 0x2996, 0x2998, 0x29D9, 0x29DB, 0x29FD, 0x2E23, 0x2E25, 0x2E27, 0x2E29, 0x2E56, 0x2E58, 0x2E5A, 0x2E5C, 0x3009, 0x300B, 0x300D, 0x300F, 0x3011, 0x3015, 0x3017, 0x3019, 0x301B, 0x301E, 0x301F, 0xFD3E, 0xFE18, 0xFE36, 0xFE38, 0xFE3A, 0xFE3C, 0xFE3E, 0xFE40, 0xFE42, 0xFE44, 0xFE48, 0xFE5A, 0xFE5C, 0xFE5E, 0xFF09, 0xFF3D, 0xFF5D, 0xFF60, 0xFF63, // Open Punctuation (https://unicodeplus.com/category/Ps)
+0x0028, 0x005B, 0x007B, 0x0F3A, 0x0F3C, 0x169B, 0x201A, 0x201E, 0x2045, 0x207D, 0x208D, 0x2308, 0x230A, 0x2329, 0x2768, 0x276A, 0x276C, 0x276E, 0x2770, 0x2772, 0x2774, 0x27C5, 0x27E6, 0x27E8, 0x27EA, 0x27EC, 0x27EE, 0x2983, 0x2985, 0x2987, 0x2989, 0x298B, 0x298D, 0x298F, 0x2991, 0x2993, 0x2995, 0x2997, 0x29D8, 0x29DA, 0x29FC, 0x2E22, 0x2E24, 0x2E26, 0x2E28, 0x2E42, 0x2E55, 0x2E57, 0x2E59, 0x2E5B, 0x3008, 0x300A, 0x300C, 0x300E, 0x3010, 0x3014, 0x3016, 0x3018, 0x301A, 0x301D, 0xFD3F, 0xFE17, 0xFE35, 0xFE37, 0xFE39, 0xFE3B, 0xFE3D, 0xFE3F, 0xFE41, 0xFE43, 0xFE47, 0xFE59, 0xFE5B, 0xFE5D, 0xFF08, 0xFF3B, 0xFF5B, 0xFF5F, 0xFF62, // Final Punctuation (https://unicodeplus.com/category/Pf)
+0x00BB, 0x2019, 0x201D, 0x203A, 0x2E03, 0x2E05, 0x2E0A, 0x2E0D, 0x2E1D, 0x2E21, // Initial Punctuation (https://unicodeplus.com/category/Pi)
+0x00AB, 0x2018, 0x201B, 0x201C, 0x201F, 0x2039, 0x2E02, 0x2E04, 0x2E09, 0x2E0C, 0x2E1C, 0x2E20, // Other Punctuation (https://unicodeplus.com/category/Po)
+[0x0021, 0x0023], [0x0025, 0x0027], 0x002A, 0x002C, 0x002E, 0x002F, 0x003A, 0x003B, 0x003F, 0x0040, 0x005C, 0x00A1, 0x00A7, 0x00B6, 0x00B7, 0x00BF, 0x037E, 0x0387, [0x055A, 0x055F], 0x0589, 0x05C0, 0x05C3, 0x05C6, 0x05F3, 0x05F4, 0x0609, 0x060A, 0x060C, 0x060D, 0x061B, [0x061D, 0x061F], [0x066A, 0x066D], 0x06D4, [0x0700, 0x070D], [0x07F7, 0x07F9], [0x0830, 0x083E], 0x085E, 0x0964, 0x0965, 0x0970, 0x09FD, 0x0A76, 0x0AF0, 0x0C77, 0x0C84, 0x0DF4, 0x0E4F, 0x0E5A, 0x0E5B, [0x0F04, 0x0F12], 0x0F14, 0x0F85, [0x0FD0, 0x0FD4], 0x0FD9, 0x0FDA, [0x104A, 0x104F], 0x10FB, [0x1360, 0x1368], 0x166E, 0x16EB, 0x16EC, 0x16ED, 0x1735, 0x1736, [0x17D4, 0x17D6], [0x17D8, 0x17DA], [0x1800, 0x1805], [0x1807, 0x180A], 0x1944, 0x1945, 0x1A1E, 0x1A1F, [0x1AA0, 0x1AA6], [0x1AA8, 0x1AAD], [0x1B5A, 0x1B60], 0x1B7D, 0x1B7E, [0x1BFC, 0x1BFF], [0x1C3B, 0x1C3F], 0x1C7E, 0x1C7F, [0x1CC0, 0x1CC7], 0x1CD3, 0x2016, 0x2017, [0x2020, 0x2027], [0x2030, 0x2038], [0x203B, 0x203E], [0x2041, 0x2043], [0x2047, 0x2051], 0x2053, [0x2055, 0x205E], [0x2CF9, 0x2CFC], 0x2CFE, 0x2CFF, 0x2D70, 0x2E00, 0x2E01, [0x2E06, 0x2E08], 0x2E0B, 0x2E0E, 0x2E0F, [0x2E10, 0x2E16], 0x2E18, 0x2E19, 0x2E1B, 0x2E1E, 0x2E1F, [0x2E2A, 0x2E2E], [0x2E30, 0x2E39], [0x2E3C, 0x2E3F], 0x2E41, [0x2E43, 0x2E4F], [0x2E52, 0x2E54], [0x3001, 0x3003], 0x303D, 0x30FB, 0xA4FE, 0xA4FF, [0xA60D, 0xA60F], 0xA673, 0xA67E, [0xA6F2, 0xA6F7], [0xA874, 0xA877], 0xA8CE, 0xA8CF, [0xA8F8, 0xA8FA], 0xA8FC, 0xA92E, 0xA92F, 0xA95F, [0xA9C1, 0xA9CD], 0xA9DE, 0xA9DF, [0xAA5C, 0xAA5F], 0xAADE, 0xAADF, 0xAAF0, 0xAAF1, 0xABEB, [0xFE10, 0xFE16], 0xFE19, 0xFE30, 0xFE45, 0xFE46, 0xFE49, [0xFE4A, 0xFE4C], [0xFE50, 0xFE52], [0xFE54, 0xFE57], [0xFE5F, 0xFE61], 0xFE68, 0xFE6A, 0xFE6B, [0xFF01, 0xFF03], [0xFF05, 0xFF07], 0xFF0A, 0xFF0C, 0xFF0E, 0xFF0F, 0xFF1A, 0xFF1B, 0xFF1F, 0xFF20, 0xFF3C, 0xFF61, 0xFF64, 0xFF65, [0x10100, 0x10102], 0x1039F, 0x103D0, 0x1056F, 0x10857, 0x1091F, 0x1093F, 0x10A50, [0x10A51, 0x10A58], 0x10A7F, 0x10AF0, [0x10AF1, 0x10AF6], 0x10B39, [0x10B3A, 0x10B3F], 0x10B99, [0x10B9A, 0x10B9C], [0x10F55, 0x10F59], [0x10F86, 0x10F89], [0x11047, 0x1104D], 0x110BB, 0x110BC, 0x110BE, 0x110BF, 0x110C0, 0x110C1, [0x11140, 0x11143], 0x11174, 0x11175, [0x111C5, 0x111C8], 0x111CD, 0x111DB, [0x111DD, 0x111DF], [0x11238, 0x1123D], 0x112A9, [0x1144B, 0x1144F], 0x1145A, 0x1145B, 0x1145D, 0x114C6, [0x115C1, 0x115D7], [0x11641, 0x11643], [0x11660, 0x1166C], 0x116B9, [0x1173C, 0x1173E], 0x1183B, [0x11944, 0x11946], 0x119E2, 0x11A3F, [0x11A40, 0x11A46], [0x11A9A, 0x11A9C], [0x11A9E, 0x11AA2], [0x11C41, 0x11C45], 0x11C70, 0x11C71, 0x11EF7, 0x11EF8, 0x11FFF, [0x12470, 0x12474], 0x12FF1, 0x12FF2, 0x16A6E, 0x16A6F, 0x16AF5, [0x16B37, 0x16B3B], 0x16B44, [0x16E97, 0x16E9A], 0x16FE2, 0x1BC9F, [0x1DA87, 0x1DA8B], 0x1E95E, 0x1E95F, // Line Separator  (https://unicodeplus.com/category/Zl)
+0x2028, // Paragraph Separator  (https://unicodeplus.com/category/Zp)
+0x2029, // Space Separator  (https://unicodeplus.com/category/Zs)
+0x0020, 0x1680, 0x2000, [0x2001, 0x200A], 0x202F, 0x205F, 0x3000];
+
+var getUnicodeCharacters = function getUnicodeCharacters(hex) {
+  var format = function format(_char) {
+    return "\\u".concat("0000".concat(_char.toString(16).toUpperCase()).slice(-4));
+  };
+
+  if (hex >= 0 && hex <= 0xD7FF || hex >= 0xE000 && hex <= 0xFFFF) {
+    return ["", format(hex)];
+  } else if (hex >= 0x10000 && hex <= 0x10FFFF) {
+    // we substract 0x10000 from hex to get a 20-bits number in the range 0..0xFFFF
+    hex -= 0x10000; // we add 0xD800 to the number formed by the first 10 bits to give the first byte
+
+    var first = ((0xffc00 & hex) >> 10) + 0xD800; // we add 0xDC00 to the number formed by the low 10 bits to give the second byte
+
+    var second = (0x3ff & hex) + 0xDC00;
+    return [format(first), format(second)];
+  } else {
+    throw new Error("Unexpected hex number: ".concat(hex));
+  }
+};
+
+var unicodeSecondCharsByFirstChar = {};
+defaultWordDividerUnicodeRanges.forEach(function (unicodeHexOrRange) {
+  if (unicodeHexOrRange instanceof Array) {
+    var _getUnicodeCharacters = getUnicodeCharacters(unicodeHexOrRange[0]),
+        _getUnicodeCharacters2 = _slicedToArray(_getUnicodeCharacters, 2),
+        firstCharOfStart = _getUnicodeCharacters2[0],
+        secondCharOfStart = _getUnicodeCharacters2[1];
+
+    var _getUnicodeCharacters3 = getUnicodeCharacters(unicodeHexOrRange[1]),
+        _getUnicodeCharacters4 = _slicedToArray(_getUnicodeCharacters3, 2),
+        firstCharOfEnd = _getUnicodeCharacters4[0],
+        secondCharOfEnd = _getUnicodeCharacters4[1];
+
+    if (firstCharOfStart === firstCharOfEnd) {
+      unicodeSecondCharsByFirstChar[firstCharOfStart] = unicodeSecondCharsByFirstChar[firstCharOfStart] || [];
+      unicodeSecondCharsByFirstChar[firstCharOfStart].push("".concat(secondCharOfStart, "-").concat(secondCharOfEnd));
+    } else {
+      throw new Error("Unexpected unicode range: [".concat(unicodeHexOrRange.map(function (hex) {
+        return "0x".concat(hex.toString(16));
+      }).join(','), "]"));
+    }
+  } else {
+    var _getUnicodeCharacters5 = getUnicodeCharacters(unicodeHexOrRange),
+        _getUnicodeCharacters6 = _slicedToArray(_getUnicodeCharacters5, 2),
+        firstChar = _getUnicodeCharacters6[0],
+        secondChar = _getUnicodeCharacters6[1];
+
+    unicodeSecondCharsByFirstChar[firstChar] = unicodeSecondCharsByFirstChar[firstChar] || [];
+    unicodeSecondCharsByFirstChar[firstChar].push(secondChar);
+  }
+});
+var defaultWordDividerRegex = "(?:".concat(Object.keys(unicodeSecondCharsByFirstChar).map(function (firstChar) {
+  return "".concat(firstChar, "[").concat(unicodeSecondCharsByFirstChar[firstChar].join(''), "]");
+}).join('|'), ")");
 exports.defaultWordDividerRegex = defaultWordDividerRegex;
