@@ -95,8 +95,7 @@ var blockUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 "q#", "qr", "qc", "qa", "qm#", "qd", // Footnotes
 "fp", // Lists
 "lh", "li#", "lf", "lim#", // Tables
-// "tr",
-// Special Text
+"tr", // Special Text
 "lit" // Special Features
 // "fig",
 // Milestones
@@ -122,11 +121,7 @@ var inlineUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 "vp", // Poetry
 "qs", "qac", // Lists
 "litl", "lik", "liv#", // Tables
-// "th#",
-// "thr#",
-// "tc#",
-// "tcr#",
-// Footnotes
+"th#", "thr#", "tc#", "tcr#", // Footnotes
 "f", "fe", "fr", "fq", "fqa", "fk", "fl", "fw", "fv", "ft", "fdc", "fm", "zFootnoteType", // Cross References
 "x", "xo", "xk", "xq", "xt", "xta", "xop", "xot", "xnt", "xdc", "rq", // Apparatus
 "zApparatusJson", // Special Text
@@ -707,6 +702,12 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
 
   var modifiedVerseObjects = [];
   filteredVerseObjects.forEach(function (verseObj) {
+    //  usfmJS mistakenly marks several tags with a `content` attribute instead of a `text` attribute (BLOCK: qm# li# qd tr + INLINE: th# thr# tc# tcr# addpn)
+    if (/^(?:qd|tr|addpn|(?:qm|li|th|thr|tc|tcr)[0-9]?)$/.test(verseObj.tag) && verseObj.content && [undefined, '', ' '].includes(verseObj.text)) {
+      verseObj.text = verseObj.content;
+      delete verseObj.content;
+    }
+
     var text = verseObj.text,
         content = verseObj.content,
         verseObjWithoutTextAndContent = _objectWithoutProperties(verseObj, _excluded);

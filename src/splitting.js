@@ -94,7 +94,7 @@ export const blockUsfmMarkers = [
   "lim#",
 
   // Tables
-  // "tr",
+  "tr",
 
   // Special Text
   "lit",
@@ -156,10 +156,10 @@ export const inlineUsfmMarkers = [
   "liv#",
 
   // Tables
-  // "th#",
-  // "thr#",
-  // "tc#",
-  // "tcr#",
+  "th#",
+  "thr#",
+  "tc#",
+  "tcr#",
 
   // Footnotes
   "f",
@@ -818,6 +818,13 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
   // For block markers which have content (like \s1 and \d), separate out that content
   let modifiedVerseObjects = []
   filteredVerseObjects.forEach(verseObj => {
+
+    //  usfmJS mistakenly marks several tags with a `content` attribute instead of a `text` attribute (BLOCK: qm# li# qd tr + INLINE: th# thr# tc# tcr# addpn)
+    if(/^(?:qd|tr|addpn|(?:qm|li|th|thr|tc|tcr)[0-9]?)$/.test(verseObj.tag) && verseObj.content && [ undefined, '', ' ' ].includes(verseObj.text)) {
+      verseObj.text = verseObj.content
+      delete verseObj.content
+    }
+
     const { text, content, ...verseObjWithoutTextAndContent } = verseObj
     const { tag } = verseObjWithoutTextAndContent
 
@@ -830,6 +837,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     } else {
       modifiedVerseObjects.push(verseObj)
     }
+
   })
 
   // handle zApparatusJson and Hebrew verse parts
