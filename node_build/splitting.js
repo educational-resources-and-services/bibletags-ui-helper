@@ -354,9 +354,10 @@ var wrapVerseObjects = function wrapVerseObjects(verseObjects) {
 
 var splitOnWords = function splitOnWords(_ref3) {
   var text = _ref3.text,
-      regexes = _ref3.regexes;
+      regexes = _ref3.regexes,
+      startingFromPotentialSplitWord = _ref3.startingFromPotentialSplitWord;
   return text // escape apostraphes
-  .replace(/(\w)’(\w)/g, "$1ESCAPEDAPOSTRAPHE$2") // escape large numbers with commas
+  .replace(startingFromPotentialSplitWord ? /(^|\w)’(\w)/g : /(\w)’(\w)/g, "$1ESCAPEDAPOSTRAPHE$2") // escape large numbers with commas
   .replace(/([0-9]),([0-9]{3}),([0-9]{3})/g, "$1ESCAPEDCOMMA$2ESCAPEDCOMMA$3").replace(/([0-9]),([0-9]{3})/g, "$1ESCAPEDCOMMA$2") // split to words
   .split(regexes.wordDividerInGroupGlobal) // unescape apostraphes and commas
   .map(function (word) {
@@ -449,7 +450,8 @@ var getGroupedVerseObjects = function getGroupedVerseObjects(_ref5) {
         if (text) {
           var textSplitOnWords = splitOnWords({
             text: text,
-            regexes: regexes
+            regexes: regexes,
+            startingFromPotentialSplitWord: !!splitWordInfo
           });
           unitObj.children = textSplitOnWords.map(function (wordOrWordDivider, idx) {
             var doesNotHaveWord = regexes.wordDividerStartToEnd.test(wordOrWordDivider);

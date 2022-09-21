@@ -444,12 +444,12 @@ const wrapVerseObjects = verseObjects => {
   })
 }
 
-const splitOnWords = ({ text, regexes }) => {
+const splitOnWords = ({ text, regexes, startingFromPotentialSplitWord }) => {
 
   return text
 
     // escape apostraphes
-    .replace(/(\w)’(\w)/g, "$1ESCAPEDAPOSTRAPHE$2")
+    .replace(startingFromPotentialSplitWord ? /(^|\w)’(\w)/g : /(\w)’(\w)/g, "$1ESCAPEDAPOSTRAPHE$2")
 
     // escape large numbers with commas
     .replace(/([0-9]),([0-9]{3}),([0-9]{3})/g, "$1ESCAPEDCOMMA$2ESCAPEDCOMMA$3")
@@ -534,7 +534,7 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
       if(text || tag === "w") {
 
         if(text) {
-          const textSplitOnWords = splitOnWords({ text, regexes })
+          const textSplitOnWords = splitOnWords({ text, regexes, startingFromPotentialSplitWord: !!splitWordInfo })
 
           unitObj.children = textSplitOnWords.map((wordOrWordDivider, idx) => {
             const doesNotHaveWord = regexes.wordDividerStartToEnd.test(wordOrWordDivider)
