@@ -394,12 +394,13 @@ var reduceLevels = function reduceLevels(unitObjs) {
 
 var filterOutEmptyObjects = function filterOutEmptyObjects(unitObjs) {
   return unitObjs.filter(function (unitObj) {
-    var text = unitObj.text,
+    var tag = unitObj.tag,
+        text = unitObj.text,
         children = unitObj.children,
         content = unitObj.content,
         apparatusJson = unitObj.apparatusJson;
 
-    if (!text && (!children || !children.length) && !content && !apparatusJson) {
+    if (tag !== 'd' && !text && (!children || !children.length) && !content && !apparatusJson) {
       return false;
     }
 
@@ -443,7 +444,7 @@ var getGroupedVerseObjects = function getGroupedVerseObjects(_ref5) {
           tag = unitObj.tag;
       var ancestorLine = [].concat(_toConsumableArray(passedInAncestorLine || []), [unitObjs, unitObj]);
 
-      if (tag === "v") {
+      if (["v", "d"].includes(tag)) {
         wordNumberInVerse = 1;
       }
 
@@ -613,10 +614,17 @@ var getFlattenedJsUsfm = function getFlattenedJsUsfm(jsUsfm) {
 
     for (var verseNum = 0; verseNum < 180; verseNum++) {
       if (chapter[verseNum]) {
-        verseObjects.push({
-          "content": verseNum,
-          "tag": "v"
-        });
+        if (verseNum === 0) {
+          verseObjects.push({
+            "tag": "d"
+          });
+        } else {
+          verseObjects.push({
+            "content": verseNum,
+            "tag": "v"
+          });
+        }
+
         verseObjects.push.apply(verseObjects, _toConsumableArray(chapter[verseNum].verseObjects));
       }
     }
@@ -771,7 +779,7 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
         vsObj.baseWords = baseWords;
         delete vsObj.content;
       } catch (e) {}
-    } else if (vsObj.tag === "v") {
+    } else if (["v", "d"].includes(vsObj.tag)) {
       baseWords = [];
     }
   }); // Make fixes:
@@ -972,6 +980,8 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
           currentRef.chapter = parseInt(content, 10);
         } else if (tag === 'v') {
           currentRef.verse = parseInt(content, 10);
+        } else if (tag === 'd') {
+          currentRef.verse = 0;
         }
 
         if ((wordNumberInVerseOfHitsByLoc[(0, _bibletagsVersification.getLocFromRef)(currentRef)] || []).includes(wordNumberInVerse)) {
