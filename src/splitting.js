@@ -488,9 +488,9 @@ const reduceLevels = unitObjs => (
 
 const filterOutEmptyObjects = unitObjs => (
   unitObjs.filter(unitObj => {
-    const { text, children, content, apparatusJson } = unitObj
+    const { tag, text, children, content, apparatusJson } = unitObj
 
-    if(!text && (!children || !children.length) && !content && !apparatusJson) {
+    if(tag !== 'd' && !text && (!children || !children.length) && !content && !apparatusJson) {
       return false
     }
 
@@ -528,7 +528,7 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
       const { text, children, tag } = unitObj
       const ancestorLine = [ ...(passedInAncestorLine || []), unitObjs, unitObj ]
 
-      if(tag === "v") {
+      if([ "v", "d" ].includes(tag)) {
         wordNumberInVerse = 1
       }
 
@@ -728,10 +728,16 @@ const getFlattenedJsUsfm = jsUsfm => {
     for(let verseNum=0; verseNum<180; verseNum++) {
       if(chapter[verseNum]) {
 
-        verseObjects.push({
-          "content": verseNum,
-          "tag": "v",
-        })
+        if(verseNum === 0) {
+          verseObjects.push({
+            "tag": "d",
+          })
+        } else {
+          verseObjects.push({
+            "content": verseNum,
+            "tag": "v",
+          })
+        }
     
         verseObjects.push(...chapter[verseNum].verseObjects)
       }
@@ -871,7 +877,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
         vsObj.baseWords = baseWords
         delete vsObj.content
       } catch(e) {}
-    } else if(vsObj.tag === "v") {
+    } else if([ "v", "d" ].includes(vsObj.tag)) {
       baseWords = []
     }
   })
@@ -1051,6 +1057,8 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
           currentRef.chapter = parseInt(content, 10)
         } else if(tag === 'v') {
           currentRef.verse = parseInt(content, 10)
+        } else if(tag === 'd') {
+          currentRef.verse = 0
         }
 
         if((wordNumberInVerseOfHitsByLoc[getLocFromRef(currentRef)] || []).includes(wordNumberInVerse)) {
