@@ -274,6 +274,7 @@ const getFilteredVerseObjects = ({ unitObjs, inlineMarkersOnly }) => {
     if(
       !tagInList({ tag, list: inlineUsfmMarkers })
       && !tagInList({ tag, list: specialUsfmMarkers })
+      && tag !== 'd'  // while this is a block usfm marker, it needs to be present with inlineMarkersOnly because like \v it indicates a new verse
       && !text
       && !children
     ) {

@@ -181,7 +181,8 @@ var getFilteredVerseObjects = function getFilteredVerseObjects(_ref2) {
     }) && !tagInList({
       tag: tag,
       list: specialUsfmMarkers
-    }) && !text && !children) {
+    }) && tag !== 'd' // while this is a block usfm marker, it needs to be present with inlineMarkersOnly because like \v it indicates a new verse
+    && !text && !children) {
       if (inlineMarkersOnly && isBlock) {
         unitObj.text = (0, _i18n["default"])(" ", "word separator");
       } else if (inlineMarkersOnly || !isBlock) {
