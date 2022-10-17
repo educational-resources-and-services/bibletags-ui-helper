@@ -40,7 +40,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var mergeAndUniquifyArraysOfScopeKeys = function mergeAndUniquifyArraysOfScopeKeys() {
   // NOTE: Built to be as fast as possible on large arrays
   var findSmallestScopeKey = function findSmallestScopeKey(scopeKeys) {
-    if (scopeKeys.length === 0) return scopeKeys[0];
+    if (scopeKeys.length === 0) return '99999999';
     var smallestScopeKey, smallestPart1, smallestPart2;
     scopeKeys.forEach(function (scopeKey) {
       var _scopeKey$split$map = scopeKey.split(/[-:]/g).map(function (part) {

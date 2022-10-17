@@ -4,7 +4,7 @@ export const mergeAndUniquifyArraysOfScopeKeys = (...arrays) => {
   // NOTE: Built to be as fast as possible on large arrays
 
   const findSmallestScopeKey = scopeKeys => {
-    if(scopeKeys.length === 0) return scopeKeys[0]
+    if(scopeKeys.length === 0) return '99999999'
 
     let smallestScopeKey, smallestPart1, smallestPart2
 
