@@ -704,73 +704,97 @@ export const getTextLanguageId = ({ languageId, bookId }) => (
     : languageId
 )
 
-export const isRTLText = ({ languageId, bookId, searchString }) => (
-  languageId === 'heb+grc'
-    ? (
-      bookId
-        ? bookId <= 39 ? true : false
-        : /^[\u0590-\u05FF ]*$/g.test(searchString)
-    )
-    : [
-      'heb',
-      'hbo',
-      'yid',
-      'per',
-      'fas',
-      'urd',
-      'pus',
-      'syc',
-      'syr',
-      'sam',
-      'snd',
-      'prs',
-      'prd',
-      'gbz',
-      'ckb',
-      'kmr',
-      'kur',
-      'sdh',
+export const isRTLStr = str => {           
+  const ltrChars = 'A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF'
+  const rtlChars = '\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC'
+  const rtlDirCheck = new RegExp(`^[^${ltrChars}]*[${rtlChars}]`)
+  return rtlDirCheck.test(str)
+}
 
-      // Arabic + its dialects follow
-      'ara',
-      'aao',
-      'abh',
-      'abv',
-      'acm',
-      'acq',
-      'acw',
-      'acx',
-      'acy',
-      'adf',
-      'aeb',
-      'aec',
-      'afb',
-      'ajp',
-      'aju',
-      'apc',
-      'apd',
-      'arb',
-      'arq',
-      'ars',
-      'ary',
-      'arz',
-      'auz',
-      'avl',
-      'ayh',
-      'ayl',
-      'ayn',
-      'ayp',
-      'jrb',
-      'jye',
-      'mxi',
-      'pga',
-      'shu',
-      'sqr',
-      'ssh',
-      'xaa',
-      'yhd',
-      'yud',
-    ].includes(languageId)
+const getFirstWordFromPieces = pieces => {
+  for(let piece of pieces) {
+    if(piece.type === `word`) {
+      return piece.text
+    } else if(piece.children instanceof Array) {
+      const wordFromChildren = getFirstWordFromPieces(piece.children)
+      if(wordFromChildren) {
+        return wordFromChildren
+      }
+    }
+  }
+}
+
+export const isRTLText = ({ languageId, bookId, searchString, pieces=[] }) => (
+  !languageId
+    ? isRTLStr(getFirstWordFromPieces(pieces))
+    : (
+      languageId === 'heb+grc'
+        ? (
+          bookId
+            ? bookId <= 39 ? true : false
+            : /^[\u0590-\u05FF ]*$/g.test(searchString)
+        )
+        : [
+          'heb',
+          'hbo',
+          'yid',
+          'per',
+          'fas',
+          'urd',
+          'pus',
+          'syc',
+          'syr',
+          'sam',
+          'snd',
+          'prs',
+          'prd',
+          'gbz',
+          'ckb',
+          'kmr',
+          'kur',
+          'sdh',
+    
+          // Arabic + its dialects follow
+          'ara',
+          'aao',
+          'abh',
+          'abv',
+          'acm',
+          'acq',
+          'acw',
+          'acx',
+          'acy',
+          'adf',
+          'aeb',
+          'aec',
+          'afb',
+          'ajp',
+          'aju',
+          'apc',
+          'apd',
+          'arb',
+          'arq',
+          'ars',
+          'ary',
+          'arz',
+          'auz',
+          'avl',
+          'ayh',
+          'ayl',
+          'ayn',
+          'ayp',
+          'jrb',
+          'jye',
+          'mxi',
+          'pga',
+          'shu',
+          'sqr',
+          'ssh',
+          'xaa',
+          'yhd',
+          'yud',
+        ].includes(languageId)
+    )
 )
 
 export const getCopyVerseText = ({ pieces, ref, versionAbbr }) => {

@@ -34,12 +34,13 @@ var _exportNames = {
   isValidEmail: true,
   isOriginalLanguageSearch: true,
   getTextLanguageId: true,
+  isRTLStr: true,
   isRTLText: true,
   getCopyVerseText: true,
   getMorphInfo: true,
   getColorWithOpacity: true
 };
-exports.toBase64 = exports.isValidEmail = exports.isRTLText = exports.isOriginalLanguageSearch = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getTextLanguageId = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMorphInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getCopyVerseText = exports.getColorWithOpacity = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
+exports.toBase64 = exports.isValidEmail = exports.isRTLText = exports.isRTLStr = exports.isOriginalLanguageSearch = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getTextLanguageId = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMorphInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getCopyVerseText = exports.getColorWithOpacity = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
 
 var _md = _interopRequireDefault(require("md5"));
 
@@ -192,6 +193,8 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
@@ -818,11 +821,47 @@ var getTextLanguageId = function getTextLanguageId(_ref13) {
 
 exports.getTextLanguageId = getTextLanguageId;
 
+var isRTLStr = function isRTLStr(str) {
+  var ltrChars = "A-Za-z\xC0-\xD6\xD8-\xF6\xF8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF";
+  var rtlChars = "\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC";
+  var rtlDirCheck = new RegExp("^[^".concat(ltrChars, "]*[").concat(rtlChars, "]"));
+  return rtlDirCheck.test(str);
+};
+
+exports.isRTLStr = isRTLStr;
+
+var getFirstWordFromPieces = function getFirstWordFromPieces(pieces) {
+  var _iterator = _createForOfIteratorHelper(pieces),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var piece = _step.value;
+
+      if (piece.type === "word") {
+        return piece.text;
+      } else if (piece.children instanceof Array) {
+        var wordFromChildren = getFirstWordFromPieces(piece.children);
+
+        if (wordFromChildren) {
+          return wordFromChildren;
+        }
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+};
+
 var isRTLText = function isRTLText(_ref14) {
   var languageId = _ref14.languageId,
       bookId = _ref14.bookId,
-      searchString = _ref14.searchString;
-  return languageId === 'heb+grc' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'hbo', 'yid', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd', 'prs', 'prd', 'gbz', 'ckb', 'kmr', 'kur', 'sdh', // Arabic + its dialects follow
+      searchString = _ref14.searchString,
+      _ref14$pieces = _ref14.pieces,
+      pieces = _ref14$pieces === void 0 ? [] : _ref14$pieces;
+  return !languageId ? isRTLStr(getFirstWordFromPieces(pieces)) : languageId === 'heb+grc' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'hbo', 'yid', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd', 'prs', 'prd', 'gbz', 'ckb', 'kmr', 'kur', 'sdh', // Arabic + its dialects follow
   'ara', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'aeb', 'aec', 'afb', 'ajp', 'aju', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'jrb', 'jye', 'mxi', 'pga', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud'].includes(languageId);
 };
 
