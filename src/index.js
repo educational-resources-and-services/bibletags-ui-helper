@@ -724,9 +724,9 @@ const getFirstWordFromPieces = pieces => {
   }
 }
 
-export const isRTLText = ({ languageId, bookId, searchString, pieces=[] }) => (
+export const isRTLText = ({ languageId, bookId, searchString, pieces }) => (
   !languageId
-    ? isRTLStr(getFirstWordFromPieces(pieces))
+    ? isRTLStr(getFirstWordFromPieces(pieces || []))
     : (
       languageId === 'heb+grc'
         ? (

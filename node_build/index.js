@@ -859,9 +859,8 @@ var isRTLText = function isRTLText(_ref14) {
   var languageId = _ref14.languageId,
       bookId = _ref14.bookId,
       searchString = _ref14.searchString,
-      _ref14$pieces = _ref14.pieces,
-      pieces = _ref14$pieces === void 0 ? [] : _ref14$pieces;
-  return !languageId ? isRTLStr(getFirstWordFromPieces(pieces)) : languageId === 'heb+grc' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'hbo', 'yid', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd', 'prs', 'prd', 'gbz', 'ckb', 'kmr', 'kur', 'sdh', // Arabic + its dialects follow
+      pieces = _ref14.pieces;
+  return !languageId ? isRTLStr(getFirstWordFromPieces(pieces || [])) : languageId === 'heb+grc' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'hbo', 'yid', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd', 'prs', 'prd', 'gbz', 'ckb', 'kmr', 'kur', 'sdh', // Arabic + its dialects follow
   'ara', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'aeb', 'aec', 'afb', 'ajp', 'aju', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'jrb', 'jye', 'mxi', 'pga', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud'].includes(languageId);
 };
 
