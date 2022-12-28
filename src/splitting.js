@@ -516,7 +516,7 @@ const getNewTagObjWithUnlistedChildrenFilterOut = ({ unitObj, list }) => ({
   )
 })
 
-const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
+const getGroupedVerseObjects = ({ verseObjects, regexes, hasWTags }) => {
 
   const includesEmptyWordDividers = regexes.wordDividerStartToEnd.test("")
   const splitWordFixesInfo = []
@@ -534,7 +534,9 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
 
       if(text || tag === "w") {
 
-        if(text) {
+        if(tag === "w") {
+          unitObj.wordNumberInVerse = wordNumberInVerse++
+        } else if(text && !hasWTags) {
           const textSplitOnWords = splitOnWords({ text, regexes, startingFromPotentialSplitWord: !!splitWordInfo })
 
           unitObj.children = textSplitOnWords.map((wordOrWordDivider, idx) => {
@@ -612,21 +614,23 @@ const getGroupedVerseObjects = ({ verseObjects, regexes }) => {
           splitWordInfo = null
         }
 
-        const lastChild = unitObj.children[unitObj.children.length - 1]
-        splitWordInfo = (
-          (
-            lastChild.type === "word"
-            && !includesEmptyWordDividers
-            && tagInList({ tag, list: inlineUsfmMarkers })
+        if(unitObj.children) {
+          const lastChild = unitObj.children[unitObj.children.length - 1]
+          splitWordInfo = (
+            (
+              lastChild.type === "word"
+              && !includesEmptyWordDividers
+              && tagInList({ tag, list: inlineUsfmMarkers })
+            )
+              ? {
+                arrayWhichEndsWithWord: unitObj.children,
+                ancestorLineWhichEndsWithWord: [ unitObj.children, lastChild ],
+                commonAncestorArray: unitObjs,
+                indexOfChildOfCommonAncestor: unitObjIndex,
+              }
+              : null
           )
-            ? {
-              arrayWhichEndsWithWord: unitObj.children,
-              ancestorLineWhichEndsWithWord: [ unitObj.children, lastChild ],
-              commonAncestorArray: unitObjs,
-              indexOfChildOfCommonAncestor: unitObjIndex,
-            }
-            : null
-        )
+        }
 
       } else if(children) {
         const childrenInfo = getGroupedVerseObjectsRecursive({
@@ -795,6 +799,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
   }
 
   const verseObjects = getFlattenedJsUsfm( usfmJS.toJSON(usfm) )
+  const hasWTags = verseObjects.some(({ tag }) => tag === "w")
 
   if(addedPseudoChapter && verseObjects[0].tag === 'c') {
     verseObjects.shift()
@@ -930,6 +935,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     modifiedVerseObjects = getGroupedVerseObjects({
       verseObjects: modifiedVerseObjects,
       regexes,
+      hasWTags,
     })
 
   }

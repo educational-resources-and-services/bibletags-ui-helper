@@ -429,7 +429,8 @@ var getNewTagObjWithUnlistedChildrenFilterOut = function getNewTagObjWithUnliste
 
 var getGroupedVerseObjects = function getGroupedVerseObjects(_ref5) {
   var verseObjects = _ref5.verseObjects,
-      regexes = _ref5.regexes;
+      regexes = _ref5.regexes,
+      hasWTags = _ref5.hasWTags;
   var includesEmptyWordDividers = regexes.wordDividerStartToEnd.test("");
   var splitWordFixesInfo = [];
   var wordNumberInVerse = 1;
@@ -449,7 +450,9 @@ var getGroupedVerseObjects = function getGroupedVerseObjects(_ref5) {
       }
 
       if (text || tag === "w") {
-        if (text) {
+        if (tag === "w") {
+          unitObj.wordNumberInVerse = wordNumberInVerse++;
+        } else if (text && !hasWTags) {
           var textSplitOnWords = splitOnWords({
             text: text,
             regexes: regexes,
@@ -520,16 +523,18 @@ var getGroupedVerseObjects = function getGroupedVerseObjects(_ref5) {
           splitWordInfo = null;
         }
 
-        var lastChild = unitObj.children[unitObj.children.length - 1];
-        splitWordInfo = lastChild.type === "word" && !includesEmptyWordDividers && tagInList({
-          tag: tag,
-          list: inlineUsfmMarkers
-        }) ? {
-          arrayWhichEndsWithWord: unitObj.children,
-          ancestorLineWhichEndsWithWord: [unitObj.children, lastChild],
-          commonAncestorArray: unitObjs,
-          indexOfChildOfCommonAncestor: unitObjIndex
-        } : null;
+        if (unitObj.children) {
+          var lastChild = unitObj.children[unitObj.children.length - 1];
+          splitWordInfo = lastChild.type === "word" && !includesEmptyWordDividers && tagInList({
+            tag: tag,
+            list: inlineUsfmMarkers
+          }) ? {
+            arrayWhichEndsWithWord: unitObj.children,
+            ancestorLineWhichEndsWithWord: [unitObj.children, lastChild],
+            commonAncestorArray: unitObjs,
+            indexOfChildOfCommonAncestor: unitObjIndex
+          } : null;
+        }
       } else if (children) {
         var childrenInfo = getGroupedVerseObjectsRecursive({
           unitObjs: children,
@@ -689,6 +694,10 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
   }
 
   var verseObjects = getFlattenedJsUsfm(_usfmJs["default"].toJSON(usfm));
+  var hasWTags = verseObjects.some(function (_ref10) {
+    var tag = _ref10.tag;
+    return tag === "w";
+  });
 
   if (addedPseudoChapter && verseObjects[0].tag === 'c') {
     verseObjects.shift();
@@ -834,7 +843,8 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
 
     modifiedVerseObjects = getGroupedVerseObjects({
       verseObjects: modifiedVerseObjects,
-      regexes: regexes
+      regexes: regexes,
+      hasWTags: hasWTags
     });
   }
 
@@ -872,10 +882,10 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
               return queryWord.slice(1).split('#').filter(function (rawDetails) {
                 return !/^not:/.test(rawDetails);
               }).every(function (rawDetails) {
-                var _ref10 = rawDetails.match(/^([^:]+):/) || [],
-                    _ref11 = _slicedToArray(_ref10, 2),
-                    x = _ref11[0],
-                    colonDetailType = _ref11[1];
+                var _ref11 = rawDetails.match(/^([^:]+):/) || [],
+                    _ref12 = _slicedToArray(_ref11, 2),
+                    x = _ref12[0],
+                    colonDetailType = _ref12[1];
 
                 return rawDetails.replace(/^[^:]+:/, '').split('/').some(function (rawDetail) {
                   if (colonDetailType === 'lemma') {
@@ -904,10 +914,10 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
                       })], [5, suffixDetails.filter(function (detail) {
                         return "spd".includes(detail);
                       })]];
-                      return indexAndDetailSets.every(function (_ref12) {
-                        var _ref13 = _slicedToArray(_ref12, 2),
-                            morphSuffixIdx = _ref13[0],
-                            details = _ref13[1];
+                      return indexAndDetailSets.every(function (_ref13) {
+                        var _ref14 = _slicedToArray(_ref13, 2),
+                            morphSuffixIdx = _ref14[0],
+                            details = _ref14[1];
 
                         return details.length === 0 || morphSuffixes.some(function (morphSuffix) {
                           return details.includes(morphSuffix[morphSuffixIdx]);
@@ -1001,10 +1011,10 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
 exports.getPiecesFromUSFM = getPiecesFromUSFM;
 
 var splitVerseIntoWords = function splitVerseIntoWords() {
-  var _ref14 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      pieces = _ref14.pieces,
-      isOriginal = _ref14.isOriginal,
-      otherParams = _objectWithoutProperties(_ref14, _excluded2);
+  var _ref15 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      pieces = _ref15.pieces,
+      isOriginal = _ref15.isOriginal,
+      otherParams = _objectWithoutProperties(_ref15, _excluded2);
 
   pieces = pieces || getPiecesFromUSFM(_objectSpread(_objectSpread({}, otherParams), {}, {
     inlineMarkersOnly: true,
@@ -1067,8 +1077,8 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
 
   var wordsWithNumber = getWordsWithNumber(pieces);
 
-  if (!isOriginal && wordsWithNumber.some(function (_ref15, idx) {
-    var wordNumberInVerse = _ref15.wordNumberInVerse;
+  if (!isOriginal && wordsWithNumber.some(function (_ref16, idx) {
+    var wordNumberInVerse = _ref16.wordNumberInVerse;
     return wordNumberInVerse !== idx + 1;
   })) {
     throw "error in splitVerseIntoWords: ".concat(JSON.stringify({
@@ -1082,10 +1092,10 @@ var splitVerseIntoWords = function splitVerseIntoWords() {
 
 exports.splitVerseIntoWords = splitVerseIntoWords;
 
-var adjustPiecesForSpecialHebrew = function adjustPiecesForSpecialHebrew(_ref16) {
-  var isOriginal = _ref16.isOriginal,
-      languageId = _ref16.languageId,
-      pieces = _ref16.pieces;
+var adjustPiecesForSpecialHebrew = function adjustPiecesForSpecialHebrew(_ref17) {
+  var isOriginal = _ref17.isOriginal,
+      languageId = _ref17.languageId,
+      pieces = _ref17.pieces;
 
   // For original Hebrew text, split off פ and ס chars that signal a break in flow.
   if (isOriginal && languageId.split('+').includes('heb')) {
@@ -1125,11 +1135,11 @@ var adjustPiecesForSpecialHebrew = function adjustPiecesForSpecialHebrew(_ref16)
 
 exports.adjustPiecesForSpecialHebrew = adjustPiecesForSpecialHebrew;
 
-var adjustTextForSups = function adjustTextForSups(_ref17) {
-  var tag = _ref17.tag,
-      text = _ref17.text,
-      pieces = _ref17.pieces,
-      idx = _ref17.idx;
+var adjustTextForSups = function adjustTextForSups(_ref18) {
+  var tag = _ref18.tag,
+      text = _ref18.text,
+      pieces = _ref18.pieces,
+      idx = _ref18.idx;
 
   if (["f", "fe", "x", "zApparatusJson"].includes(tag)) {
     // footnote or cross ref
