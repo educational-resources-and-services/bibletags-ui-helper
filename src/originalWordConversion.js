@@ -137,7 +137,7 @@ export const getPartialUGNTWordRowFromUsfmWord = ({ w, id, lemma, strong, morph 
   const definitionId = (strong.match(/G[0-9]{5}/) || [])[0]
   const form = normalizeSearchStr({ str: w })
 
-  if(!id || !lemma || !definitionId || !morph || !form) {
+  if(!lemma || !definitionId || !morph || !form) {
     console.log('word with missing info', wordUsfm)
     return {}
   }
@@ -183,7 +183,7 @@ export const getPartialUGNTWordRowFromUsfmWord = ({ w, id, lemma, strong, morph 
 }
 
 export const getPartialWordRowFromUsfmWord = usfmWord => (
-  (usfmWord.id && parseInt(usfmWord.id.slice(0,2), 10) <= 39)  // no usfmWord.id means it is the LXX and so should use getPartialUGNTWordRowFromUsfmWord since it is Greek
+  (usfmWord.id && parseInt(usfmWord.id.slice(0,2), 10) <= 39)  // no usfmWord.id means it is the LXX and so should be treated like the GNT
     ? getPartialUHBWordRowFromUsfmWord(usfmWord)
     : getPartialUGNTWordRowFromUsfmWord(usfmWord)
 )
@@ -237,7 +237,7 @@ export const getUGNTWordInfoFromWordRow = word => {
 }
 
 export const getWordInfoFromWordRow = word => (
-  parseInt(word.id.slice(0,2), 10) <= 39
+  (word.id && parseInt(word.id.slice(0,2), 10) <= 39)  // no word.id means it is the LXX and so should be treated like the GNT
     ? getUHBWordInfoFromWordRow(word)
     : getUGNTWordInfoFromWordRow(word)
 )

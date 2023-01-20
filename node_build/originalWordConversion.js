@@ -183,7 +183,7 @@ var getPartialUGNTWordRowFromUsfmWord = function getPartialUGNTWordRowFromUsfmWo
     str: w
   });
 
-  if (!id || !lemma || !definitionId || !morph || !form) {
+  if (!lemma || !definitionId || !morph || !form) {
     console.log('word with missing info', wordUsfm);
     return {};
   }
@@ -222,7 +222,7 @@ var getPartialUGNTWordRowFromUsfmWord = function getPartialUGNTWordRowFromUsfmWo
 exports.getPartialUGNTWordRowFromUsfmWord = getPartialUGNTWordRowFromUsfmWord;
 
 var getPartialWordRowFromUsfmWord = function getPartialWordRowFromUsfmWord(usfmWord) {
-  return usfmWord.id && parseInt(usfmWord.id.slice(0, 2), 10) <= 39 // no usfmWord.id means it is the LXX and so should use getPartialUGNTWordRowFromUsfmWord since it is Greek
+  return usfmWord.id && parseInt(usfmWord.id.slice(0, 2), 10) <= 39 // no usfmWord.id means it is the LXX and so should be treated like the GNT
   ? getPartialUHBWordRowFromUsfmWord(usfmWord) : getPartialUGNTWordRowFromUsfmWord(usfmWord);
 };
 
@@ -257,7 +257,8 @@ var getUGNTWordInfoFromWordRow = function getUGNTWordInfoFromWordRow(word) {
 exports.getUGNTWordInfoFromWordRow = getUGNTWordInfoFromWordRow;
 
 var getWordInfoFromWordRow = function getWordInfoFromWordRow(word) {
-  return parseInt(word.id.slice(0, 2), 10) <= 39 ? getUHBWordInfoFromWordRow(word) : getUGNTWordInfoFromWordRow(word);
+  return word.id && parseInt(word.id.slice(0, 2), 10) <= 39 // no word.id means it is the LXX and so should be treated like the GNT
+  ? getUHBWordInfoFromWordRow(word) : getUGNTWordInfoFromWordRow(word);
 };
 
 exports.getWordInfoFromWordRow = getWordInfoFromWordRow;
