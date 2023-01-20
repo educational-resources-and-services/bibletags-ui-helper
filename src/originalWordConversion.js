@@ -183,7 +183,7 @@ export const getPartialUGNTWordRowFromUsfmWord = ({ w, id, lemma, strong, morph 
 }
 
 export const getPartialWordRowFromUsfmWord = usfmWord => (
-  parseInt(usfmWord.id.slice(0,2), 10) <= 39
+  (usfmWord.id && parseInt(usfmWord.id.slice(0,2), 10) <= 39)  // no usfmWord.id means it is the LXX and so should use getPartialUGNTWordRowFromUsfmWord since it is Greek
     ? getPartialUHBWordRowFromUsfmWord(usfmWord)
     : getPartialUGNTWordRowFromUsfmWord(usfmWord)
 )

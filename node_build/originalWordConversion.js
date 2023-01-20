@@ -222,7 +222,8 @@ var getPartialUGNTWordRowFromUsfmWord = function getPartialUGNTWordRowFromUsfmWo
 exports.getPartialUGNTWordRowFromUsfmWord = getPartialUGNTWordRowFromUsfmWord;
 
 var getPartialWordRowFromUsfmWord = function getPartialWordRowFromUsfmWord(usfmWord) {
-  return parseInt(usfmWord.id.slice(0, 2), 10) <= 39 ? getPartialUHBWordRowFromUsfmWord(usfmWord) : getPartialUGNTWordRowFromUsfmWord(usfmWord);
+  return usfmWord.id && parseInt(usfmWord.id.slice(0, 2), 10) <= 39 // no usfmWord.id means it is the LXX and so should use getPartialUGNTWordRowFromUsfmWord since it is Greek
+  ? getPartialUHBWordRowFromUsfmWord(usfmWord) : getPartialUGNTWordRowFromUsfmWord(usfmWord);
 };
 
 exports.getPartialWordRowFromUsfmWord = getPartialWordRowFromUsfmWord;
