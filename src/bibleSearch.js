@@ -52,7 +52,10 @@ export const bibleSearch = async ({
 
   const versions = await getVersions(versionIds)
 
-  if(versionIds.length !== versions.length) throw `one or more invalid versions`
+  // ignore versions that are invalid
+  const initialNumVersionIds = versionIds.length
+  versionIds = versionIds.filter(versionId => versions.some(({ id }) => id === versionId))
+  if(initialNumVersionIds > 0 && versionIds.length === 0) throw `all versions are invalid`
 
   let { same="verse" } = flags
   if(isOriginalLanguageSearch && same === "verse") {
