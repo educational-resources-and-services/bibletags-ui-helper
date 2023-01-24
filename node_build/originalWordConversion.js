@@ -222,7 +222,7 @@ var getPartialUGNTWordRowFromUsfmWord = function getPartialUGNTWordRowFromUsfmWo
 exports.getPartialUGNTWordRowFromUsfmWord = getPartialUGNTWordRowFromUsfmWord;
 
 var getPartialWordRowFromUsfmWord = function getPartialWordRowFromUsfmWord(usfmWord) {
-  return usfmWord.id && parseInt(usfmWord.id.slice(0, 2), 10) <= 39 // no usfmWord.id means it is the LXX and so should be treated like the GNT
+  return typeof usfmWord.id === "string" && parseInt(usfmWord.id.slice(0, 2), 10) <= 39 // no usfmWord.id means it is the LXX and so should be treated like the GNT
   ? getPartialUHBWordRowFromUsfmWord(usfmWord) : getPartialUGNTWordRowFromUsfmWord(usfmWord);
 };
 
@@ -257,7 +257,7 @@ var getUGNTWordInfoFromWordRow = function getUGNTWordInfoFromWordRow(word) {
 exports.getUGNTWordInfoFromWordRow = getUGNTWordInfoFromWordRow;
 
 var getWordInfoFromWordRow = function getWordInfoFromWordRow(word) {
-  return word.id && parseInt(word.id.slice(0, 2), 10) <= 39 // no word.id means it is the LXX and so should be treated like the GNT
+  return typeof word.id === "string" && parseInt(word.id.slice(0, 2), 10) <= 39 // no word.id means it is the LXX and so should be treated like the GNT
   ? getUHBWordInfoFromWordRow(word) : getUGNTWordInfoFromWordRow(word);
 };
 

@@ -183,7 +183,7 @@ export const getPartialUGNTWordRowFromUsfmWord = ({ w, id, lemma, strong, morph 
 }
 
 export const getPartialWordRowFromUsfmWord = usfmWord => (
-  (usfmWord.id && parseInt(usfmWord.id.slice(0,2), 10) <= 39)  // no usfmWord.id means it is the LXX and so should be treated like the GNT
+  (typeof usfmWord.id === `string` && parseInt(usfmWord.id.slice(0,2), 10) <= 39)  // no usfmWord.id means it is the LXX and so should be treated like the GNT
     ? getPartialUHBWordRowFromUsfmWord(usfmWord)
     : getPartialUGNTWordRowFromUsfmWord(usfmWord)
 )
@@ -237,7 +237,7 @@ export const getUGNTWordInfoFromWordRow = word => {
 }
 
 export const getWordInfoFromWordRow = word => (
-  (word.id && parseInt(word.id.slice(0,2), 10) <= 39)  // no word.id means it is the LXX and so should be treated like the GNT
+  (typeof word.id === `string` && parseInt(word.id.slice(0,2), 10) <= 39)  // no word.id means it is the LXX and so should be treated like the GNT
     ? getUHBWordInfoFromWordRow(word)
     : getUGNTWordInfoFromWordRow(word)
 )
