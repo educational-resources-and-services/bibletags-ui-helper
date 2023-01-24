@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.removeCantillation = exports.normalizeSearchStr = exports.isValidBibleSearch = exports.getSuggestedInflectedSearch = exports.getQueryAndFlagInfo = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.getConcentricCircleScopes = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
+exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.removeCantillation = exports.normalizeSearchStr = exports.isValidBibleSearch = exports.getSuggestedInflectedSearches = exports.getQueryAndFlagInfo = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.getConcentricCircleScopes = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
 
 require("regenerator-runtime/runtime.js");
 
@@ -634,71 +634,102 @@ var getConcentricCircleScopes = function getConcentricCircleScopes(bookId) {
 
 exports.getConcentricCircleScopes = getConcentricCircleScopes;
 
-var getSuggestedInflectedSearch = function getSuggestedInflectedSearch(_ref9) {
+var getSuggestedInflectedSearches = function getSuggestedInflectedSearches(_ref9) {
   var morph = _ref9.morph,
       form = _ref9.form,
       lex = _ref9.lex,
-      nakedStrongs = _ref9.nakedStrongs;
-  if (!morph) return null;
-  var grammaticalDetailKeyByMorphCode = {};
+      nakedStrongs = _ref9.nakedStrongs,
+      lemmas = _ref9.lemmas,
+      lemma = _ref9.lemma;
+  var suggestedSearches = [];
 
-  var _loop3 = function _loop3(key) {
-    ;
-    (_constants.grammaticalDetailMap[key].detail || []).forEach(function (morphCode) {
-      grammaticalDetailKeyByMorphCode[morphCode] = key;
-    });
-  };
+  if (morph) {
+    (function () {
+      var grammaticalDetailKeyByMorphCode = {};
 
-  for (var key in _constants.grammaticalDetailMap) {
-    _loop3(key);
+      var _loop3 = function _loop3(key) {
+        ;
+        (_constants.grammaticalDetailMap[key].detail || []).forEach(function (morphCode) {
+          grammaticalDetailKeyByMorphCode[morphCode] = key;
+        });
+      };
+
+      for (var key in _constants.grammaticalDetailMap) {
+        _loop3(key);
+      }
+
+      var grammarDetailKeys = [];
+      var label;
+      morph.slice(3).split(':').some(function (partOfMorph, wordPartIdx) {
+        if (/^(?:He|Ar)/.test(morph)) {
+          if (/^(?:N[cg]|A[aco])[^:]{2}/.test(partOfMorph)) {
+            if (/^A/.test(partOfMorph)) {
+              grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["gender:".concat(partOfMorph[2])]);
+            }
+
+            grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["number:".concat(partOfMorph[3])]);
+            return true;
+          } else if (["H19310", "H08593"].includes(nakedStrongs)) {
+            grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["gender:".concat(partOfMorph[3])]);
+            return true;
+          } else if (/^V[^:]{2}/.test(partOfMorph)) {
+            grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["stem:".concat(morph[0]).concat(partOfMorph[1])]);
+            return true;
+          }
+        } else {
+          // Greek
+          if (/^[NAPR].{5}[^,]/.test(partOfMorph)) {
+            grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["person:".concat(partOfMorph[5])]);
+            grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["case:".concat(partOfMorph[6])]);
+            grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["gender:".concat(partOfMorph[7])]);
+            grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["number:".concat(partOfMorph[8])]);
+            label = /^P/.test(partOfMorph) ? (0, _i18n["default"])("Search {{word}} with the {{case}}", {
+              word: lex,
+              "case": grammarDetailKeys[1]
+            }) : (0, _i18n["default"])("Search inflected: {{form}}", {
+              form: form
+            });
+            return true;
+          }
+        }
+      });
+      var searchAddOn = grammarDetailKeys.filter(Boolean).map(function (key) {
+        return "#".concat(key);
+      }).join('');
+
+      if (searchAddOn) {
+        suggestedSearches.push({
+          searchText: "#".concat(nakedStrongs).concat(searchAddOn),
+          label: label || (0, _i18n["default"])("Search {{grammatical_details}} of {{word}}", {
+            grammatical_details: _utils.combineItems.apply(void 0, _toConsumableArray(searchAddOn.slice(1).split('#'))),
+            word: lex
+          })
+        });
+      }
+    })();
   }
 
-  var grammarDetailKeys = [];
-  var label;
-  morph.slice(3).split(':').some(function (partOfMorph, wordPartIdx) {
-    if (/^(?:He|Ar)/.test(morph)) {
-      if (/^(?:N[cg]|A[aco])[^:]{2}/.test(partOfMorph)) {
-        if (/^A/.test(partOfMorph)) {
-          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["gender:".concat(partOfMorph[2])]);
-        }
-
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["number:".concat(partOfMorph[3])]);
-        return true;
-      } else if (["H19310", "H08593"].includes(nakedStrongs)) {
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["gender:".concat(partOfMorph[3])]);
-        return true;
-      } else if (/^V[^:]{2}/.test(partOfMorph)) {
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["stem:".concat(morph[0]).concat(partOfMorph[1])]);
-        return true;
-      }
+  if ((lemmas || []).length >= 2) {
+    if (lemma) {
+      suggestedSearches.push({
+        searchText: "#".concat(nakedStrongs, "#lemma:").concat(lemma),
+        label: (0, _i18n["default"])("Search only with lemma {{lemma}}", {
+          lemma: lemma
+        })
+      });
     } else {
-      // Greek
-      if (/^[NAPR].{5}[^,]/.test(partOfMorph)) {
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["person:".concat(partOfMorph[5])]);
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["case:".concat(partOfMorph[6])]);
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["gender:".concat(partOfMorph[7])]);
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["number:".concat(partOfMorph[8])]);
-        label = /^P/.test(partOfMorph) ? (0, _i18n["default"])("Search {{word}} with the {{case}}", {
-          word: lex,
-          "case": grammarDetailKeys[1]
-        }) : (0, _i18n["default"])("Search inflected: {{form}}", {
-          form: form
+      lemmas.forEach(function (lemma) {
+        suggestedSearches.push({
+          searchText: "#".concat(nakedStrongs, "#lemma:").concat(lemma),
+          label: (0, _i18n["default"])("Search only with lemma {{lemma}}", {
+            lemma: lemma
+          })
         });
-        return true;
-      }
+      });
     }
-  });
-  var searchAddOn = grammarDetailKeys.filter(Boolean).map(function (key) {
-    return "#".concat(key);
-  }).join('');
-  if (!searchAddOn) return null;
-  return {
-    searchText: "#".concat(nakedStrongs).concat(searchAddOn),
-    label: label || (0, _i18n["default"])("Search {{grammatical_details}} of {{word}}", {
-      grammatical_details: _utils.combineItems.apply(void 0, _toConsumableArray(searchAddOn.slice(1).split('#'))),
-      word: lex
-    })
-  };
+  }
+
+  return suggestedSearches;
 };
 
-exports.getSuggestedInflectedSearch = getSuggestedInflectedSearch;
+exports.getSuggestedInflectedSearches = getSuggestedInflectedSearches;

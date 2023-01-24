@@ -494,72 +494,95 @@ export const getConcentricCircleScopes = bookId => {
 
 }
 
-export const getSuggestedInflectedSearch = ({ morph, form, lex, nakedStrongs }) => {
+export const getSuggestedInflectedSearches = ({ morph, form, lex, nakedStrongs, lemmas, lemma }) => {
 
-  if(!morph) return null
+  const suggestedSearches = []
 
-  const grammaticalDetailKeyByMorphCode = {}
-  for(let key in grammaticalDetailMap) {
-    ;(grammaticalDetailMap[key].detail || []).forEach(morphCode => {
-      grammaticalDetailKeyByMorphCode[morphCode] = key
-    })
-  }
-  const grammarDetailKeys = []
-  
-  let label
-  morph.slice(3).split(':').some((partOfMorph, wordPartIdx) => {
-    if(/^(?:He|Ar)/.test(morph)) {
-      if(/^(?:N[cg]|A[aco])[^:]{2}/.test(partOfMorph)) {
-        if(/^A/.test(partOfMorph)) {
-          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`gender:${partOfMorph[2]}`])
-        }
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`number:${partOfMorph[3]}`])
-        return true
-      } else if([ `H19310`, `H08593` ].includes(nakedStrongs)) {
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`gender:${partOfMorph[3]}`])
-        return true
-      } else if(/^V[^:]{2}/.test(partOfMorph)) {
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`stem:${morph[0]}${partOfMorph[1]}`])
-        return true
-      }
-    } else {  // Greek
-      if(/^[NAPR].{5}[^,]/.test(partOfMorph)) {
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`person:${partOfMorph[5]}`])
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`case:${partOfMorph[6]}`])
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`gender:${partOfMorph[7]}`])
-        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`number:${partOfMorph[8]}`])
-        label = (
-          /^P/.test(partOfMorph)
-            ? (
-              i18n("Search {{word}} with the {{case}}", {
-                word: lex,
-                case: grammarDetailKeys[1],
-              })
-            )
-            : i18n("Search inflected: {{form}}", { form })
-        )
-        return true
-      }
-    }
-  })
+  if(morph) {
 
-  const searchAddOn = (
-    grammarDetailKeys
-      .filter(Boolean)
-      .map(key => `#${key}`)
-      .join('')
-  )
-
-  if(!searchAddOn) return null
-
-  return {
-    searchText: `#${nakedStrongs}${searchAddOn}`,
-    label: label || (
-      i18n("Search {{grammatical_details}} of {{word}}", {
-        grammatical_details: combineItems(...searchAddOn.slice(1).split('#')),
-        word: lex,
+    const grammaticalDetailKeyByMorphCode = {}
+    for(let key in grammaticalDetailMap) {
+      ;(grammaticalDetailMap[key].detail || []).forEach(morphCode => {
+        grammaticalDetailKeyByMorphCode[morphCode] = key
       })
-    ),
+    }
+    const grammarDetailKeys = []
+
+    let label
+    morph.slice(3).split(':').some((partOfMorph, wordPartIdx) => {
+      if(/^(?:He|Ar)/.test(morph)) {
+        if(/^(?:N[cg]|A[aco])[^:]{2}/.test(partOfMorph)) {
+          if(/^A/.test(partOfMorph)) {
+            grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`gender:${partOfMorph[2]}`])
+          }
+          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`number:${partOfMorph[3]}`])
+          return true
+        } else if([ `H19310`, `H08593` ].includes(nakedStrongs)) {
+          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`gender:${partOfMorph[3]}`])
+          return true
+        } else if(/^V[^:]{2}/.test(partOfMorph)) {
+          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`stem:${morph[0]}${partOfMorph[1]}`])
+          return true
+        }
+      } else {  // Greek
+        if(/^[NAPR].{5}[^,]/.test(partOfMorph)) {
+          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`person:${partOfMorph[5]}`])
+          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`case:${partOfMorph[6]}`])
+          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`gender:${partOfMorph[7]}`])
+          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`number:${partOfMorph[8]}`])
+          label = (
+            /^P/.test(partOfMorph)
+              ? (
+                i18n("Search {{word}} with the {{case}}", {
+                  word: lex,
+                  case: grammarDetailKeys[1],
+                })
+              )
+              : i18n("Search inflected: {{form}}", { form })
+          )
+          return true
+        }
+      }
+    })
+
+    const searchAddOn = (
+      grammarDetailKeys
+        .filter(Boolean)
+        .map(key => `#${key}`)
+        .join('')
+    )
+
+    if(searchAddOn) {
+      suggestedSearches.push({
+        searchText: `#${nakedStrongs}${searchAddOn}`,
+        label: label || (
+          i18n("Search {{grammatical_details}} of {{word}}", {
+            grammatical_details: combineItems(...searchAddOn.slice(1).split('#')),
+            word: lex,
+          })
+        ),
+      })
+    }
+
   }
+
+
+  if((lemmas || []).length >= 2) {
+    if(lemma) {
+      suggestedSearches.push({
+        searchText: `#${nakedStrongs}#lemma:${lemma}`,
+        label: i18n("Search only with lemma {{lemma}}", { lemma }),
+      })
+    } else {
+      lemmas.forEach(lemma => {
+        suggestedSearches.push({
+          searchText: `#${nakedStrongs}#lemma:${lemma}`,
+          label: i18n("Search only with lemma {{lemma}}", { lemma }),
+        })
+      })
+    }
+  }
+
+  return suggestedSearches
 
 }
