@@ -1,4 +1,5 @@
 import { hebrewPrefixSuffixMap, grammaticalDetailMap } from "./constants"
+import i18n from "./i18n"
 
 export const mergeAndUniquifyArraysOfScopeKeys = (...arrays) => {
   // NOTE: Built to be as fast as possible on large arrays
@@ -436,3 +437,16 @@ export const getLengthOfAllScopeMaps = (wordAlts, lookForIsNot) => (
         : wordAlts.reduce((total, { scopeMap }) => total + Object.values(scopeMap).length, 0)
     )
 )
+
+export const combineItems = (...labels) => {
+  const nonEmptyLabels = labels.filter(Boolean)
+
+  if(nonEmptyLabels.length === 0) return ""
+
+  return nonEmptyLabels.reduce((item1, item2) => (
+    i18n("{{item1}}, {{item2}}", {
+      item1,
+      item2,
+    })
+  ))
+}

@@ -1,9 +1,10 @@
 import "regenerator-runtime/runtime.js"  // needed to build-for-node given async functions
 import { getOriginalLocsFromRange, getCorrespondingRefs, getRefFromLoc, getLocFromRef } from '@bibletags/bibletags-versification'
+import i18n from "./i18n"
 
 import { bibleSearchScopeKeysByTestament } from './index'
 import { grammaticalDetailMap, bibleSearchFlagMap } from './constants'
-import { getQueryArrayAndWords } from './utils'
+import { getQueryArrayAndWords, combineItems } from './utils'
 
 export const containsHebrewChars = text => /[\u0590-\u05FF]/.test(text)
 export const containsGreekChars = text => /[\u0370-\u03FF\u1F00-\u1FFF]/.test(text)
@@ -389,3 +390,176 @@ export const getGrammarDetailsForAutoCompletionSuggestions = ({ currentWord, nor
 }
 
 export const escapeRegex = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+export const getConcentricCircleScopes = bookId => {
+
+  const scopeLabels = {
+    ot: i18n("Old Testament"),
+    "ot-narrative": i18n("OT Narrative Books"),
+    "ot-poetic": i18n("OT Poetic Books"),
+    "ot-prophetic": i18n("OT Prophetic Books"),
+    law: i18n("Pentateuch"),
+    history: i18n("Joshua–Esther"),
+    nt: i18n("New Testament"),
+    "nt-narrative": i18n("NT Narrative Books"),
+    "lukes-writings": i18n("Luke’s Writings"),
+    "johns-writings": i18n("John’s Writings"),
+    "pauls-writings": i18n("Paul’s Writings"),
+    gospels: i18n("Gospels"),
+    epistles: i18n("Epistles"),
+  }
+
+  const scopeSets = [
+    {
+      bookIds: [ `1-5` ],
+      scopes: [ `law`, `ot-narrative`, `ot` ],
+    },
+    {
+      bookIds: [ `6-17` ],
+      scopes: [ `history`, `ot-narrative`, `ot` ],
+    },
+    {
+      bookIds: [ `18-22`, 25 ],
+      scopes: [ `ot-poetic`, `ot` ],
+    },
+    {
+      bookIds: [ 23, 24 ],
+      scopes: [ `ot-prophetic`, `ot` ],
+    },
+    {
+      bookIds: [ `26-39` ],
+      scopes: [ `ot-prophetic`, `ot` ],
+    },
+    {
+      bookIds: [ 40, 41 ],
+      scopes: [ `gospels`, `nt-narrative`, `nt` ],
+    },
+    {
+      bookIds: [ 42 ],
+      scopes: [ `lukes-writings`, `gospels`, `nt-narrative`, `nt` ],
+    },
+    {
+      bookIds: [ 43 ],
+      scopes: [ `johns-writings`, `gospels`, `nt-narrative`, `nt` ],
+    },
+    {
+      bookIds: [ 44 ],
+      scopes: [ `lukes-writings`, `nt-narrative`, `nt` ],
+    },
+    {
+      bookIds: [ `45-58` ],
+      scopes: [ `pauls-writings`, `epistles`, `nt` ],
+    },
+    {
+      bookIds: [ 59 ],
+      scopes: [ `epistles`, `nt` ],
+    },
+    {
+      bookIds: [ 60, 61 ],
+      scopes: [ `peters-writings`, `epistles`, `nt` ],
+    },
+    {
+      bookIds: [ `62-65` ],
+      scopes: [ `johns-writings`, `epistles`, `nt` ],
+    },
+    {
+      bookIds: [ 66 ],
+      scopes: [ `johns-writings`, `nt` ],
+    },
+  ]
+
+  let scopesWithLabels = []
+  scopeSets.some(({ bookIds, scopes }) => {
+    bookIds = (
+      bookIds
+        .map(strOrInt => {
+          if(typeof strOrInt === `string`) {
+            let [ from, to ] = strOrInt.split('-').map(num => parseInt(num, 10))
+            return Array(to - from + 1).fill().map(() => from++)
+          }
+          return strOrInt
+        })
+        .flat()
+    )
+    if(bookIds.includes(bookId)) {
+      scopesWithLabels = scopes.map(scope => ({
+        label: scopeLabels[scope],
+        scope,
+      }))
+      return true
+    }
+  })
+
+  return scopesWithLabels
+
+}
+
+export const getSuggestedInflectedSearch = ({ morph, form, lex, nakedStrongs }) => {
+
+  if(!morph) return null
+
+  const grammaticalDetailKeyByMorphCode = {}
+  for(let key in grammaticalDetailMap) {
+    ;(grammaticalDetailMap[key].detail || []).forEach(morphCode => {
+      grammaticalDetailKeyByMorphCode[morphCode] = key
+    })
+  }
+  const grammarDetailKeys = []
+  
+  let label
+  morph.slice(3).split(':').some((partOfMorph, wordPartIdx) => {
+    if(/^(?:He|Ar)/.test(morph)) {
+      if(/^(?:N[cg]|A[aco])[^:]{2}/.test(partOfMorph)) {
+        if(/^A/.test(partOfMorph)) {
+          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`gender:${partOfMorph[2]}`])
+        }
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`number:${partOfMorph[3]}`])
+        return true
+      } else if([ `H19310`, `H08593` ].includes(nakedStrongs)) {
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`gender:${partOfMorph[3]}`])
+        return true
+      } else if(/^V[^:]{2}/.test(partOfMorph)) {
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`stem:${morph[0]}${partOfMorph[1]}`])
+        return true
+      }
+    } else {  // Greek
+      if(/^[NAPR].{5}[^,]/.test(partOfMorph)) {
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`person:${partOfMorph[5]}`])
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`case:${partOfMorph[6]}`])
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`gender:${partOfMorph[7]}`])
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode[`number:${partOfMorph[8]}`])
+        label = (
+          /^P/.test(partOfMorph)
+            ? (
+              i18n("Search {{word}} with the {{case}}", {
+                word: lex,
+                case: grammarDetailKeys[1],
+              })
+            )
+            : i18n("Search inflected: {{form}}", { form })
+        )
+        return true
+      }
+    }
+  })
+
+  const searchAddOn = (
+    grammarDetailKeys
+      .filter(Boolean)
+      .map(key => `#${key}`)
+      .join('')
+  )
+
+  if(!searchAddOn) return null
+
+  return {
+    searchText: `#${nakedStrongs}${searchAddOn}`,
+    label: label || (
+      i18n("Search {{grammatical_details}} of {{word}}", {
+        grammatical_details: combineItems(...searchAddOn.slice(1).split('#')),
+        word: lex,
+      })
+    ),
+  }
+
+}

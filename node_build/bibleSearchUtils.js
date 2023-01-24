@@ -3,17 +3,21 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.removeCantillation = exports.normalizeSearchStr = exports.isValidBibleSearch = exports.getQueryAndFlagInfo = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
+exports.stripVocalOfAccents = exports.stripHebrewVowelsEtc = exports.removeCantillation = exports.normalizeSearchStr = exports.isValidBibleSearch = exports.getSuggestedInflectedSearch = exports.getQueryAndFlagInfo = exports.getInfoOnResultLocs = exports.getGrammarDetailsForAutoCompletionSuggestions = exports.getFlagSuggestions = exports.getConcentricCircleScopes = exports.findAutoCompleteSuggestions = exports.escapeRegex = exports.containsHebrewChars = exports.containsGreekChars = exports.completeQueryGroupings = void 0;
 
 require("regenerator-runtime/runtime.js");
 
 var _bibletagsVersification = require("@bibletags/bibletags-versification");
+
+var _i18n = _interopRequireDefault(require("./i18n"));
 
 var _index = require("./index");
 
 var _constants = require("./constants");
 
 var _utils = require("./utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
@@ -534,3 +538,167 @@ var escapeRegex = function escapeRegex(str) {
 };
 
 exports.escapeRegex = escapeRegex;
+
+var getConcentricCircleScopes = function getConcentricCircleScopes(bookId) {
+  var scopeLabels = {
+    ot: (0, _i18n["default"])("Old Testament"),
+    "ot-narrative": (0, _i18n["default"])("OT Narrative Books"),
+    "ot-poetic": (0, _i18n["default"])("OT Poetic Books"),
+    "ot-prophetic": (0, _i18n["default"])("OT Prophetic Books"),
+    law: (0, _i18n["default"])("Pentateuch"),
+    history: (0, _i18n["default"])("Joshua–Esther"),
+    nt: (0, _i18n["default"])("New Testament"),
+    "nt-narrative": (0, _i18n["default"])("NT Narrative Books"),
+    "lukes-writings": (0, _i18n["default"])("Luke’s Writings"),
+    "johns-writings": (0, _i18n["default"])("John’s Writings"),
+    "pauls-writings": (0, _i18n["default"])("Paul’s Writings"),
+    gospels: (0, _i18n["default"])("Gospels"),
+    epistles: (0, _i18n["default"])("Epistles")
+  };
+  var scopeSets = [{
+    bookIds: ["1-5"],
+    scopes: ["law", "ot-narrative", "ot"]
+  }, {
+    bookIds: ["6-17"],
+    scopes: ["history", "ot-narrative", "ot"]
+  }, {
+    bookIds: ["18-22", 25],
+    scopes: ["ot-poetic", "ot"]
+  }, {
+    bookIds: [23, 24],
+    scopes: ["ot-prophetic", "ot"]
+  }, {
+    bookIds: ["26-39"],
+    scopes: ["ot-prophetic", "ot"]
+  }, {
+    bookIds: [40, 41],
+    scopes: ["gospels", "nt-narrative", "nt"]
+  }, {
+    bookIds: [42],
+    scopes: ["lukes-writings", "gospels", "nt-narrative", "nt"]
+  }, {
+    bookIds: [43],
+    scopes: ["johns-writings", "gospels", "nt-narrative", "nt"]
+  }, {
+    bookIds: [44],
+    scopes: ["lukes-writings", "nt-narrative", "nt"]
+  }, {
+    bookIds: ["45-58"],
+    scopes: ["pauls-writings", "epistles", "nt"]
+  }, {
+    bookIds: [59],
+    scopes: ["epistles", "nt"]
+  }, {
+    bookIds: [60, 61],
+    scopes: ["peters-writings", "epistles", "nt"]
+  }, {
+    bookIds: ["62-65"],
+    scopes: ["johns-writings", "epistles", "nt"]
+  }, {
+    bookIds: [66],
+    scopes: ["johns-writings", "nt"]
+  }];
+  var scopesWithLabels = [];
+  scopeSets.some(function (_ref8) {
+    var bookIds = _ref8.bookIds,
+        scopes = _ref8.scopes;
+    bookIds = bookIds.map(function (strOrInt) {
+      if (typeof strOrInt === "string") {
+        var _strOrInt$split$map = strOrInt.split('-').map(function (num) {
+          return parseInt(num, 10);
+        }),
+            _strOrInt$split$map2 = _slicedToArray(_strOrInt$split$map, 2),
+            from = _strOrInt$split$map2[0],
+            to = _strOrInt$split$map2[1];
+
+        return Array(to - from + 1).fill().map(function () {
+          return from++;
+        });
+      }
+
+      return strOrInt;
+    }).flat();
+
+    if (bookIds.includes(bookId)) {
+      scopesWithLabels = scopes.map(function (scope) {
+        return {
+          label: scopeLabels[scope],
+          scope: scope
+        };
+      });
+      return true;
+    }
+  });
+  return scopesWithLabels;
+};
+
+exports.getConcentricCircleScopes = getConcentricCircleScopes;
+
+var getSuggestedInflectedSearch = function getSuggestedInflectedSearch(_ref9) {
+  var morph = _ref9.morph,
+      form = _ref9.form,
+      lex = _ref9.lex,
+      nakedStrongs = _ref9.nakedStrongs;
+  if (!morph) return null;
+  var grammaticalDetailKeyByMorphCode = {};
+
+  var _loop3 = function _loop3(key) {
+    ;
+    (_constants.grammaticalDetailMap[key].detail || []).forEach(function (morphCode) {
+      grammaticalDetailKeyByMorphCode[morphCode] = key;
+    });
+  };
+
+  for (var key in _constants.grammaticalDetailMap) {
+    _loop3(key);
+  }
+
+  var grammarDetailKeys = [];
+  var label;
+  morph.slice(3).split(':').some(function (partOfMorph, wordPartIdx) {
+    if (/^(?:He|Ar)/.test(morph)) {
+      if (/^(?:N[cg]|A[aco])[^:]{2}/.test(partOfMorph)) {
+        if (/^A/.test(partOfMorph)) {
+          grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["gender:".concat(partOfMorph[2])]);
+        }
+
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["number:".concat(partOfMorph[3])]);
+        return true;
+      } else if (["H19310", "H08593"].includes(nakedStrongs)) {
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["gender:".concat(partOfMorph[3])]);
+        return true;
+      } else if (/^V[^:]{2}/.test(partOfMorph)) {
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["stem:".concat(morph[0]).concat(partOfMorph[1])]);
+        return true;
+      }
+    } else {
+      // Greek
+      if (/^[NAPR].{5}[^,]/.test(partOfMorph)) {
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["person:".concat(partOfMorph[5])]);
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["case:".concat(partOfMorph[6])]);
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["gender:".concat(partOfMorph[7])]);
+        grammarDetailKeys.push(grammaticalDetailKeyByMorphCode["number:".concat(partOfMorph[8])]);
+        label = /^P/.test(partOfMorph) ? (0, _i18n["default"])("Search {{word}} with the {{case}}", {
+          word: lex,
+          "case": grammarDetailKeys[1]
+        }) : (0, _i18n["default"])("Search inflected: {{form}}", {
+          form: form
+        });
+        return true;
+      }
+    }
+  });
+  var searchAddOn = grammarDetailKeys.filter(Boolean).map(function (key) {
+    return "#".concat(key);
+  }).join('');
+  if (!searchAddOn) return null;
+  return {
+    searchText: "#".concat(nakedStrongs).concat(searchAddOn),
+    label: label || (0, _i18n["default"])("Search {{grammatical_details}} of {{word}}", {
+      grammatical_details: _utils.combineItems.apply(void 0, _toConsumableArray(searchAddOn.slice(1).split('#'))),
+      word: lex
+    })
+  };
+};
+
+exports.getSuggestedInflectedSearch = getSuggestedInflectedSearch;

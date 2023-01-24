@@ -119,7 +119,7 @@ var getPartialUHBWordRowFromUsfmWord = function getPartialUHBWordRowFromUsfmWord
     case 'P':
       wordRow.type = pos + mainPartMorph[1];
 
-      if (mainPartMorph[1] === 'f' && mainPartMorph.length > 2) {
+      if (mainPartMorph.length > 2) {
         var person = mainPartMorph[2];
 
         if (!['x'].includes(person)) {

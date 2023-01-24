@@ -3,9 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.reportClockedPromiseTimes = exports.mergeAndUniquifyArraysOfScopeKeys = exports.getWordDetails = exports.getQueryArrayAndWords = exports.getLengthOfAllScopeMaps = exports.clockPromise = exports.clock = void 0;
+exports.reportClockedPromiseTimes = exports.mergeAndUniquifyArraysOfScopeKeys = exports.getWordDetails = exports.getQueryArrayAndWords = exports.getLengthOfAllScopeMaps = exports.combineItems = exports.clockPromise = exports.clock = void 0;
 
 var _constants = require("./constants");
+
+var _i18n = _interopRequireDefault(require("./i18n"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
@@ -502,3 +506,20 @@ var getLengthOfAllScopeMaps = function getLengthOfAllScopeMaps(wordAlts, lookFor
 };
 
 exports.getLengthOfAllScopeMaps = getLengthOfAllScopeMaps;
+
+var combineItems = function combineItems() {
+  for (var _len2 = arguments.length, labels = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+    labels[_key2] = arguments[_key2];
+  }
+
+  var nonEmptyLabels = labels.filter(Boolean);
+  if (nonEmptyLabels.length === 0) return "";
+  return nonEmptyLabels.reduce(function (item1, item2) {
+    return (0, _i18n["default"])("{{item1}}, {{item2}}", {
+      item1: item1,
+      item2: item2
+    });
+  });
+};
+
+exports.combineItems = combineItems;

@@ -84,7 +84,7 @@ export const getPartialUHBWordRowFromUsfmWord = ({ w, id, lemma, strong, morph }
 
     case 'P':
       wordRow.type = pos + mainPartMorph[1]
-      if(mainPartMorph[1] === 'f' && mainPartMorph.length > 2) {
+      if(mainPartMorph.length > 2) {
         const person = mainPartMorph[2]
         if(!['x'].includes(person)) {
           wordRow.person = person
