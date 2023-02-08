@@ -6,6 +6,8 @@ import { getInfoOnResultLocs, normalizeSearchStr } from './bibleSearchUtils'
 import { getWordsHash } from "./index"
 
 const WILD_CARD_LIMIT = 100
+const TIMEOUT_MS = 3000
+const MEMORY_LIMIT_MB = 1000
 
 export const bibleSearch = async ({
   query,
@@ -36,8 +38,8 @@ export const bibleSearch = async ({
     ) || 0
     const time = now - startTime
 
-    if(time > 1000 || memory > 1000) {
-      console.error(`Search exceeds maximum complexity // Time: ${time}ms // Memory: ${memory}mb`)
+    if(time > TIMEOUT_MS || memory > MEMORY_LIMIT_MB) {
+      console.error(`Search exceeds maximum complexity // Query: ${query} // Flags: ${JSON.stringify(flags)} // Time: ${time}ms // Memory: ${memory}mb`)
       throw `Search exceeds maximum complexity`
     }
 

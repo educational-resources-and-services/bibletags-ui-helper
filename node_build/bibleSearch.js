@@ -40,6 +40,8 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 var WILD_CARD_LIMIT = 100;
+var TIMEOUT_MS = 3000;
+var MEMORY_LIMIT_MB = 1000;
 
 var bibleSearch = /*#__PURE__*/function () {
   var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(_ref) {
@@ -60,8 +62,8 @@ var bibleSearch = /*#__PURE__*/function () {
               var memory = typeof process !== 'undefined' && process.memoryUsage && Math.ceil(process.memoryUsage().rss / 1000 / 1000) || 0;
               var time = now - startTime;
 
-              if (time > 1000 || memory > 1000) {
-                console.error("Search exceeds maximum complexity // Time: ".concat(time, "ms // Memory: ").concat(memory, "mb"));
+              if (time > TIMEOUT_MS || memory > MEMORY_LIMIT_MB) {
+                console.error("Search exceeds maximum complexity // Query: ".concat(query, " // Flags: ").concat(JSON.stringify(flags), " // Time: ").concat(time, "ms // Memory: ").concat(memory, "mb"));
                 throw "Search exceeds maximum complexity";
               }
 
