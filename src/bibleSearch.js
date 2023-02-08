@@ -22,7 +22,29 @@ export const bibleSearch = async ({
   doClocking=false,
 }) => {
 
-  doClocking && clock(`Query prep`)
+  const startTime = Date.now()
+  let lastTime = startTime
+  const checkTimeAndMemory = descriptionOfNextSection => {
+    const now = Date.now()
+    if(now === lastTime) return
+    lastTime = now
+
+    const memory = (
+      typeof process !== 'undefined'
+      && process.memoryUsage
+      && Math.ceil(process.memoryUsage().rss/1000/1000)
+    ) || 0
+    const time = now - startTime
+
+    if(time > 1000 || memory > 1000) {
+      console.error(`Search exceeds maximum complexity // Time: ${time}ms // Memory: ${memory}mb`)
+      throw `Search exceeds maximum complexity`
+    }
+
+    doClocking && descriptionOfNextSection !== undefined && clock(descriptionOfNextSection)
+  }
+
+  checkTimeAndMemory(`Query prep`)
 
   // TODO: make sure the query does not exceed maximum complexity
 
@@ -73,7 +95,7 @@ export const bibleSearch = async ({
   const wordResultsByVersionId = {}
   let hitsByBookId = Array(1+66).fill(0)
 
-  doClocking && clock(`Get words for all versions`)
+  checkTimeAndMemory(`Get words for all versions`)
 
   const { wordDetailsArray, getWordNumbersMatchingAllWordDetails } = getWordDetails({ queryWords, isOriginalLanguageSearch })
 
@@ -147,6 +169,11 @@ export const bibleSearch = async ({
       const isOr = /^[0-9]+\+$/.test(group[0])
       const minimumNumHits = isOr && parseInt(group[0].slice(0, -1), 10)
 
+      if(!isExactPhrase) {
+        // dedup words
+        group = [ ...new Set(group) ]
+      }
+
       // run subqueries
       const subqueryAndWordResults = group.slice((isExactPhrase || isOr) ? 1 : 0).map(item => (
         item instanceof Array
@@ -154,7 +181,7 @@ export const bibleSearch = async ({
           : (wordResultsByVersionId[versionId][item] || item)
       ))
 
-      doClocking && clock(`Get scopeKeys for eval of group: ${group.map(i => typeof i === 'string' ? i : '[]').join(" ")} (${versionId})`)
+      checkTimeAndMemory(`Get scopeKeys for eval of group: ${group.map(i => typeof i === 'string' ? i : '[]').join(" ")} (${versionId})`)
 
       let scopeKeysToExamine
       const noWordsHavePositiveDetails = subqueryAndWordResults.every(rowsOrResultObj => (rowsOrResultObj[0] || {}).isNot)
@@ -215,7 +242,7 @@ export const bibleSearch = async ({
 
       }
 
-      doClocking && clock(`Evaluate group: ${group.map(i => typeof i === 'string' ? i : '[]').join(" ")} (${versionId})`)
+      checkTimeAndMemory(`Evaluate group: ${group.map(i => typeof i === 'string' ? i : '[]').join(" ")} (${versionId})`)
 
       // loop through the scope keys of the shortest
       const scopeKeys = []
@@ -336,9 +363,13 @@ export const bibleSearch = async ({
                       })
                     }
                     if(thisWordNumberIsPossibleHit) numPossibleHitsForThisWord++
+
+                    checkTimeAndMemory()
                   })
                 }
               }
+
+              checkTimeAndMemory()
             })
           }
 
@@ -347,6 +378,7 @@ export const bibleSearch = async ({
           doExactPhraseFollowedBy = 0
           minPossibleHitsOfAnyWord = Math.min(minPossibleHitsOfAnyWord, numPossibleHitsForThisWord)
 
+          checkTimeAndMemory()
         })
 
         if(hits.length > 0) {
@@ -376,7 +408,7 @@ export const bibleSearch = async ({
 
     const { scopeKeys, numHitsByScopeKey } = evaluateGroup(queryArray)
 
-    doClocking && clock(`Add results to stack (${versionId})`)
+    checkTimeAndMemory(`Add results to stack (${versionId})`)
 
     scopeKeys.forEach(scopeKey => {
 
@@ -430,7 +462,7 @@ export const bibleSearch = async ({
     hitsByBookId = null
   }
 
-  doClocking && clock(`Get count and arrange ordering`)
+  checkTimeAndMemory(`Get count and arrange ordering`)
 
   const rowCountByBookId = stackedResultsByBookId.map(a => a.length)
 
@@ -438,7 +470,7 @@ export const bibleSearch = async ({
     // TODO: reorder stackedResultsByBookId
   }
 
-  doClocking && clock(`Sort result for books within the return range`)
+  checkTimeAndMemory(`Sort result for books within the return range`)
 
   let resultCountForSort = 0
   const bookIdsInReturnRange = (
@@ -469,13 +501,13 @@ export const bibleSearch = async ({
     })
   }
 
-  doClocking && clock(`Get result subset to return`)
+  checkTimeAndMemory(`Get result subset to return`)
 
   const results = stackedResultsByBookId.flat().slice(offset, offset + limit)
 
   if(same !== 'verse') {
 
-    doClocking && clock(`Get originalLoc for result being returned`)
+    checkTimeAndMemory(`Get originalLoc for result being returned`)
 
     const ids = []
     const resultNeedingOriginalLocById = {}
@@ -495,7 +527,7 @@ export const bibleSearch = async ({
 
   }
 
-  doClocking && clock(`Get usfm for result being returned`)
+  checkTimeAndMemory(`Get usfm for result being returned`)
 
   const resultsByVersionIdNeedingUsfm = []
   results.forEach(result => {
@@ -530,7 +562,7 @@ export const bibleSearch = async ({
 
   if(!isOriginalLanguageSearch && tagSetIds.length > 0) {
 
-    doClocking && clock(`Get tagSets for result being returned`)
+    checkTimeAndMemory(`Get tagSets for result being returned`)
 
     const tagSets = await getTagSetsByIds(tagSetIds)
 
@@ -543,7 +575,7 @@ export const bibleSearch = async ({
 
   }
 
-  doClocking && clock(``)
+  checkTimeAndMemory(``)
 
   // if total count <= limit, get otherSuggestedQueries
     // for multi-word search without quotes... when few/no results, also do searches with one word left out of each, telling the user how many results would be available if they scratched that word
