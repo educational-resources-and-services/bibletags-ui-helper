@@ -156,9 +156,7 @@ export const bibleSearch = async ({
 
   }))
 
-  if(getLengthOfAllScopeMaps(allRows) > 100000) {
-    throw `Search exceeds maximum complexity`
-  }
+  checkTimeAndMemory()
 
   // for each version, in order
   versionIds.forEach(versionId => {

@@ -258,15 +258,8 @@ var bibleSearch = /*#__PURE__*/function () {
             }()));
 
           case 40:
-            if (!((0, _utils.getLengthOfAllScopeMaps)(allRows) > 100000)) {
-              _context5.next = 42;
-              break;
-            }
+            checkTimeAndMemory(); // for each version, in order
 
-            throw "Search exceeds maximum complexity";
-
-          case 42:
-            // for each version, in order
             versionIds.forEach(function (versionId) {
               var evaluateGroup = function evaluateGroup(group) {
                 var isExactPhrase = group[0] === '"';
@@ -581,7 +574,7 @@ var bibleSearch = /*#__PURE__*/function () {
             results = stackedResultsByBookId.flat().slice(offset, offset + limit);
 
             if (!(same !== 'verse')) {
-              _context5.next = 61;
+              _context5.next = 60;
               break;
             }
 
@@ -594,7 +587,7 @@ var bibleSearch = /*#__PURE__*/function () {
               resultNeedingOriginalLocById[id] = result;
             });
             versionIdsToGetUnitRangesFrom = isOriginalLanguageSearch ? versionIds : versionIds.slice(0, 1);
-            _context5.next = 61;
+            _context5.next = 60;
             return Promise.all(versionIdsToGetUnitRangesFrom.map( /*#__PURE__*/function () {
               var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(versionId) {
                 var unitRanges;
@@ -629,7 +622,7 @@ var bibleSearch = /*#__PURE__*/function () {
               };
             }()));
 
-          case 61:
+          case 60:
             checkTimeAndMemory("Get usfm for result being returned");
             resultsByVersionIdNeedingUsfm = [];
             results.forEach(function (result) {
@@ -640,7 +633,7 @@ var bibleSearch = /*#__PURE__*/function () {
             });
             tagSetIds = [];
             versionResultsNeedingUsfmByVersionIdAndLoc = {};
-            _context5.next = 68;
+            _context5.next = 67;
             return Promise.all(Object.keys(resultsByVersionIdNeedingUsfm).map( /*#__PURE__*/function () {
               var _ref12 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(versionId) {
                 var resultsNeedingUsfm, _getInfoOnResultLocs, locs, versionResultsNeedingUsfmByLoc, verses;
@@ -689,21 +682,21 @@ var bibleSearch = /*#__PURE__*/function () {
               };
             }()));
 
-          case 68:
+          case 67:
             results.forEach(function (result) {
               result.versionResults[0].usfm = result.versionResults[0].usfm.join("\n");
             });
 
             if (!(!isOriginalLanguageSearch && tagSetIds.length > 0)) {
-              _context5.next = 75;
+              _context5.next = 74;
               break;
             }
 
             checkTimeAndMemory("Get tagSets for result being returned");
-            _context5.next = 73;
+            _context5.next = 72;
             return getTagSetsByIds(tagSetIds);
 
-          case 73:
+          case 72:
             tagSets = _context5.sent;
             tagSets.forEach(function (tagSet) {
               var _tagSet$id$split = tagSet.id.split('-'),
@@ -716,7 +709,7 @@ var bibleSearch = /*#__PURE__*/function () {
               resultObj.tagSets.push(tagSet);
             });
 
-          case 75:
+          case 74:
             checkTimeAndMemory(""); // if total count <= limit, get otherSuggestedQueries
             // for multi-word search without quotes... when few/no results, also do searches with one word left out of each, telling the user how many results would be available if they scratched that word
             // for multi-word search with quotes... when few/no results, also do non-quoted search, telling the user how many results would be available if they scratched that word
@@ -732,7 +725,7 @@ var bibleSearch = /*#__PURE__*/function () {
               otherSuggestedQueries: []
             });
 
-          case 77:
+          case 76:
           case "end":
             return _context5.stop();
         }
