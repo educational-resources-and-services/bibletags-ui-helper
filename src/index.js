@@ -211,17 +211,19 @@ export const getPassageInfoArrayFromText = ({
   const infoArray = []
 
   const bookSuggestionOptions = getBookSuggestionOptions()
-  const chapterAndVersePartRegexStr = `([0-9]{1,3})(?:[:.]([0-9]{1,3}))?([a-c]|ff?)?(?:[-–—]([0-9]{1,3})(?:[:.]([0-9]{1,3}))?([a-c]|ff?)?)?(?!\\p{Letter}|[-–—:_+&/%])`
+  const chapterAndVersePartRegexStr = `([0-9]{1,3})(?:[:.]([0-9]{1,3}))?([a-c]|ff?)?(?:[-–]([0-9]{1,3})(?:[:.]([0-9]{1,3}))?([a-c]|ff?)?)?(?!\\p{Letter}|[0-9-–:_+&/%])`
 
   let matchArr
   const bookPortionOfRegex = (
     allowApproximateBookNames
-      ? `((?:\\p{Letter}|[0-9-–—:_+&/%])+(?: (?:\\p{Letter}|[0-9-–—:_+&/%])+){0,3})`  // assumes maximum of four-word book names
+      ? `((?:\\p{Letter}|[0-9-–:_+&/%])+(?: (?:\\p{Letter}|[0-9-–:_+&/%])+){0,3})`  // assumes maximum of four-word book names
       : `(${bookSuggestionOptions.map(({ suggestedQuery }) => suggestedQuery).join('|')})`
   )
   const searchRegex = new RegExp(`${mustIncludeEntirety ? `^` : ``}${bookPortionOfRegex} ${chapterAndVersePartRegexStr}`, `giu`)
 
   while((matchArr = searchRegex.exec(text)) !== null) {
+
+    if(matchArr.index > 0 && /(?:\p{Letter}|[0-9-–:_+&/%])/u.test(text[matchArr.index-1])) continue
 
     let [
       entirety,
@@ -270,7 +272,7 @@ export const getPassageInfoArrayFromText = ({
     }
 
     // get version abbr add-ons if it exists; increase lastIndex on regex
-    const [ versionAbbrPlus=`` ] = text.slice(searchRegex.lastIndex).match(/^ (?:[A-Z0-9]{2,9}|\([A-Z0-9]{2,9}\)|\[[A-Z0-9]{2,9}\]|\{[A-Z0-9]{2,9}\})/) || []
+    const [ versionAbbrPlus=`` ] = text.slice(searchRegex.lastIndex).match(/^ (?:[A-Z0-9]{2,9}|\([A-Z0-9]{2,9}\)|\[[A-Z0-9]{2,9}\]|\{[A-Z0-9]{2,9}\})(?!\p{Letter}|[0-9-–:_+&/%])/u) || []
     if(versionAbbrPlus) {
       entirety += versionAbbrPlus
       searchRegex.lastIndex += versionAbbrPlus.length
@@ -368,7 +370,7 @@ export const getPassageInfoArrayFromText = ({
           endChapter,
           endVerse,
           endIgnoreText,
-        ] = addOn.match(new RegExp(chapterAndVersePartRegexStr))
+        ] = addOn.match(new RegExp(chapterAndVersePartRegexStr, 'u'))
 
         if(
           connector === `,`
