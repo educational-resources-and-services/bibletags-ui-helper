@@ -12,6 +12,8 @@ var _exportNames = {
   getVersionStr: true,
   getRefsInfo: true,
   getPassageStr: true,
+  getBookSuggestionOptions: true,
+  getPassageInfoArrayFromText: true,
   getRefsFromPassageStr: true,
   getBibleBookNames: true,
   getBibleBookName: true,
@@ -40,7 +42,7 @@ var _exportNames = {
   getMorphInfo: true,
   getColorWithOpacity: true
 };
-exports.toBase64 = exports.isValidEmail = exports.isRTLText = exports.isRTLStr = exports.isOriginalLanguageSearch = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getTextLanguageId = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMorphInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getCopyVerseText = exports.getColorWithOpacity = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
+exports.toBase64 = exports.isValidEmail = exports.isRTLText = exports.isRTLStr = exports.isOriginalLanguageSearch = exports.hash64 = exports.getWordsHash = exports.getWordHashes = exports.getVersionStr = exports.getUsfmRefStrFromLoc = exports.getUsfmBibleBookAbbr = exports.getTextLanguageId = exports.getStrongs = exports.getRefsInfo = exports.getRefsFromUsfmRefStr = exports.getRefsFromPassageStr = exports.getPassageStr = exports.getPassageInfoArrayFromText = exports.getPOSTerm = exports.getOrigLanguageText = exports.getOrigLangVersionIdFromRef = exports.getOrigLangAndLXXVersionInfo = exports.getNormalizedPOSCode = exports.getMorphPartDisplayInfo = exports.getMorphInfo = exports.getMainWordPartIndex = exports.getIsEntirelyPrefixAndSuffix = exports.getCopyVerseText = exports.getColorWithOpacity = exports.getBookSuggestionOptions = exports.getBookIdFromUsfmBibleBookAbbr = exports.getBibleBookNames = exports.getBibleBookName = exports.getBibleBookAbbreviatedNames = exports.getBibleBookAbbreviatedName = void 0;
 
 var _md = _interopRequireDefault(require("md5"));
 
@@ -399,9 +401,7 @@ var getPassageStr = function getPassageStr(params) {
 
 exports.getPassageStr = getPassageStr;
 
-var getRefsFromPassageStr = function getRefsFromPassageStr(passageStr) {
-  var normalizedPassageStr = passageStr.replace(/  +/g, ' ').trim();
-
+var getBookSuggestionOptions = function getBookSuggestionOptions() {
   var indicateBookId = function indicateBookId(book, bookId) {
     return {
       suggestedQuery: book,
@@ -421,121 +421,217 @@ var getRefsFromPassageStr = function getRefsFromPassageStr(passageStr) {
       suggestedQuery: suggestedQuery.replace(digitWithSpaceAfterRegex, '$1'),
       bookId: bookId
     } : null;
-  }).filter(Boolean))); // split off potential versionId
+  }).filter(Boolean)));
+  return bookSuggestionOptions;
+};
 
-  var passageStrSets = [{
-    passageStr: normalizedPassageStr
-  }];
+exports.getBookSuggestionOptions = getBookSuggestionOptions;
 
-  var _normalizedPassageStr = normalizedPassageStr.match(/^(.*?)(?: ([a-z0-9]{2,9}))?$/i),
-      _normalizedPassageStr2 = _slicedToArray(_normalizedPassageStr, 3),
-      x = _normalizedPassageStr2[0],
-      passageStrWithoutVersionId = _normalizedPassageStr2[1],
-      versionId = _normalizedPassageStr2[2];
+var getPassageInfoArrayFromText = function getPassageInfoArrayFromText(_ref5) {
+  var text = _ref5.text,
+      contextRef = _ref5.contextRef,
+      allowApproximateBookNames = _ref5.allowApproximateBookNames,
+      mustIncludeEntirety = _ref5.mustIncludeEntirety;
+  var infoArray = [];
+  var bookSuggestionOptions = getBookSuggestionOptions();
+  var chapterAndVersePartRegexStr = "([0-9]{1,3})(?:[:.]([0-9]{1,3}))?([a-c]|ff?)?(?:[-\u2013\u2014]([0-9]{1,3})(?:[:.]([0-9]{1,3}))?([a-c]|ff?)?)?(?!\\p{Letter}|[-\u2013\u2014:_+&/%])";
+  var matchArr;
+  var bookPortionOfRegex = allowApproximateBookNames ? "((?:\\p{Letter}|[0-9-\u2013\u2014:_+&/%])+(?: (?:\\p{Letter}|[0-9-\u2013\u2014:_+&/%])+){0,3})" // assumes maximum of four-word book names
+  : "(".concat(bookSuggestionOptions.map(function (_ref6) {
+    var suggestedQuery = _ref6.suggestedQuery;
+    return suggestedQuery;
+  }).join('|'), ")");
+  var searchRegex = new RegExp("".concat(mustIncludeEntirety ? "^" : "").concat(bookPortionOfRegex, " ").concat(chapterAndVersePartRegexStr), "giu");
 
-  passageStrSets.push({
-    passageStr: passageStrWithoutVersionId,
-    versionId: versionId && versionId.toLowerCase()
-  });
+  var _loop = function _loop() {
+    var _matchArr = matchArr,
+        _matchArr2 = _slicedToArray(_matchArr, 8),
+        entirety = _matchArr2[0],
+        book = _matchArr2[1],
+        startChapter = _matchArr2[2],
+        startVerse = _matchArr2[3],
+        _matchArr2$ = _matchArr2[4],
+        startIgnoreText = _matchArr2$ === void 0 ? "" : _matchArr2$,
+        endChapter = _matchArr2[5],
+        endVerse = _matchArr2[6],
+        _matchArr2$2 = _matchArr2[7],
+        endIgnoreText = _matchArr2$2 === void 0 ? "" : _matchArr2$2;
 
-  for (var _i2 = 0, _passageStrSets = passageStrSets; _i2 < _passageStrSets.length; _i2++) {
-    var passageStrSet = _passageStrSets[_i2];
-    var _passageStr = passageStrSet.passageStr,
-        _versionId = passageStrSet.versionId;
-
-    var _passageStr$match = _passageStr.match(/^(.+?)(?: ([-–—0-9:]+))?$/),
-        _passageStr$match2 = _slicedToArray(_passageStr$match, 3),
-        _x = _passageStr$match2[0],
-        book = _passageStr$match2[1],
-        _passageStr$match2$ = _passageStr$match2[2],
-        nonBookPart = _passageStr$match2$ === void 0 ? '' : _passageStr$match2$;
-
+    var versionId = void 0;
+    var refSets = [];
     var bookId = parseInt(((0, _bibleSearchUtils.findAutoCompleteSuggestions)({
       str: book,
       suggestionOptions: bookSuggestionOptions,
       max: 1
     })[0] || {}).bookId, 10);
-    if (!bookId) continue;
 
-    var _nonBookPart$split = nonBookPart.split(/[-–—]/g),
-        _nonBookPart$split2 = _slicedToArray(_nonBookPart$split, 3),
-        nonBookPartFirstHalf = _nonBookPart$split2[0],
-        nonBookPartSecondHalf = _nonBookPart$split2[1],
-        x1 = _nonBookPart$split2[2];
-
-    if (!nonBookPartFirstHalf || x1) continue;
-
-    var _nonBookPartFirstHalf = nonBookPartFirstHalf.split(':'),
-        _nonBookPartFirstHalf2 = _slicedToArray(_nonBookPartFirstHalf, 3),
-        startChapter = _nonBookPartFirstHalf2[0],
-        startVerse = _nonBookPartFirstHalf2[1],
-        x2 = _nonBookPartFirstHalf2[2];
-
-    if (!startChapter || x2) continue;
-    var endChapter = startChapter;
-    var endVerse = startVerse;
-
-    if (nonBookPartSecondHalf) {
-      var _nonBookPartSecondHal = nonBookPartSecondHalf.split(':'),
-          _nonBookPartSecondHal2 = _slicedToArray(_nonBookPartSecondHal, 3),
-          nonBookPartSecondHalfPiece1 = _nonBookPartSecondHal2[0],
-          nonBookPartSecondHalfPiece2 = _nonBookPartSecondHal2[1],
-          x3 = _nonBookPartSecondHal2[2];
-
-      if (!nonBookPartSecondHalfPiece1 || x3) continue;
-
-      if (nonBookPartSecondHalfPiece2) {
-        endChapter = nonBookPartSecondHalfPiece1;
-        endVerse = nonBookPartSecondHalfPiece2;
-      } else {
-        endVerse = nonBookPartSecondHalfPiece1;
+    if (!bookId) {
+      if (/ /.test(book) && allowApproximateBookNames && !mustIncludeEntirety) {
+        // remove first word and see if it now is a passage ref
+        searchRegex.lastIndex = matchArr.index + book.indexOf(' ');
       }
+
+      return "continue";
+    } // if ignore texts are uppercase at all, then this is not a match
+
+
+    if (/[A-Z]/.test("".concat(startIgnoreText).concat(endIgnoreText))) return "continue"; // get comma add-ons if they exist; try all separately and increase lastIndex on regex
+
+    var _ref7 = text.slice(searchRegex.lastIndex).match(new RegExp("^(?:[,;] ?".concat(chapterAndVersePartRegexStr, ")+"), "u")) || [],
+        _ref8 = _slicedToArray(_ref7, 1),
+        _ref8$ = _ref8[0],
+        commaAddOnStr = _ref8$ === void 0 ? "" : _ref8$;
+
+    var commaAddOns = commaAddOnStr.match(/[,;] ?[^,;]+/g) || [];
+
+    if (commaAddOns.length) {
+      entirety += commaAddOnStr;
+      searchRegex.lastIndex += commaAddOnStr.length;
+    } // get version abbr add-ons if it exists; increase lastIndex on regex
+
+
+    var _ref9 = text.slice(searchRegex.lastIndex).match(/^ (?:[A-Z0-9]{2,9}|\([A-Z0-9]{2,9}\)|\[[A-Z0-9]{2,9}\]|\{[A-Z0-9]{2,9}\})/) || [],
+        _ref10 = _slicedToArray(_ref9, 1),
+        _ref10$ = _ref10[0],
+        versionAbbrPlus = _ref10$ === void 0 ? "" : _ref10$;
+
+    if (versionAbbrPlus) {
+      entirety += versionAbbrPlus;
+      searchRegex.lastIndex += versionAbbrPlus.length;
+      versionId = versionAbbrPlus.replace(/[[\](){} ]/g, '').toLowerCase();
     }
 
-    var refs = [_objectSpread({
-      bookId: bookId,
-      chapter: parseInt(startChapter, 10)
-    }, !startVerse ? {} : {
-      verse: parseInt(startVerse, 10)
-    })];
+    if (mustIncludeEntirety && searchRegex.lastIndex !== entirety.length) return "break";
 
-    if (startVerse !== endVerse || startChapter !== endChapter) {
-      refs.push(_objectSpread({
+    var addRefIfValid = function addRefIfValid(_ref11) {
+      var startChapter = _ref11.startChapter,
+          startVerse = _ref11.startVerse,
+          endChapter = _ref11.endChapter,
+          endVerse = _ref11.endVerse;
+      // 1 [ch OR vs (if single chapter book)]
+      // 1-2 [ch-ch OR vs-vs (if single chapter book)]
+      // 1:1 [ch:vs]
+      // 1:1-2 [ch:vs-vs]
+      // 1:1-2:2 [ch:vs-ch:vs]
+      if (!startVerse && endVerse) return; // i.e. 1-2:2 (invalid)
+
+      if (startChapter && startVerse && endChapter && !endVerse) {
+        // i.e. 1:1-2
+        endVerse = endChapter;
+        endChapter = startChapter;
+      }
+
+      if (_bibletagsVersification.numberOfVersesPerChapterPerBook[bookId - 1].length === 1 && !startVerse) {
+        // i.e 1 OR 1-2
+        startVerse = startChapter;
+        startChapter = "1";
+
+        if (endChapter) {
+          endVerse = endChapter;
+          endChapter = "1";
+        }
+      }
+
+      endChapter = endChapter || (endVerse ? startChapter : undefined);
+      if (parseInt(endChapter || startChapter, 10) > (bookId === 39 ? 4 : _bibletagsVersification.numberOfVersesPerChapterPerBook[bookId - 1].length)) return;
+      var refs = [_objectSpread({
         bookId: bookId,
-        chapter: parseInt(endChapter, 10)
-      }, !endVerse ? {} : {
-        verse: parseInt(endVerse, 10)
-      }));
-    }
+        chapter: parseInt(startChapter, 10)
+      }, !startVerse ? {} : {
+        verse: parseInt(startVerse, 10)
+      })];
 
-    refs = refs.filter(function (_ref5) {
-      var chapter = _ref5.chapter,
-          verse = _ref5.verse;
-      return chapter && verse !== NaN;
+      if (startVerse !== endVerse || startChapter !== endChapter) {
+        refs.push(_objectSpread({
+          bookId: bookId,
+          chapter: parseInt(endChapter, 10)
+        }, !endVerse ? {} : {
+          verse: parseInt(endVerse, 10)
+        }));
+      }
+
+      refs = refs.filter(function (_ref12) {
+        var chapter = _ref12.chapter,
+            verse = _ref12.verse;
+        return chapter && verse !== NaN;
+      });
+      if (refs.length > 1 && (refs[0].chapter > refs[1].chapter || refs[0].chapter === refs[1].chapter && refs[0].verse !== undefined && refs[0].verse > (refs[1].verse || 0))) return; // from and to portions out of order
+
+      if (refs.length > 0) {
+        refSets.push(refs);
+      }
+    };
+
+    addRefIfValid({
+      startChapter: startChapter,
+      startVerse: startVerse,
+      endChapter: endChapter,
+      endVerse: endVerse
     });
 
-    if (refs.length > 0) {
-      return {
-        refs: refs,
-        versionId: _versionId
-      };
-    } // TODO: make this work with i18n!
-    // get i18n ref signatures
-    // determine book
-    // if has start_chapter and end_chapter
-    // determine start_chapter
-    // determine end_chapter
-    // else 
-    // determine chapter
-    // if has start_verse and end_verse
-    // determine start_verse
-    // determine end_verse
-    // else 
-    // determine verse
+    if (refSets.length > 0) {
+      commaAddOns.forEach(function (commaAddOn) {
+        var _commaAddOn$match = commaAddOn.match(/^([,;]) ?([^,;]+)$/),
+            _commaAddOn$match2 = _slicedToArray(_commaAddOn$match, 3),
+            x = _commaAddOn$match2[0],
+            connector = _commaAddOn$match2[1],
+            addOn = _commaAddOn$match2[2];
 
+        var _addOn$match = addOn.match(new RegExp(chapterAndVersePartRegexStr)),
+            _addOn$match2 = _slicedToArray(_addOn$match, 7),
+            entireAddOn = _addOn$match2[0],
+            startChapter = _addOn$match2[1],
+            startVerse = _addOn$match2[2],
+            startIgnoreText = _addOn$match2[3],
+            endChapter = _addOn$match2[4],
+            endVerse = _addOn$match2[5],
+            endIgnoreText = _addOn$match2[6];
+
+        if (connector === "," && refSets.at(-1).at(-1).verse !== undefined && !startVerse) {
+          startVerse = startChapter;
+          startChapter = "".concat(refSets.at(-1).at(-1).chapter);
+        }
+
+        addRefIfValid({
+          startChapter: startChapter,
+          startVerse: startVerse,
+          endChapter: endChapter,
+          endVerse: endVerse
+        });
+      });
+      infoArray.push({
+        startCharacterIndex: matchArr.index,
+        endCharacterIndex: matchArr.index + entirety.length,
+        refSets: refSets,
+        versionId: versionId
+      });
+    }
+  };
+
+  while ((matchArr = searchRegex.exec(text)) !== null) {
+    var _ret = _loop();
+
+    if (_ret === "continue") continue;
+    if (_ret === "break") break;
   }
 
-  return null;
+  return infoArray;
+};
+
+exports.getPassageInfoArrayFromText = getPassageInfoArrayFromText;
+
+var getRefsFromPassageStr = function getRefsFromPassageStr(passageStr) {
+  var normalizedPassageStr = passageStr.replace(/  +/g, ' ').trim();
+  var info = getPassageInfoArrayFromText({
+    text: normalizedPassageStr,
+    allowApproximateBookNames: true,
+    mustIncludeEntirety: true
+  })[0];
+  if (!info) return null;
+  return {
+    refs: info.refSets[0],
+    versionId: info.versionId
+  };
 };
 
 exports.getRefsFromPassageStr = getRefsFromPassageStr;
@@ -677,27 +773,27 @@ var getBibleBookAbbreviatedName = function getBibleBookAbbreviatedName(bookId) {
 
 exports.getBibleBookAbbreviatedName = getBibleBookAbbreviatedName;
 
-var getNormalizedPOSCode = function getNormalizedPOSCode(_ref6) {
-  var morphLang = _ref6.morphLang,
-      morphPos = _ref6.morphPos;
+var getNormalizedPOSCode = function getNormalizedPOSCode(_ref13) {
+  var morphLang = _ref13.morphLang,
+      morphPos = _ref13.morphPos;
   return ['He', 'Ar'].includes(morphLang) ? morphPos : (0, _greekMorph.getNormalizedGreekPOSCode)(morphPos);
 };
 
 exports.getNormalizedPOSCode = getNormalizedPOSCode;
 
-var getPOSTerm = function getPOSTerm(_ref7) {
-  var languageId = _ref7.languageId,
-      posCode = _ref7.posCode;
+var getPOSTerm = function getPOSTerm(_ref14) {
+  var languageId = _ref14.languageId,
+      posCode = _ref14.posCode;
   return languageId === 'heb' ? (0, _hebrewMorph.getHebrewPOSTerm)(posCode) : (0, _greekMorph.getGreekPOSTerm)(posCode);
 };
 
 exports.getPOSTerm = getPOSTerm;
 
-var getMorphPartDisplayInfo = function getMorphPartDisplayInfo(_ref8) {
-  var morphLang = _ref8.morphLang,
-      morphPart = _ref8.morphPart,
-      isPrefixOrSuffix = _ref8.isPrefixOrSuffix,
-      wordIsMultiPart = _ref8.wordIsMultiPart;
+var getMorphPartDisplayInfo = function getMorphPartDisplayInfo(_ref15) {
+  var morphLang = _ref15.morphLang,
+      morphPart = _ref15.morphPart,
+      isPrefixOrSuffix = _ref15.isPrefixOrSuffix,
+      wordIsMultiPart = _ref15.wordIsMultiPart;
   return ['He', 'Ar'].includes(morphLang) ? (0, _hebrewMorph.getHebrewMorphPartDisplayInfo)({
     morphLang: morphLang,
     morphPart: morphPart,
@@ -752,14 +848,14 @@ var hash64 = function hash64(str) {
 
 exports.hash64 = hash64;
 
-var getWordsHash = function getWordsHash(_ref9) {
-  var usfm = _ref9.usfm,
-      wordDividerRegex = _ref9.wordDividerRegex;
+var getWordsHash = function getWordsHash(_ref16) {
+  var usfm = _ref16.usfm,
+      wordDividerRegex = _ref16.wordDividerRegex;
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
-  }).map(function (_ref10) {
-    var text = _ref10.text;
+  }).map(function (_ref17) {
+    var text = _ref17.text;
     return text.toLowerCase();
   }); // After importing the full ESV, I found only 1 redundancy in the 
   // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).
@@ -771,14 +867,14 @@ var getWordsHash = function getWordsHash(_ref9) {
 
 exports.getWordsHash = getWordsHash;
 
-var getWordHashes = function getWordHashes(_ref11) {
-  var usfm = _ref11.usfm,
-      wordDividerRegex = _ref11.wordDividerRegex;
+var getWordHashes = function getWordHashes(_ref18) {
+  var usfm = _ref18.usfm,
+      wordDividerRegex = _ref18.wordDividerRegex;
   var words = (0, _splitting.splitVerseIntoWords)({
     usfm: usfm,
     wordDividerRegex: wordDividerRegex
-  }).map(function (_ref12) {
-    var text = _ref12.text;
+  }).map(function (_ref19) {
+    var text = _ref19.text;
     return text.toLowerCase();
   }); // After importing the full ESV, I found only 1 redundancy in the 
   // wordHashesSubmission.hash with 4 characters (out of 13k distinct words).
@@ -813,9 +909,9 @@ var isOriginalLanguageSearch = function isOriginalLanguageSearch(searchText) {
 
 exports.isOriginalLanguageSearch = isOriginalLanguageSearch;
 
-var getTextLanguageId = function getTextLanguageId(_ref13) {
-  var languageId = _ref13.languageId,
-      bookId = _ref13.bookId;
+var getTextLanguageId = function getTextLanguageId(_ref20) {
+  var languageId = _ref20.languageId,
+      bookId = _ref20.bookId;
   return languageId === "heb+grc" ? bookId <= 39 ? 'heb' : 'grc' : languageId;
 };
 
@@ -855,26 +951,26 @@ var getFirstWordFromPieces = function getFirstWordFromPieces(pieces) {
   }
 };
 
-var isRTLText = function isRTLText(_ref14) {
-  var languageId = _ref14.languageId,
-      bookId = _ref14.bookId,
-      searchString = _ref14.searchString,
-      pieces = _ref14.pieces;
+var isRTLText = function isRTLText(_ref21) {
+  var languageId = _ref21.languageId,
+      bookId = _ref21.bookId,
+      searchString = _ref21.searchString,
+      pieces = _ref21.pieces;
   return !languageId ? isRTLStr(getFirstWordFromPieces(pieces || [])) : languageId === 'heb+grc' ? bookId ? bookId <= 39 ? true : false : /^[\u0590-\u05FF ]*$/g.test(searchString) : ['heb', 'hbo', 'yid', 'per', 'fas', 'urd', 'pus', 'syc', 'syr', 'sam', 'snd', 'prs', 'prd', 'gbz', 'ckb', 'kmr', 'kur', 'sdh', // Arabic + its dialects follow
   'ara', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'aeb', 'aec', 'afb', 'ajp', 'aju', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'jrb', 'jye', 'mxi', 'pga', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud'].includes(languageId);
 };
 
 exports.isRTLText = isRTLText;
 
-var getCopyVerseText = function getCopyVerseText(_ref15) {
-  var pieces = _ref15.pieces,
-      ref = _ref15.ref,
-      versionAbbr = _ref15.versionAbbr;
+var getCopyVerseText = function getCopyVerseText(_ref22) {
+  var pieces = _ref22.pieces,
+      ref = _ref22.ref,
+      versionAbbr = _ref22.versionAbbr;
   var selectedTextContent = '';
-  pieces.forEach(function (_ref16) {
-    var tag = _ref16.tag,
-        text = _ref16.text,
-        nextChar = _ref16.nextChar;
+  pieces.forEach(function (_ref23) {
+    var tag = _ref23.tag,
+        text = _ref23.text,
+        nextChar = _ref23.nextChar;
 
     if (!text) {
       if (nextChar === ' ') {

@@ -1,5 +1,5 @@
 import md5 from 'md5'
-import { getRefFromLoc, getNumberOfChapters } from "@bibletags/bibletags-versification"
+import { getRefFromLoc, getNumberOfChapters, numberOfVersesPerChapterPerBook } from "@bibletags/bibletags-versification"
 import { Buffer } from 'buffer'
 
 import i18n, { i18nNumber } from './i18n'
@@ -165,18 +165,13 @@ export const getPassageStr = params => {
   return info.book || ""
 }
 
-export const getRefsFromPassageStr = passageStr => {
-
-  const normalizedPassageStr = (
-    passageStr
-      .replace(/  +/g, ' ')
-      .trim()
-  )
+export const getBookSuggestionOptions = () => {
 
   const indicateBookId = (book, bookId) => ({
     suggestedQuery: book,
     bookId,
   })
+
   let bookSuggestionOptions = (
     [
       ...getBibleBookNames().map(indicateBookId),
@@ -201,24 +196,46 @@ export const getRefsFromPassageStr = passageStr => {
     ),
   ]
 
-  // split off potential versionId
+  return bookSuggestionOptions
+}
 
-  const passageStrSets = [
-    {
-      passageStr: normalizedPassageStr,
-    },
-  ]
+export const getPassageInfoArrayFromText = ({
+  text,
+  contextRef,  // TODO: use this to parse things like `vs 3`, `ch 2-4`, `vs. 2,3`, `v2,3`, `verses 3-5`, `verse 3`, etc (consider i18n)
+  allowApproximateBookNames,
+  mustIncludeEntirety,
+  // TODO: make this function generally work with i18n!
+  // TODO: also accept languageIds or the like and find refs in any listed languages
+}) => {
 
-  const [ x, passageStrWithoutVersionId, versionId ] = normalizedPassageStr.match(/^(.*?)(?: ([a-z0-9]{2,9}))?$/i)
-  passageStrSets.push({
-    passageStr: passageStrWithoutVersionId,
-    versionId: versionId && versionId.toLowerCase(),
-  })
+  const infoArray = []
 
-  for(let passageStrSet of passageStrSets) {
-    const { passageStr, versionId } = passageStrSet
+  const bookSuggestionOptions = getBookSuggestionOptions()
+  const chapterAndVersePartRegexStr = `([0-9]{1,3})(?:[:.]([0-9]{1,3}))?([a-c]|ff?)?(?:[-–—]([0-9]{1,3})(?:[:.]([0-9]{1,3}))?([a-c]|ff?)?)?(?!\\p{Letter}|[-–—:_+&/%])`
 
-    const [ x, book, nonBookPart='' ] = passageStr.match(/^(.+?)(?: ([-–—0-9:]+))?$/)
+  let matchArr
+  const bookPortionOfRegex = (
+    allowApproximateBookNames
+      ? `((?:\\p{Letter}|[0-9-–—:_+&/%])+(?: (?:\\p{Letter}|[0-9-–—:_+&/%])+){0,3})`  // assumes maximum of four-word book names
+      : `(${bookSuggestionOptions.map(({ suggestedQuery }) => suggestedQuery).join('|')})`
+  )
+  const searchRegex = new RegExp(`${mustIncludeEntirety ? `^` : ``}${bookPortionOfRegex} ${chapterAndVersePartRegexStr}`, `giu`)
+
+  while((matchArr = searchRegex.exec(text)) !== null) {
+
+    let [
+      entirety,
+      book,
+      startChapter,
+      startVerse,
+      startIgnoreText=``,
+      endChapter,
+      endVerse,
+      endIgnoreText=``,
+    ] = matchArr
+
+    let versionId
+    const refSets = []
 
     const bookId = (
       parseInt(
@@ -233,76 +250,180 @@ export const getRefsFromPassageStr = passageStr => {
       )
     )
 
-    if(!bookId) continue
-
-    const [ nonBookPartFirstHalf, nonBookPartSecondHalf, x1 ] = nonBookPart.split(/[-–—]/g)
-    if(!nonBookPartFirstHalf || x1) continue
-    const [ startChapter, startVerse, x2 ] = nonBookPartFirstHalf.split(':')
-    if(!startChapter || x2) continue
-
-    let endChapter = startChapter
-    let endVerse = startVerse
-    if(nonBookPartSecondHalf) {
-      const [ nonBookPartSecondHalfPiece1, nonBookPartSecondHalfPiece2, x3 ] = nonBookPartSecondHalf.split(':')
-      if(!nonBookPartSecondHalfPiece1 || x3) continue
-      if(nonBookPartSecondHalfPiece2) {
-        endChapter = nonBookPartSecondHalfPiece1
-        endVerse = nonBookPartSecondHalfPiece2
-      } else {
-        endVerse = nonBookPartSecondHalfPiece1
+    if(!bookId) {
+      if(/ /.test(book) && allowApproximateBookNames && !mustIncludeEntirety) {
+        // remove first word and see if it now is a passage ref
+        searchRegex.lastIndex = matchArr.index + book.indexOf(' ')
       }
+      continue
     }
 
-    let refs = [{
-      bookId,
-      chapter: parseInt(startChapter, 10),
-      ...(!startVerse ? {} : { verse: parseInt(startVerse, 10) }),
-    }]
+    // if ignore texts are uppercase at all, then this is not a match
+    if(/[A-Z]/.test(`${startIgnoreText}${endIgnoreText}`)) continue
 
-    if(startVerse !== endVerse || startChapter !== endChapter) {
-      refs.push({
+    // get comma add-ons if they exist; try all separately and increase lastIndex on regex
+    const [ commaAddOnStr=`` ] = text.slice(searchRegex.lastIndex).match(new RegExp(`^(?:[,;] ?${chapterAndVersePartRegexStr})+`, `u`)) || []
+    const commaAddOns = commaAddOnStr.match(/[,;] ?[^,;]+/g) || []
+    if(commaAddOns.length) {
+      entirety += commaAddOnStr
+      searchRegex.lastIndex += commaAddOnStr.length
+    }
+
+    // get version abbr add-ons if it exists; increase lastIndex on regex
+    const [ versionAbbrPlus=`` ] = text.slice(searchRegex.lastIndex).match(/^ (?:[A-Z0-9]{2,9}|\([A-Z0-9]{2,9}\)|\[[A-Z0-9]{2,9}\]|\{[A-Z0-9]{2,9}\})/) || []
+    if(versionAbbrPlus) {
+      entirety += versionAbbrPlus
+      searchRegex.lastIndex += versionAbbrPlus.length
+      versionId = versionAbbrPlus.replace(/[[\](){} ]/g, '').toLowerCase()
+    }
+
+    if(mustIncludeEntirety && searchRegex.lastIndex !== entirety.length) break
+
+
+    const addRefIfValid = ({
+      startChapter,
+      startVerse,
+      endChapter,
+      endVerse,
+    }) => {
+
+      // 1 [ch OR vs (if single chapter book)]
+      // 1-2 [ch-ch OR vs-vs (if single chapter book)]
+      // 1:1 [ch:vs]
+      // 1:1-2 [ch:vs-vs]
+      // 1:1-2:2 [ch:vs-ch:vs]
+
+      if(!startVerse && endVerse) return  // i.e. 1-2:2 (invalid)
+
+      if(startChapter && startVerse && endChapter && !endVerse) {  // i.e. 1:1-2
+        endVerse = endChapter
+        endChapter = startChapter
+      }
+
+      if(numberOfVersesPerChapterPerBook[bookId-1].length === 1 && !startVerse) {  // i.e 1 OR 1-2
+        startVerse = startChapter
+        startChapter = `1`
+        if(endChapter) {
+          endVerse = endChapter
+          endChapter = `1`
+        }
+      }
+
+      endChapter = endChapter || (endVerse ? startChapter : undefined)
+
+      if(parseInt(endChapter || startChapter, 10) > (bookId === 39 ? 4 : numberOfVersesPerChapterPerBook[bookId-1].length)) return
+
+      let refs = [{
         bookId,
-        chapter: parseInt(endChapter, 10),
-        ...(!endVerse ? {} : { verse: parseInt(endVerse, 10) }),
-      })
-    }
+        chapter: parseInt(startChapter, 10),
+        ...(!startVerse ? {} : { verse: parseInt(startVerse, 10) }),
+      }]
 
-    refs = refs.filter(({ chapter, verse }) => chapter && verse !== NaN)
-
-    if(refs.length > 0) {
-      return {
-        refs,
-        versionId,
+      if(startVerse !== endVerse || startChapter !== endChapter) {
+        refs.push({
+          bookId,
+          chapter: parseInt(endChapter, 10),
+          ...(!endVerse ? {} : { verse: parseInt(endVerse, 10) }),
+        })
       }
+
+      refs = refs.filter(({ chapter, verse }) => chapter && verse !== NaN)
+
+      if(
+        refs.length > 1
+        && (
+          refs[0].chapter > refs[1].chapter
+          || (
+            refs[0].chapter === refs[1].chapter
+            && refs[0].verse !== undefined
+            && refs[0].verse > (refs[1].verse || 0)
+          )
+        )
+      ) return  // from and to portions out of order
+
+      if(refs.length > 0) {
+        refSets.push(refs)
+      }
+
     }
 
-    // TODO: make this work with i18n!
+    addRefIfValid({
+      startChapter,
+      startVerse,
+      endChapter,
+      endVerse,
+    })
 
-    // get i18n ref signatures
+    if(refSets.length > 0) {
 
-    // determine book
+      commaAddOns.forEach(commaAddOn => {
 
-    // if has start_chapter and end_chapter
+        const [ x, connector, addOn ] = commaAddOn.match(/^([,;]) ?([^,;]+)$/)
 
-      // determine start_chapter
-      // determine end_chapter
+        let [
+          entireAddOn,
+          startChapter,
+          startVerse,
+          startIgnoreText,
+          endChapter,
+          endVerse,
+          endIgnoreText,
+        ] = addOn.match(new RegExp(chapterAndVersePartRegexStr))
 
-    // else 
+        if(
+          connector === `,`
+          && refSets.at(-1).at(-1).verse !== undefined
+          && !startVerse
+        ) {
+          startVerse = startChapter
+          startChapter = `${refSets.at(-1).at(-1).chapter}`
+        }
 
-      // determine chapter
+        addRefIfValid({
+          startChapter,
+          startVerse,
+          endChapter,
+          endVerse,
+        })
 
-    // if has start_verse and end_verse
+      })
 
-      // determine start_verse
-      // determine end_verse
+      infoArray.push({
+        startCharacterIndex: matchArr.index,
+        endCharacterIndex: matchArr.index + entirety.length,
+        refSets,
+        versionId,
+      })
 
-    // else 
-
-      // determine verse
+    }
 
   }
 
-  return null
+  return infoArray
+
+}
+
+export const getRefsFromPassageStr = passageStr => {
+
+  const normalizedPassageStr = (
+    passageStr
+      .replace(/  +/g, ' ')
+      .trim()
+  )
+
+  const info = getPassageInfoArrayFromText({
+    text: normalizedPassageStr,
+    allowApproximateBookNames: true,
+    mustIncludeEntirety: true,
+  })[0]
+
+  if(!info) return null
+
+  return {
+    refs: info.refSets[0],
+    versionId: info.versionId,
+  }
+
 }
 
 export const getBibleBookNames = () => ([
