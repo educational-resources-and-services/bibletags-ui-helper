@@ -264,7 +264,8 @@ export const getPassageInfoArrayFromText = ({
     if(/[A-Z]/.test(`${startIgnoreText}${endIgnoreText}`)) continue
 
     // get comma add-ons if they exist; try all separately and increase lastIndex on regex
-    const [ commaAddOnStr=`` ] = text.slice(searchRegex.lastIndex).match(new RegExp(`^(?:[,;] ?${chapterAndVersePartRegexStr})+`, `u`)) || []
+    const negativeLookaheadBookPortionOfRegex = bookPortionOfRegex.replace(/^\(/, '(?!')
+    const [ commaAddOnStr=`` ] = text.slice(searchRegex.lastIndex).match(new RegExp(`^(?:[,;] ?${negativeLookaheadBookPortionOfRegex}${chapterAndVersePartRegexStr})+`, `u`)) || []
     const commaAddOns = commaAddOnStr.match(/[,;] ?[^,;]+/g) || []
     if(commaAddOns.length) {
       entirety += commaAddOnStr

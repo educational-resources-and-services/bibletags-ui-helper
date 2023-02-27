@@ -479,7 +479,9 @@ var getPassageInfoArrayFromText = function getPassageInfoArrayFromText(_ref5) {
 
     if (/[A-Z]/.test("".concat(startIgnoreText).concat(endIgnoreText))) return "continue"; // get comma add-ons if they exist; try all separately and increase lastIndex on regex
 
-    var _ref7 = text.slice(searchRegex.lastIndex).match(new RegExp("^(?:[,;] ?".concat(chapterAndVersePartRegexStr, ")+"), "u")) || [],
+    var negativeLookaheadBookPortionOfRegex = bookPortionOfRegex.replace(/^\(/, '(?!');
+
+    var _ref7 = text.slice(searchRegex.lastIndex).match(new RegExp("^(?:[,;] ?".concat(negativeLookaheadBookPortionOfRegex).concat(chapterAndVersePartRegexStr, ")+"), "u")) || [],
         _ref8 = _slicedToArray(_ref7, 1),
         _ref8$ = _ref8[0],
         commaAddOnStr = _ref8$ === void 0 ? "" : _ref8$;
