@@ -282,7 +282,14 @@ var getRefsInfo = function getRefsInfo(_ref) {
       abbreviated = _ref.abbreviated,
       usfmBookAbbr = _ref.usfmBookAbbr;
   var info = {};
-  refs.forEach(function (ref) {
+
+  var getBaseLoc = function getBaseLoc(ref) {
+    return (ref.loc || (0, _bibletagsVersification.getLocFromRef)(ref)).split(':')[0];
+  };
+
+  var isStartAndEndWithSameBaseLoc = refs.length === 2 && getBaseLoc(refs[0]) === getBaseLoc(refs[1]);
+  var fromRefHasWordRangeStartingFrom1 = ((refs[0].wordRanges || [])[0] || "").split('-')[0] === '1';
+  refs.forEach(function (ref, idx) {
     var wordRanges = ref.wordRanges;
 
     var _ref2 = ref.loc ? (0, _bibletagsVersification.getRefFromLoc)(ref.loc) : ref,
@@ -307,12 +314,25 @@ var getRefsInfo = function getRefsInfo(_ref) {
     if (verse != null) {
       var verseText;
 
-      if (wordRanges) {
-        verseText = wordRanges[0].split('-')[0] === '1' ? (0, _i18n["default"])("{{verse}}a", {
-          verse: verse
-        }) : (0, _i18n["default"])("{{verse}}b", {
-          verse: verse
-        });
+      if (wordRanges || isStartAndEndWithSameBaseLoc) {
+        if ( // fromRef and starts from 1
+        idx === 0 && fromRefHasWordRangeStartingFrom1 // toRef and not isStartAndEndWithSameBaseLoc
+        || idx === 1 && !isStartAndEndWithSameBaseLoc) {
+          verseText = (0, _i18n["default"])("{{verse}}a", {
+            verse: verse
+          });
+        } else if ( // fromRef and does not start from 1
+        idx === 0 && !fromRefHasWordRangeStartingFrom1 // toRef and isStartAndEndWithSameBaseLoc and fromRef starts from 1
+        || idx === 1 && isStartAndEndWithSameBaseLoc && fromRefHasWordRangeStartingFrom1) {
+          verseText = (0, _i18n["default"])("{{verse}}b", {
+            verse: verse
+          });
+        } else {
+          // toRef and isStartAndEndWithSameBaseLoc and fromRef does not start from 1
+          verseText = (0, _i18n["default"])("{{verse}}c", {
+            verse: verse
+          });
+        }
       } else {
         verseText = verse;
       }

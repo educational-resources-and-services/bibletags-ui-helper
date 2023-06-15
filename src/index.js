@@ -1,5 +1,5 @@
 import md5 from 'md5'
-import { getRefFromLoc, getNumberOfChapters, numberOfVersesPerChapterPerBook } from "@bibletags/bibletags-versification"
+import { getRefFromLoc, getNumberOfChapters, numberOfVersesPerChapterPerBook, getLocFromRef } from "@bibletags/bibletags-versification"
 import { Buffer } from 'buffer'
 
 import i18n, { i18nNumber } from './i18n'
@@ -65,7 +65,11 @@ export const getVersionStr = versionId => {
 export const getRefsInfo = ({ refs, skipBookName, abbreviated, usfmBookAbbr }) => {
   const info = {}
 
-  refs.forEach(ref => {
+  const getBaseLoc = ref => (ref.loc || getLocFromRef(ref)).split(':')[0]
+  const isStartAndEndWithSameBaseLoc = refs.length === 2 && getBaseLoc(refs[0]) === getBaseLoc(refs[1])
+  const fromRefHasWordRangeStartingFrom1 = ((refs[0].wordRanges || [])[0] || ``).split('-')[0] === '1'
+
+  refs.forEach((ref, idx) => {
     const { wordRanges } = ref
     const { bookId, chapter, verse } = ref.loc ? getRefFromLoc(ref.loc) : ref
 
@@ -95,10 +99,24 @@ export const getRefsInfo = ({ refs, skipBookName, abbreviated, usfmBookAbbr }) =
 
     if(verse != null) {
       let verseText
-      if(wordRanges) {
-        verseText = wordRanges[0].split('-')[0] === '1'
-          ? i18n("{{verse}}a", { verse })
-          : i18n("{{verse}}b", { verse })
+      if(wordRanges || isStartAndEndWithSameBaseLoc) {
+        if(
+          // fromRef and starts from 1
+          (idx === 0 && fromRefHasWordRangeStartingFrom1)
+          // toRef and not isStartAndEndWithSameBaseLoc
+          || (idx === 1 && !isStartAndEndWithSameBaseLoc)
+        ) {
+            verseText = i18n("{{verse}}a", { verse })
+        } else if(
+          // fromRef and does not start from 1
+          (idx === 0 && !fromRefHasWordRangeStartingFrom1)
+          // toRef and isStartAndEndWithSameBaseLoc and fromRef starts from 1
+          || (idx === 1 && isStartAndEndWithSameBaseLoc && fromRefHasWordRangeStartingFrom1)
+        ) {
+          verseText = i18n("{{verse}}b", { verse })
+        } else {  // toRef and isStartAndEndWithSameBaseLoc and fromRef does not start from 1
+          verseText = i18n("{{verse}}c", { verse })
+        }
       } else {
         verseText = verse
       }
