@@ -96,7 +96,7 @@ export const getRefsInfo = ({ refs, skipBookName, abbreviated, usfmBookAbbr }) =
     if(verse != null) {
       let verseText
       if(wordRanges) {
-        verseText = wordRanges[0].substr(0,1) === '1'
+        verseText = wordRanges[0].split('-')[0] === '1'
           ? i18n("{{verse}}a", { verse })
           : i18n("{{verse}}b", { verse })
       } else {

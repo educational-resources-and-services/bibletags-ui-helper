@@ -308,7 +308,7 @@ var getRefsInfo = function getRefsInfo(_ref) {
       var verseText;
 
       if (wordRanges) {
-        verseText = wordRanges[0].substr(0, 1) === '1' ? (0, _i18n["default"])("{{verse}}a", {
+        verseText = wordRanges[0].split('-')[0] === '1' ? (0, _i18n["default"])("{{verse}}a", {
           verse: verse
         }) : (0, _i18n["default"])("{{verse}}b", {
           verse: verse
