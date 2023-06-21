@@ -808,6 +808,7 @@ export const getPiecesFromUSFM = ({ usfm='', inlineMarkersOnly, wordDividerRegex
     addedPseudoChapter = true
   }
   usfm = usfm.replace(/\\fqa /g, `\\fq `)  // usfm-js does not properly handle \fqa, so we change those to \fq since there is no need to distiguish between the two
+  usfm = usfm.replace(/\\\+xt(\*| )/g, `\\xt$1`)  // the + is not needed and produces unexpected results
 
   const verseObjects = getFlattenedJsUsfm( usfmJS.toJSON(usfm) )
   const hasWTags = verseObjects.some(({ tag }) => tag === "w")
