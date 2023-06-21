@@ -188,6 +188,10 @@ var getFilteredVerseObjects = function getFilteredVerseObjects(_ref2) {
       } else if (inlineMarkersOnly || !isBlock) {
         return false;
       }
+    }
+
+    if (isBlock && text && !children && inlineMarkersOnly) {
+      unitObj.text = text = (0, _i18n["default"])(" ", "word separator") + unitObj.text;
     } // change all .text to .children
 
 
@@ -694,6 +698,10 @@ var getPiecesFromUSFM = function getPiecesFromUSFM(_ref9) {
     usfm = "\\c 1\n".concat(usfm);
     addedPseudoChapter = true;
   }
+
+  usfm = usfm.replace(/\\fqa /g, "\\fq "); // usfm-js does not properly handle \fqa, so we change those to \fq since there is no need to distiguish between the two
+
+  usfm = usfm.replace(/\\\+xt(\*| )/g, "\\xt$1"); // the + is not needed and produces unexpected results
 
   var verseObjects = getFlattenedJsUsfm(_usfmJs["default"].toJSON(usfm));
   var hasWTags = verseObjects.some(function (_ref10) {
