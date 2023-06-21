@@ -256,7 +256,7 @@ const getFilteredVerseObjects = ({ unitObjs, inlineMarkersOnly }) => {
   let inHeadingBlock = false
 
   return unitObjs.filter(unitObj => {
-    const { tag, text, type, children } = unitObj
+    let { tag, text, type, children } = unitObj
 
     // It seems that usfmMarkersWithContentToDiscard is not needed, since usfm-js distinguishes between content and text,
     // and so if something is not in usfmMarkers and has no text, we just get rid of it.
@@ -286,6 +286,14 @@ const getFilteredVerseObjects = ({ unitObjs, inlineMarkersOnly }) => {
         return false
       }
 
+    }
+    if(
+      isBlock
+      && text
+      && !children
+      && inlineMarkersOnly
+    ) {
+      unitObj.text = text = i18n(" ", "word separator") + unitObj.text
     }
 
     // change all .text to .children
