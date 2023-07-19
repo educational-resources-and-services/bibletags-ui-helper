@@ -244,6 +244,10 @@ export const specialUsfmMarkers = [
 
 ]
 
+export const noContentUsfmMarkers = [
+  "b",
+]
+
 export const tagInList = ({ tag, list }) => (
   tag
   && (
@@ -500,7 +504,7 @@ const filterOutEmptyObjects = unitObjs => (
   unitObjs.filter(unitObj => {
     const { tag, text, children, content, apparatusJson } = unitObj
 
-    if(tag !== 'd' && !text && (!children || !children.length) && !content && !apparatusJson) {
+    if(tag !== 'd' && !text && (!children || !children.length) && !content && !apparatusJson && !tagInList({ tag, list: noContentUsfmMarkers })) {
       return false
     }
 

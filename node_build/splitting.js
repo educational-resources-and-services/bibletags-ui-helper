@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.wordPartDividerRegex = exports.tagInList = exports.splitVerseIntoWords = exports.specialUsfmMarkers = exports.inlineUsfmMarkers = exports.headingBlockUsfmMarkers = exports.getPiecesFromUSFM = exports.getIsHebrew = exports.blockUsfmMarkers = exports.adjustTextForSups = exports.adjustPiecesForSpecialHebrew = void 0;
+exports.wordPartDividerRegex = exports.tagInList = exports.splitVerseIntoWords = exports.specialUsfmMarkers = exports.noContentUsfmMarkers = exports.inlineUsfmMarkers = exports.headingBlockUsfmMarkers = exports.getPiecesFromUSFM = exports.getIsHebrew = exports.blockUsfmMarkers = exports.adjustTextForSups = exports.adjustPiecesForSpecialHebrew = void 0;
 
 var _usfmJs = _interopRequireDefault(require("usfm-js"));
 
@@ -140,6 +140,8 @@ var specialUsfmMarkers = [// see http://ubsicap.github.io/usfm/index.html
 "c", // "ca",
 "cp"];
 exports.specialUsfmMarkers = specialUsfmMarkers;
+var noContentUsfmMarkers = ["b"];
+exports.noContentUsfmMarkers = noContentUsfmMarkers;
 
 var tagInList = function tagInList(_ref) {
   var tag = _ref.tag,
@@ -406,7 +408,10 @@ var filterOutEmptyObjects = function filterOutEmptyObjects(unitObjs) {
         content = unitObj.content,
         apparatusJson = unitObj.apparatusJson;
 
-    if (tag !== 'd' && !text && (!children || !children.length) && !content && !apparatusJson) {
+    if (tag !== 'd' && !text && (!children || !children.length) && !content && !apparatusJson && !tagInList({
+      tag: tag,
+      list: noContentUsfmMarkers
+    })) {
       return false;
     }
 
