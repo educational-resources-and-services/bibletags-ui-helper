@@ -552,6 +552,7 @@ var getConcentricCircleScopes = function getConcentricCircleScopes(bookId) {
     "lukes-writings": (0, _i18n["default"])("Luke’s Writings"),
     "johns-writings": (0, _i18n["default"])("John’s Writings"),
     "pauls-writings": (0, _i18n["default"])("Paul’s Writings"),
+    "peters-writings": (0, _i18n["default"])("Peter’s Writings"),
     gospels: (0, _i18n["default"])("Gospels"),
     epistles: (0, _i18n["default"])("Epistles")
   };

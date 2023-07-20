@@ -405,6 +405,7 @@ export const getConcentricCircleScopes = bookId => {
     "lukes-writings": i18n("Luke’s Writings"),
     "johns-writings": i18n("John’s Writings"),
     "pauls-writings": i18n("Paul’s Writings"),
+    "peters-writings": i18n("Peter’s Writings"),
     gospels: i18n("Gospels"),
     epistles: i18n("Epistles"),
   }
