@@ -212,6 +212,10 @@ export const getBookSuggestionOptions = () => {
         ))
         .filter(Boolean)
     ),
+    {
+      suggestedQuery: i18n("Song of Solomon", "", "book"),
+      bookId: 22,
+    },
   ]
 
   return bookSuggestionOptions

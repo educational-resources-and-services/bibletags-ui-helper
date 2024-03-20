@@ -441,7 +441,10 @@ var getBookSuggestionOptions = function getBookSuggestionOptions() {
       suggestedQuery: suggestedQuery.replace(digitWithSpaceAfterRegex, '$1'),
       bookId: bookId
     } : null;
-  }).filter(Boolean)));
+  }).filter(Boolean)), [{
+    suggestedQuery: (0, _i18n["default"])("Song of Solomon", "", "book"),
+    bookId: 22
+  }]);
   return bookSuggestionOptions;
 };
 
