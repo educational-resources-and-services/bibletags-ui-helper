@@ -442,6 +442,9 @@ var getBookSuggestionOptions = function getBookSuggestionOptions() {
       bookId: bookId
     } : null;
   }).filter(Boolean)), [{
+    suggestedQuery: (0, _i18n["default"])("Psalm", "", "book"),
+    bookId: 19
+  }, {
     suggestedQuery: (0, _i18n["default"])("Song of Solomon", "", "book"),
     bookId: 22
   }]);

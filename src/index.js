@@ -213,6 +213,10 @@ export const getBookSuggestionOptions = () => {
         .filter(Boolean)
     ),
     {
+      suggestedQuery: i18n("Psalm", "", "book"),
+      bookId: 19,
+    },
+    {
       suggestedQuery: i18n("Song of Solomon", "", "book"),
       bookId: 22,
     },
