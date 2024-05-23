@@ -538,12 +538,18 @@ var getPassageInfoArrayFromText = function getPassageInfoArrayFromText(_ref5) {
           startVerse = _ref11.startVerse,
           endChapter = _ref11.endChapter,
           endVerse = _ref11.endVerse;
+
       // 1 [ch OR vs (if single chapter book)]
       // 1-2 [ch-ch OR vs-vs (if single chapter book)]
       // 1:1 [ch:vs]
       // 1:1-2 [ch:vs-vs]
       // 1:1-2:2 [ch:vs-ch:vs]
-      if (!startVerse && endVerse) return; // i.e. 1-2:2 (invalid)
+      // 1-2:2 [ch-ch:vs]
+      // if(!startVerse && endVerse) return  // i.e. 1-2:2 (invalid)
+      if (!startVerse && endVerse) {
+        // i.e. 1-2:2 [ch-ch:vs]
+        startVerse = 1;
+      }
 
       if (startChapter && startVerse && endChapter && !endVerse) {
         // i.e. 1:1-2

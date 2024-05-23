@@ -321,8 +321,12 @@ export const getPassageInfoArrayFromText = ({
       // 1:1 [ch:vs]
       // 1:1-2 [ch:vs-vs]
       // 1:1-2:2 [ch:vs-ch:vs]
+      // 1-2:2 [ch-ch:vs]
 
-      if(!startVerse && endVerse) return  // i.e. 1-2:2 (invalid)
+      // if(!startVerse && endVerse) return  // i.e. 1-2:2 (invalid)
+      if(!startVerse && endVerse) {  // i.e. 1-2:2 [ch-ch:vs]
+        startVerse = 1
+      }
 
       if(startChapter && startVerse && endChapter && !endVerse) {  // i.e. 1:1-2
         endVerse = endChapter
