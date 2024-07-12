@@ -1117,7 +1117,7 @@ var adjustPiecesForSpecialHebrew = function adjustPiecesForSpecialHebrew(_ref17)
     return pieces.map(function (piece) {
       if (!piece.lemma && /^[ ׃]*פ *$/.test(piece.text || "")) {
         return [_objectSpread(_objectSpread({}, piece), {}, {
-          text: piece.text.slice(0, -1)
+          text: /׃/.test(piece.text) ? "\u05C3" : ""
         }), {
           endTag: "peh*",
           tag: "peh",
@@ -1125,7 +1125,7 @@ var adjustPiecesForSpecialHebrew = function adjustPiecesForSpecialHebrew(_ref17)
         }];
       } else if (!piece.lemma && /^[ ׃]*ס *$/.test(piece.text || "")) {
         return [_objectSpread(_objectSpread({}, piece), {}, {
-          text: piece.text.slice(0, -1)
+          text: /׃/.test(piece.text) ? "\u05C3" : ""
         }), {
           endTag: "samech*",
           tag: "samech",

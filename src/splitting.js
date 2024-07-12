@@ -1164,7 +1164,7 @@ export const adjustPiecesForSpecialHebrew = ({ isOriginal, languageId, pieces })
           return [
             {
               ...piece,
-              text: piece.text.slice(0, -1),
+              text: /׃/.test(piece.text) ? `׃` : ``,
             },
             {
               endTag: "peh*",
@@ -1176,7 +1176,7 @@ export const adjustPiecesForSpecialHebrew = ({ isOriginal, languageId, pieces })
           return [
             {
               ...piece,
-              text: piece.text.slice(0, -1),
+              text: /׃/.test(piece.text) ? `׃` : ``,
             },
             {
               endTag: "samech*",
