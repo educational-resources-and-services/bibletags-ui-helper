@@ -1115,7 +1115,7 @@ var adjustPiecesForSpecialHebrew = function adjustPiecesForSpecialHebrew(_ref17)
   // For original Hebrew text, split off פ and ס chars that signal a break in flow.
   if (isOriginal && languageId.split('+').includes('heb')) {
     return pieces.map(function (piece) {
-      if (!piece.lemma && /^[ ׃]*פ$/.test(piece.text || "")) {
+      if (!piece.lemma && /^[ ׃]*פ *$/.test(piece.text || "")) {
         return [_objectSpread(_objectSpread({}, piece), {}, {
           text: piece.text.slice(0, -1)
         }), {
@@ -1123,7 +1123,7 @@ var adjustPiecesForSpecialHebrew = function adjustPiecesForSpecialHebrew(_ref17)
           tag: "peh",
           text: ' פ'
         }];
-      } else if (!piece.lemma && /^[ ׃]*ס$/.test(piece.text || "")) {
+      } else if (!piece.lemma && /^[ ׃]*ס *$/.test(piece.text || "")) {
         return [_objectSpread(_objectSpread({}, piece), {}, {
           text: piece.text.slice(0, -1)
         }), {

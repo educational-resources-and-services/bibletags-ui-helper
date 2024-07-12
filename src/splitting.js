@@ -1160,7 +1160,7 @@ export const adjustPiecesForSpecialHebrew = ({ isOriginal, languageId, pieces })
   if(isOriginal && languageId.split('+').includes('heb')) {
     return pieces
       .map(piece => {
-        if(!piece.lemma && /^[ ׃]*פ$/.test(piece.text || "")) {
+        if(!piece.lemma && /^[ ׃]*פ *$/.test(piece.text || "")) {
           return [
             {
               ...piece,
@@ -1172,7 +1172,7 @@ export const adjustPiecesForSpecialHebrew = ({ isOriginal, languageId, pieces })
               text: ' פ',
             },
           ]
-        } else if(!piece.lemma && /^[ ׃]*ס$/.test(piece.text || "")) {
+        } else if(!piece.lemma && /^[ ׃]*ס *$/.test(piece.text || "")) {
           return [
             {
               ...piece,
