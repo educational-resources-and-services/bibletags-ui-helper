@@ -1164,24 +1164,24 @@ export const adjustPiecesForSpecialHebrew = ({ isOriginal, languageId, pieces })
           return [
             {
               ...piece,
-              text: /׃/.test(piece.text) ? `׃` : ``,
+              text: /׃/.test(piece.text) ? `׃ ` : ` `,
             },
             {
               endTag: "peh*",
               tag: "peh",
-              text: ' פ',
+              text: 'פ',
             },
           ]
         } else if(!piece.lemma && /^[ ׃]*ס *$/.test(piece.text || "")) {
           return [
             {
               ...piece,
-              text: /׃/.test(piece.text) ? `׃` : ``,
+              text: /׃/.test(piece.text) ? `׃ ` : ` `,
             },
             {
               endTag: "samech*",
               tag: "samech",
-              text: ' ס   ',
+              text: 'ס   ',
             },
           ]
         } else if(piece.lemma === 'סֶלָה' && !piece.parentTagIsSelah) {
