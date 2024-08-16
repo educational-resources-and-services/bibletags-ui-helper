@@ -285,6 +285,7 @@ const getFilteredVerseObjects = ({ unitObjs, inlineMarkersOnly }) => {
 
       if(inlineMarkersOnly && isBlock) {
         unitObj.text = i18n(" ", "word separator")
+        delete unitObj.tag
 
       } else if(inlineMarkersOnly || !isBlock) {
         return false

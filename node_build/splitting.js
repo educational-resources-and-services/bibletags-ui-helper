@@ -187,6 +187,7 @@ var getFilteredVerseObjects = function getFilteredVerseObjects(_ref2) {
     && !text && !children) {
       if (inlineMarkersOnly && isBlock) {
         unitObj.text = (0, _i18n["default"])(" ", "word separator");
+        delete unitObj.tag;
       } else if (inlineMarkersOnly || !isBlock) {
         return false;
       }
