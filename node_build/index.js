@@ -352,7 +352,15 @@ var getRefsInfo = function getRefsInfo(_ref) {
 exports.getRefsInfo = getRefsInfo;
 
 var getPassageStr = function getPassageStr(params) {
-  var info = getRefsInfo(params); // modify chapter and verse numeric representation
+  var info = getRefsInfo(params);
+
+  var getVerse = function getVerse(num) {
+    return num === 0 ? params.abbreviated ? (0, _i18n["default"])("T", "", "abbreviated representation of a psalm title") : (0, _i18n["default"])("[title]", "", "represents a psalm title") : (0, _i18n.i18nNumber)({
+      num: num,
+      type: 'verse'
+    });
+  }; // modify chapter and verse numeric representation
+
 
   if (info.chapter) {
     info.chapter = (0, _i18n.i18nNumber)({
@@ -376,24 +384,15 @@ var getPassageStr = function getPassageStr(params) {
   }
 
   if (info.verse != null) {
-    info.verse = (0, _i18n.i18nNumber)({
-      num: info.verse,
-      type: 'verse'
-    });
+    info.verse = getVerse(info.verse);
   }
 
   if (info.start_verse != null) {
-    info.start_verse = info.start_verse === 0 ? (0, _i18n["default"])("[title]", "", "represents a psalm title") : (0, _i18n.i18nNumber)({
-      num: info.start_verse,
-      type: 'verse'
-    });
+    info.start_verse = getVerse(info.start_verse);
   }
 
   if (info.end_verse != null) {
-    info.end_verse = (0, _i18n.i18nNumber)({
-      num: info.end_verse,
-      type: 'verse'
-    });
+    info.end_verse = getVerse(info.end_verse);
   }
 
   if (info.start_chapter && info.start_verse != null) {

@@ -136,6 +136,16 @@ export const getRefsInfo = ({ refs, skipBookName, abbreviated, usfmBookAbbr }) =
 export const getPassageStr = params => {
   const info = getRefsInfo(params)
 
+  const getVerse = num => (
+    num === 0
+      ? (
+        params.abbreviated
+          ? i18n("T", "", "abbreviated representation of a psalm title")
+          : i18n("[title]", "", "represents a psalm title")
+      )
+      : i18nNumber({ num, type: 'verse' })
+  )
+
   // modify chapter and verse numeric representation
   if(info.chapter) {
     info.chapter = i18nNumber({ num: info.chapter, type: 'chapter' })
@@ -147,17 +157,13 @@ export const getPassageStr = params => {
     info.end_chapter = i18nNumber({ num: info.end_chapter, type: 'chapter' })
   }
   if(info.verse != null) {
-    info.verse = i18nNumber({ num: info.verse, type: 'verse' })
+    info.verse = getVerse(info.verse)
   }
   if(info.start_verse != null) {
-    info.start_verse = (
-      info.start_verse === 0
-        ? i18n("[title]", "", "represents a psalm title")
-        : i18nNumber({ num: info.start_verse, type: 'verse' })
-    )
+    info.start_verse = getVerse(info.start_verse)
   }
   if(info.end_verse != null) {
-    info.end_verse = i18nNumber({ num: info.end_verse, type: 'verse' })
+    info.end_verse = getVerse(info.end_verse)
   }
 
   if(info.start_chapter && info.start_verse != null) {
