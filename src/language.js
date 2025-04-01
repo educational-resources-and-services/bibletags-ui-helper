@@ -37,10 +37,10 @@ export const findLanguage = ({ searchStr, maxNumHits=10 }) => {
   return hits
 }
 
-export const getLanguageInfo = iso6393 => {
+export const getLanguageInfo = iso6393OrIso6391 => {
   const [
     englishName,
-    x,
+    iso6393,
     iso6392b,
     iso6392t,
     iso6391,
@@ -49,7 +49,7 @@ export const getLanguageInfo = iso6393 => {
     standardWordDivider=' ',
     phraseDividerRegex=`[–,;—:\\(\\)\\[\\]\\{\\}\\|\\"\\'“”‘’~«»]`,
     sentenceDividerRegex=`[\\.\\?¿!]`,
-  ] = iso6393Info.find(([ englishName, i3 ]) => i3 === iso6393) || []
+  ] = iso6393Info.find(([ englishName, i3, i2b, i2t, i1 ]) => [ i3, i1 ].includes(iso6393OrIso6391)) || []
 
   return {
     englishName,

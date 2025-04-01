@@ -69,17 +69,20 @@ var findLanguage = function findLanguage(_ref) {
 
 exports.findLanguage = findLanguage;
 
-var getLanguageInfo = function getLanguageInfo(iso6393) {
+var getLanguageInfo = function getLanguageInfo(iso6393OrIso6391) {
   var _ref2 = _iso6393Info["default"].find(function (_ref4) {
-    var _ref5 = _slicedToArray(_ref4, 2),
+    var _ref5 = _slicedToArray(_ref4, 5),
         englishName = _ref5[0],
-        i3 = _ref5[1];
+        i3 = _ref5[1],
+        i2b = _ref5[2],
+        i2t = _ref5[3],
+        i1 = _ref5[4];
 
-    return i3 === iso6393;
+    return [i3, i1].includes(iso6393OrIso6391);
   }) || [],
       _ref3 = _slicedToArray(_ref2, 10),
       englishName = _ref3[0],
-      x = _ref3[1],
+      iso6393 = _ref3[1],
       iso6392b = _ref3[2],
       iso6392t = _ref3[3],
       iso6391 = _ref3[4],
