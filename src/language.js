@@ -27,6 +27,7 @@ export const findLanguage = ({ searchStr, maxNumHits=10, iso6391Only }) => {
     hits.push({
       englishName: foundInfo[0],
       iso6393: foundInfo[1],
+      iso6391: foundInfo[4],
       nativeName: foundInfo[5] || foundInfo[0],
     })
 
@@ -66,11 +67,13 @@ export const getLanguageInfo = iso6393OrIso6391 => {
   }
 }
 
-export const getAllLanguages = () => (
+export const getAllLanguages = ({ iso6391Only }={}) => (
   iso6393Info
+    .filter(info => !iso6391Only || info[4] !== undefined)
     .map(info => ({
       englishName: info[0],
       iso6393: info[1],
+      iso6391: info[4],
       nativeName: info[5] || info[0],
     }))
 )

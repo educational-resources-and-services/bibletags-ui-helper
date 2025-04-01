@@ -60,6 +60,7 @@ var findLanguage = function findLanguage(_ref) {
     hits.push({
       englishName: foundInfo[0],
       iso6393: foundInfo[1],
+      iso6391: foundInfo[4],
       nativeName: foundInfo[5] || foundInfo[0]
     });
     if (hits.length >= maxNumHits) break;
@@ -115,10 +116,16 @@ var getLanguageInfo = function getLanguageInfo(iso6393OrIso6391) {
 exports.getLanguageInfo = getLanguageInfo;
 
 var getAllLanguages = function getAllLanguages() {
-  return _iso6393Info["default"].map(function (info) {
+  var _ref6 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      iso6391Only = _ref6.iso6391Only;
+
+  return _iso6393Info["default"].filter(function (info) {
+    return !iso6391Only || info[4] !== undefined;
+  }).map(function (info) {
     return {
       englishName: info[0],
       iso6393: info[1],
+      iso6391: info[4],
       nativeName: info[5] || info[0]
     };
   });
