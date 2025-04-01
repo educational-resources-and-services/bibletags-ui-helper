@@ -1,7 +1,7 @@
 import iso6393Info from './iso6393Info'
 import { normalizeSearchStr } from './bibleSearchUtils'
 
-export const findLanguage = ({ searchStr, maxNumHits=10 }) => {
+export const findLanguage = ({ searchStr, maxNumHits=10, iso6391Only }) => {
   const wordSplitRegex = / \(| |-/g
   const normalizedSearchStrArray = normalizeSearchStr({ str: searchStr }).split(wordSplitRegex)
 
@@ -9,6 +9,7 @@ export const findLanguage = ({ searchStr, maxNumHits=10 }) => {
 
   for(let i=0; i<iso6393Info.length;) {
     const foundIdx = iso6393Info.slice(i).findIndex(info => {
+      if(iso6391Only && info[4] === undefined) return false
       const nameWords = [ ...info[0].split(wordSplitRegex), ...(info[5] || '').split(wordSplitRegex) ].filter(Boolean)
       return (
         normalizedSearchStrArray

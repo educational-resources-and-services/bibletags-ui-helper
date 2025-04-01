@@ -34,7 +34,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 var findLanguage = function findLanguage(_ref) {
   var searchStr = _ref.searchStr,
       _ref$maxNumHits = _ref.maxNumHits,
-      maxNumHits = _ref$maxNumHits === void 0 ? 10 : _ref$maxNumHits;
+      maxNumHits = _ref$maxNumHits === void 0 ? 10 : _ref$maxNumHits,
+      iso6391Only = _ref.iso6391Only;
   var wordSplitRegex = / \(| |-/g;
   var normalizedSearchStrArray = (0, _bibleSearchUtils.normalizeSearchStr)({
     str: searchStr
@@ -43,6 +44,7 @@ var findLanguage = function findLanguage(_ref) {
 
   for (var i = 0; i < _iso6393Info["default"].length;) {
     var foundIdx = _iso6393Info["default"].slice(i).findIndex(function (info) {
+      if (iso6391Only && info[4] === undefined) return false;
       var nameWords = [].concat(_toConsumableArray(info[0].split(wordSplitRegex)), _toConsumableArray((info[5] || '').split(wordSplitRegex))).filter(Boolean);
       return normalizedSearchStrArray.every(function (searchWord) {
         return nameWords.some(function (nameWord) {
