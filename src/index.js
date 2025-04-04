@@ -140,8 +140,8 @@ export const getPassageStr = params => {
     num === 0
       ? (
         params.abbreviated
-          ? i18n("T", "", "abbreviated representation of a psalm title")
-          : i18n("[title]", "", "represents a psalm title")
+          ? i18n("T", "abbreviated representation of a psalm title")
+          : i18n("[title]", "represents a psalm title")
       )
       : i18nNumber({ num, type: 'verse' })
   )
