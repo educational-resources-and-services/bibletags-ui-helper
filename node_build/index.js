@@ -355,7 +355,7 @@ var getPassageStr = function getPassageStr(params) {
   var info = getRefsInfo(params);
 
   var getVerse = function getVerse(num) {
-    return num === 0 ? params.abbreviated ? (0, _i18n["default"])("T", "", "abbreviated representation of a psalm title") : (0, _i18n["default"])("[title]", "", "represents a psalm title") : (0, _i18n.i18nNumber)({
+    return num === 0 ? params.abbreviated ? (0, _i18n["default"])("T", "abbreviated representation of a psalm title") : (0, _i18n["default"])("[title]", "represents a psalm title") : (0, _i18n.i18nNumber)({
       num: num,
       type: 'verse'
     });
