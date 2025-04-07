@@ -12,28 +12,28 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 var getPosTerm = function getPosTerm(code) {
   switch (code) {
     case 'A':
-      return (0, _i18n["default"])("adjective", "", "grammar");
+      return (0, _i18n["default"])("adjective", "", "original-languages");
 
     case 'C':
-      return (0, _i18n["default"])("conjunction", "", "grammar");
+      return (0, _i18n["default"])("conjunction", "", "original-languages");
 
     case 'D':
-      return (0, _i18n["default"])("adverb", "", "grammar");
+      return (0, _i18n["default"])("adverb", "", "original-languages");
 
     case 'N':
-      return (0, _i18n["default"])("noun", "", "grammar");
+      return (0, _i18n["default"])("noun", "", "original-languages");
 
     case 'P':
-      return (0, _i18n["default"])("pronoun", "", "grammar");
+      return (0, _i18n["default"])("pronoun", "", "original-languages");
 
     case 'R':
-      return (0, _i18n["default"])("preposition", "", "grammar");
+      return (0, _i18n["default"])("preposition", "", "original-languages");
 
     case 'T':
-      return (0, _i18n["default"])("particle", "", "grammar");
+      return (0, _i18n["default"])("particle", "", "original-languages");
 
     case 'V':
-      return (0, _i18n["default"])("verb", "", "grammar");
+      return (0, _i18n["default"])("verb", "", "original-languages");
   }
 };
 
@@ -56,154 +56,154 @@ var getGrammarTerms = function getGrammarTerms(code) {
 
     case 'person':
       return {
-        1: (0, _i18n["default"])("1st", "", "grammar"),
-        2: (0, _i18n["default"])("2nd", "", "grammar"),
-        3: (0, _i18n["default"])("3rd", "", "grammar")
+        1: (0, _i18n["default"])("1st", "", "original-languages"),
+        2: (0, _i18n["default"])("2nd", "", "original-languages"),
+        3: (0, _i18n["default"])("3rd", "", "original-languages")
       };
 
     case 'gender':
       return {
-        m: (0, _i18n["default"])("masculine", "", "grammar"),
-        f: (0, _i18n["default"])("feminine", "", "grammar"),
-        b: (0, _i18n["default"])("gender-both", "", "grammar"),
-        c: (0, _i18n["default"])("common", "", "grammar")
+        m: (0, _i18n["default"])("masculine", "", "original-languages"),
+        f: (0, _i18n["default"])("feminine", "", "original-languages"),
+        b: (0, _i18n["default"])("gender-both", "", "original-languages"),
+        c: (0, _i18n["default"])("common", "", "original-languages")
       };
 
     case 'number':
       return {
-        s: (0, _i18n["default"])("singular", "", "grammar"),
-        p: (0, _i18n["default"])("plural", "", "grammar"),
-        d: (0, _i18n["default"])("dual", "", "grammar")
+        s: (0, _i18n["default"])("singular", "", "original-languages"),
+        p: (0, _i18n["default"])("plural", "", "original-languages"),
+        d: (0, _i18n["default"])("dual", "", "original-languages")
       };
 
     case 'state':
       return {
-        a: (0, _i18n["default"])("absolute", "", "grammar"),
-        c: (0, _i18n["default"])("construct", "", "grammar"),
-        d: (0, _i18n["default"])("determined", "", "grammar")
+        a: (0, _i18n["default"])("absolute", "", "original-languages"),
+        c: (0, _i18n["default"])("construct", "", "original-languages"),
+        d: (0, _i18n["default"])("determined", "", "original-languages")
       };
 
     case 'adjType':
       return {
-        c: (0, _i18n["default"])("cardinal-number", "", "grammar"),
-        o: (0, _i18n["default"])("ordinal-number", "", "grammar")
+        c: (0, _i18n["default"])("cardinal-number", "", "original-languages"),
+        o: (0, _i18n["default"])("ordinal-number", "", "original-languages")
       };
 
     case 'nounType':
       return {
-        g: (0, _i18n["default"])("gentilic", "", "grammar"),
-        p: (0, _i18n["default"])("proper-name", "", "grammar")
+        g: (0, _i18n["default"])("gentilic", "", "original-languages"),
+        p: (0, _i18n["default"])("proper-name", "", "original-languages")
       };
 
     case 'pronounType':
       return {
-        d: (0, _i18n["default"])("demonstrative", "", "grammar"),
-        f: (0, _i18n["default"])("indefinite", "", "grammar"),
-        i: (0, _i18n["default"])("interrogative", "", "grammar"),
-        p: (0, _i18n["default"])("personal", "", "grammar"),
-        r: (0, _i18n["default"])("relative", "", "grammar")
+        d: (0, _i18n["default"])("demonstrative", "", "original-languages"),
+        f: (0, _i18n["default"])("indefinite", "", "original-languages"),
+        i: (0, _i18n["default"])("interrogative", "", "original-languages"),
+        p: (0, _i18n["default"])("personal", "", "original-languages"),
+        r: (0, _i18n["default"])("relative", "", "original-languages")
       };
 
     case 'prepType':
       return {
-        d: (0, _i18n["default"])("definite-article", "", "grammar")
+        d: (0, _i18n["default"])("definite-article", "", "original-languages")
       };
 
     case 'suffixType':
       return {
-        d: (0, _i18n["default"])("directional", "", "grammar"),
-        h: (0, _i18n["default"])("paragogic", "", "grammar"),
-        n: (0, _i18n["default"])("paragogic", "", "grammar")
+        d: (0, _i18n["default"])("directional", "", "original-languages"),
+        h: (0, _i18n["default"])("paragogic", "", "original-languages"),
+        n: (0, _i18n["default"])("paragogic", "", "original-languages")
       };
 
     case 'particleType':
       return {
-        a: (0, _i18n["default"])("affirmation", "", "grammar"),
-        d: (0, _i18n["default"])("definite-article", "", "grammar"),
-        e: (0, _i18n["default"])("exhortation", "", "grammar"),
-        i: (0, _i18n["default"])("interrogative", "", "grammar"),
-        j: (0, _i18n["default"])("interjection", "", "grammar"),
-        m: (0, _i18n["default"])("demonstrative", "", "grammar"),
-        n: (0, _i18n["default"])("negative", "", "grammar"),
-        o: (0, _i18n["default"])("direct-object-marker", "", "grammar"),
-        r: (0, _i18n["default"])("relative", "", "grammar")
+        a: (0, _i18n["default"])("affirmation", "", "original-languages"),
+        d: (0, _i18n["default"])("definite-article", "", "original-languages"),
+        e: (0, _i18n["default"])("exhortation", "", "original-languages"),
+        i: (0, _i18n["default"])("interrogative", "", "original-languages"),
+        j: (0, _i18n["default"])("interjection", "", "original-languages"),
+        m: (0, _i18n["default"])("demonstrative", "", "original-languages"),
+        n: (0, _i18n["default"])("negative", "", "original-languages"),
+        o: (0, _i18n["default"])("direct-object-marker", "", "original-languages"),
+        r: (0, _i18n["default"])("relative", "", "original-languages")
       };
 
     case 'stemHe':
       return {
-        q: (0, _i18n["default"])("qal", "", "grammar"),
-        N: (0, _i18n["default"])("niphal", "", "grammar"),
-        p: (0, _i18n["default"])("piel", "", "grammar"),
-        P: (0, _i18n["default"])("pual", "", "grammar"),
-        h: (0, _i18n["default"])("hiphil", "", "grammar"),
-        H: (0, _i18n["default"])("hophal", "", "grammar"),
-        t: (0, _i18n["default"])("hithpael", "", "grammar"),
-        o: (0, _i18n["default"])("polel", "", "grammar"),
-        O: (0, _i18n["default"])("polal", "", "grammar"),
-        r: (0, _i18n["default"])("hithpolel", "", "grammar"),
-        m: (0, _i18n["default"])("poel", "", "grammar"),
-        M: (0, _i18n["default"])("poal", "", "grammar"),
-        k: (0, _i18n["default"])("palel", "", "grammar"),
-        K: (0, _i18n["default"])("pulal", "", "grammar"),
-        Q: (0, _i18n["default"])("qal-passive", "", "grammar"),
-        l: (0, _i18n["default"])("pilpel", "", "grammar"),
-        L: (0, _i18n["default"])("polpal", "", "grammar"),
-        f: (0, _i18n["default"])("hithpalpel", "", "grammar"),
-        D: (0, _i18n["default"])("nithpael", "", "grammar"),
-        j: (0, _i18n["default"])("pealal", "", "grammar"),
-        i: (0, _i18n["default"])("pilel", "", "grammar"),
-        u: (0, _i18n["default"])("hothpaal", "", "grammar"),
-        c: (0, _i18n["default"])("tiphil", "", "grammar"),
-        v: (0, _i18n["default"])("hishtaphel", "", "grammar"),
-        w: (0, _i18n["default"])("nithpalel", "", "grammar"),
-        y: (0, _i18n["default"])("nithpoel", "", "grammar"),
-        z: (0, _i18n["default"])("hithpoel", "", "grammar")
+        q: (0, _i18n["default"])("qal", "", "original-languages"),
+        N: (0, _i18n["default"])("niphal", "", "original-languages"),
+        p: (0, _i18n["default"])("piel", "", "original-languages"),
+        P: (0, _i18n["default"])("pual", "", "original-languages"),
+        h: (0, _i18n["default"])("hiphil", "", "original-languages"),
+        H: (0, _i18n["default"])("hophal", "", "original-languages"),
+        t: (0, _i18n["default"])("hithpael", "", "original-languages"),
+        o: (0, _i18n["default"])("polel", "", "original-languages"),
+        O: (0, _i18n["default"])("polal", "", "original-languages"),
+        r: (0, _i18n["default"])("hithpolel", "", "original-languages"),
+        m: (0, _i18n["default"])("poel", "", "original-languages"),
+        M: (0, _i18n["default"])("poal", "", "original-languages"),
+        k: (0, _i18n["default"])("palel", "", "original-languages"),
+        K: (0, _i18n["default"])("pulal", "", "original-languages"),
+        Q: (0, _i18n["default"])("qal-passive", "", "original-languages"),
+        l: (0, _i18n["default"])("pilpel", "", "original-languages"),
+        L: (0, _i18n["default"])("polpal", "", "original-languages"),
+        f: (0, _i18n["default"])("hithpalpel", "", "original-languages"),
+        D: (0, _i18n["default"])("nithpael", "", "original-languages"),
+        j: (0, _i18n["default"])("pealal", "", "original-languages"),
+        i: (0, _i18n["default"])("pilel", "", "original-languages"),
+        u: (0, _i18n["default"])("hothpaal", "", "original-languages"),
+        c: (0, _i18n["default"])("tiphil", "", "original-languages"),
+        v: (0, _i18n["default"])("hishtaphel", "", "original-languages"),
+        w: (0, _i18n["default"])("nithpalel", "", "original-languages"),
+        y: (0, _i18n["default"])("nithpoel", "", "original-languages"),
+        z: (0, _i18n["default"])("hithpoel", "", "original-languages")
       };
 
     case 'stemAr':
       return {
-        q: (0, _i18n["default"])("peal", "", "grammar"),
-        Q: (0, _i18n["default"])("peil", "", "grammar"),
-        u: (0, _i18n["default"])("hithpeel", "", "grammar"),
-        N: (0, _i18n["default"])("niphal", "", "grammar"),
-        p: (0, _i18n["default"])("pael", "", "grammar"),
-        P: (0, _i18n["default"])("ithpaal", "", "grammar"),
-        M: (0, _i18n["default"])("hithpaal", "", "grammar"),
-        a: (0, _i18n["default"])("aphel", "", "grammar"),
-        h: (0, _i18n["default"])("haphel", "", "grammar"),
-        s: (0, _i18n["default"])("saphel", "", "grammar"),
-        e: (0, _i18n["default"])("shaphel", "", "grammar"),
-        H: (0, _i18n["default"])("hophal", "", "grammar"),
-        i: (0, _i18n["default"])("ithpeel", "", "grammar"),
-        t: (0, _i18n["default"])("hishtaphel", "", "grammar"),
-        v: (0, _i18n["default"])("ishtaphel", "", "grammar"),
-        w: (0, _i18n["default"])("hithaphel", "", "grammar"),
-        o: (0, _i18n["default"])("polel", "", "grammar"),
-        z: (0, _i18n["default"])("ithpoel", "", "grammar"),
-        r: (0, _i18n["default"])("hithpolel", "", "grammar"),
-        f: (0, _i18n["default"])("hithpalpel", "", "grammar"),
-        b: (0, _i18n["default"])("hephal", "", "grammar"),
-        c: (0, _i18n["default"])("tiphel", "", "grammar"),
-        m: (0, _i18n["default"])("poel", "", "grammar"),
-        l: (0, _i18n["default"])("palpel", "", "grammar"),
-        L: (0, _i18n["default"])("ithpalpel", "", "grammar"),
-        O: (0, _i18n["default"])("ithpolel", "", "grammar"),
-        G: (0, _i18n["default"])("ittaphal", "", "grammar")
+        q: (0, _i18n["default"])("peal", "", "original-languages"),
+        Q: (0, _i18n["default"])("peil", "", "original-languages"),
+        u: (0, _i18n["default"])("hithpeel", "", "original-languages"),
+        N: (0, _i18n["default"])("niphal", "", "original-languages"),
+        p: (0, _i18n["default"])("pael", "", "original-languages"),
+        P: (0, _i18n["default"])("ithpaal", "", "original-languages"),
+        M: (0, _i18n["default"])("hithpaal", "", "original-languages"),
+        a: (0, _i18n["default"])("aphel", "", "original-languages"),
+        h: (0, _i18n["default"])("haphel", "", "original-languages"),
+        s: (0, _i18n["default"])("saphel", "", "original-languages"),
+        e: (0, _i18n["default"])("shaphel", "", "original-languages"),
+        H: (0, _i18n["default"])("hophal", "", "original-languages"),
+        i: (0, _i18n["default"])("ithpeel", "", "original-languages"),
+        t: (0, _i18n["default"])("hishtaphel", "", "original-languages"),
+        v: (0, _i18n["default"])("ishtaphel", "", "original-languages"),
+        w: (0, _i18n["default"])("hithaphel", "", "original-languages"),
+        o: (0, _i18n["default"])("polel", "", "original-languages"),
+        z: (0, _i18n["default"])("ithpoel", "", "original-languages"),
+        r: (0, _i18n["default"])("hithpolel", "", "original-languages"),
+        f: (0, _i18n["default"])("hithpalpel", "", "original-languages"),
+        b: (0, _i18n["default"])("hephal", "", "original-languages"),
+        c: (0, _i18n["default"])("tiphel", "", "original-languages"),
+        m: (0, _i18n["default"])("poel", "", "original-languages"),
+        l: (0, _i18n["default"])("palpel", "", "original-languages"),
+        L: (0, _i18n["default"])("ithpalpel", "", "original-languages"),
+        O: (0, _i18n["default"])("ithpolel", "", "original-languages"),
+        G: (0, _i18n["default"])("ittaphal", "", "original-languages")
       };
 
     case 'aspect':
       return {
-        p: (0, _i18n["default"])("perfect", "", "grammar"),
-        q: (0, _i18n["default"])("sequential-perfect", "", "grammar"),
-        i: (0, _i18n["default"])("imperfect", "", "grammar"),
-        w: (0, _i18n["default"])("sequential-imperfect", "", "grammar"),
-        h: (0, _i18n["default"])("cohortative", "", "grammar"),
-        j: (0, _i18n["default"])("jussive", "", "grammar"),
-        v: (0, _i18n["default"])("imperative", "", "grammar"),
-        r: (0, _i18n["default"])("participle", "", "grammar"),
-        s: (0, _i18n["default"])("passive-participle", "", "grammar"),
-        a: (0, _i18n["default"])("infinitive-absolute", "", "grammar"),
-        c: (0, _i18n["default"])("infinitive-construct", "", "grammar")
+        p: (0, _i18n["default"])("perfect", "", "original-languages"),
+        q: (0, _i18n["default"])("sequential-perfect", "", "original-languages"),
+        i: (0, _i18n["default"])("imperfect", "", "original-languages"),
+        w: (0, _i18n["default"])("sequential-imperfect", "", "original-languages"),
+        h: (0, _i18n["default"])("cohortative", "", "original-languages"),
+        j: (0, _i18n["default"])("jussive", "", "original-languages"),
+        v: (0, _i18n["default"])("imperative", "", "original-languages"),
+        r: (0, _i18n["default"])("participle", "", "original-languages"),
+        s: (0, _i18n["default"])("passive-participle", "", "original-languages"),
+        a: (0, _i18n["default"])("infinitive-absolute", "", "original-languages"),
+        c: (0, _i18n["default"])("infinitive-construct", "", "original-languages")
       };
   }
 };
@@ -341,7 +341,7 @@ var getHebrewMorphPartDisplayInfo = function getHebrewMorphPartDisplayInfo(_ref5
         });
         pushTerm({
           morphStrs: morphStrs,
-          term: (0, _i18n["default"])("suffix", "", "grammar")
+          term: (0, _i18n["default"])("suffix", "", "original-languages")
         });
       }
 

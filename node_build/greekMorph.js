@@ -24,49 +24,49 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 var getPosTerm = function getPosTerm(code) {
   switch (code) {
     case 'N':
-      return (0, _i18n["default"])("noun", "", "grammar");
+      return (0, _i18n["default"])("noun", "", "original-languages");
 
     case 'A':
-      return (0, _i18n["default"])("adjective", "", "grammar");
+      return (0, _i18n["default"])("adjective", "", "original-languages");
 
     case 'NS':
-      return (0, _i18n["default"])("adjective", "", "grammar");
+      return (0, _i18n["default"])("adjective", "", "original-languages");
     // better categorized as an adjective
 
     case 'NP':
-      return (0, _i18n["default"])("adjective", "", "grammar");
+      return (0, _i18n["default"])("adjective", "", "original-languages");
     // better categorized as an adjective
 
     case 'E':
-      return (0, _i18n["default"])("determiner", "", "grammar");
+      return (0, _i18n["default"])("determiner", "", "original-languages");
 
     case 'R':
-      return (0, _i18n["default"])("pronoun", "", "grammar");
+      return (0, _i18n["default"])("pronoun", "", "original-languages");
 
     case 'V':
-      return (0, _i18n["default"])("verb", "", "grammar");
+      return (0, _i18n["default"])("verb", "", "original-languages");
 
     case 'I':
-      return (0, _i18n["default"])("interjection", "", "grammar");
+      return (0, _i18n["default"])("interjection", "", "original-languages");
 
     case 'P':
-      return (0, _i18n["default"])("preposition", "", "grammar");
+      return (0, _i18n["default"])("preposition", "", "original-languages");
 
     case 'D':
-      return (0, _i18n["default"])("adverb", "", "grammar");
+      return (0, _i18n["default"])("adverb", "", "original-languages");
 
     case 'PI':
-      return (0, _i18n["default"])("adverb", "", "grammar");
+      return (0, _i18n["default"])("adverb", "", "original-languages");
     // better categorized as an adverb
 
     case 'C':
-      return (0, _i18n["default"])("conjunction", "", "grammar");
+      return (0, _i18n["default"])("conjunction", "", "original-languages");
 
     case 'T':
-      return (0, _i18n["default"])("particle", "", "grammar");
+      return (0, _i18n["default"])("particle", "", "original-languages");
 
     case 'TF':
-      return (0, _i18n["default"])("foreign", "", "grammar");
+      return (0, _i18n["default"])("foreign", "", "original-languages");
     // better in its own category
   }
 };
@@ -74,145 +74,145 @@ var getPosTerm = function getPosTerm(code) {
 var getPosTypeTerm = function getPosTypeTerm(code) {
   switch (code) {
     case 'NS':
-      return (0, _i18n["default"])("substantive", "", "grammar");
+      return (0, _i18n["default"])("substantive", "", "original-languages");
 
     case 'NP':
-      return (0, _i18n["default"])("predicate", "", "grammar");
+      return (0, _i18n["default"])("predicate", "", "original-languages");
 
     case 'AA':
-      return (0, _i18n["default"])("ascriptive", "", "grammar");
+      return (0, _i18n["default"])("ascriptive", "", "original-languages");
 
     case 'AR':
-      return (0, _i18n["default"])("restrictive", "", "grammar");
+      return (0, _i18n["default"])("restrictive", "", "original-languages");
 
     case 'EA':
-      return (0, _i18n["default"])("article", "", "grammar");
+      return (0, _i18n["default"])("article", "", "original-languages");
 
     case 'ED':
-      return (0, _i18n["default"])("demonstrative", "", "grammar");
+      return (0, _i18n["default"])("demonstrative", "", "original-languages");
 
     case 'EF':
-      return (0, _i18n["default"])("differential", "", "grammar");
+      return (0, _i18n["default"])("differential", "", "original-languages");
 
     case 'EP':
-      return (0, _i18n["default"])("possessive", "", "grammar");
+      return (0, _i18n["default"])("possessive", "", "original-languages");
 
     case 'EQ':
-      return (0, _i18n["default"])("quantifier", "", "grammar");
+      return (0, _i18n["default"])("quantifier", "", "original-languages");
 
     case 'EN':
-      return (0, _i18n["default"])("number", "", "grammar");
+      return (0, _i18n["default"])("number", "", "original-languages");
 
     case 'EO':
-      return (0, _i18n["default"])("ordinal", "", "grammar");
+      return (0, _i18n["default"])("ordinal", "", "original-languages");
 
     case 'ER':
-      return (0, _i18n["default"])("relative", "", "grammar");
+      return (0, _i18n["default"])("relative", "", "original-languages");
 
     case 'ET':
-      return (0, _i18n["default"])("interrogative", "", "grammar");
+      return (0, _i18n["default"])("interrogative", "", "original-languages");
 
     case 'RD':
-      return (0, _i18n["default"])("demonstrative", "", "grammar");
+      return (0, _i18n["default"])("demonstrative", "", "original-languages");
 
     case 'RP':
-      return (0, _i18n["default"])("personal", "", "grammar");
+      return (0, _i18n["default"])("personal", "", "original-languages");
 
     case 'RE':
-      return (0, _i18n["default"])("reflexive", "", "grammar");
+      return (0, _i18n["default"])("reflexive", "", "original-languages");
 
     case 'RC':
-      return (0, _i18n["default"])("reciprocal", "", "grammar");
+      return (0, _i18n["default"])("reciprocal", "", "original-languages");
 
     case 'RI':
-      return (0, _i18n["default"])("indefinite", "", "grammar");
+      return (0, _i18n["default"])("indefinite", "", "original-languages");
 
     case 'RR':
-      return (0, _i18n["default"])("relative", "", "grammar");
+      return (0, _i18n["default"])("relative", "", "original-languages");
 
     case 'RT':
-      return (0, _i18n["default"])("interrogative", "", "grammar");
-    // case 'VT': return i18n("transitive", "", "grammar")
-    // case 'VI': return i18n("intransitive", "", "grammar")
-    // case 'VL': return i18n("linking", "", "grammar")
-    // case 'VM': return i18n("modal", "", "grammar")
-    // case 'VP': return i18n("periphrastic", "", "grammar")
+      return (0, _i18n["default"])("interrogative", "", "original-languages");
+    // case 'VT': return i18n("transitive", "", "original-languages")
+    // case 'VI': return i18n("intransitive", "", "original-languages")
+    // case 'VL': return i18n("linking", "", "original-languages")
+    // case 'VM': return i18n("modal", "", "original-languages")
+    // case 'VP': return i18n("periphrastic", "", "original-languages")
 
     case 'IE':
-      return (0, _i18n["default"])("exclamation", "", "grammar");
+      return (0, _i18n["default"])("exclamation", "", "original-languages");
 
     case 'ID':
-      return (0, _i18n["default"])("directive", "", "grammar");
+      return (0, _i18n["default"])("directive", "", "original-languages");
 
     case 'IR':
-      return (0, _i18n["default"])("response", "", "grammar");
+      return (0, _i18n["default"])("response", "", "original-languages");
 
     case 'PI':
-      return (0, _i18n["default"])("improper-preposition", "", "grammar");
+      return (0, _i18n["default"])("improper-preposition", "", "original-languages");
 
     case 'DO':
-      return (0, _i18n["default"])("correlative", "", "grammar");
+      return (0, _i18n["default"])("correlative", "", "original-languages");
 
     case 'CC':
-      return (0, _i18n["default"])("coordinating", "", "grammar");
+      return (0, _i18n["default"])("coordinating", "", "original-languages");
 
     case 'CS':
-      return (0, _i18n["default"])("subordinating", "", "grammar");
+      return (0, _i18n["default"])("subordinating", "", "original-languages");
 
     case 'CO':
-      return (0, _i18n["default"])("correlative", "", "grammar");
+      return (0, _i18n["default"])("correlative", "", "original-languages");
   }
 };
 
 var getMorphTerms = function getMorphTerms() {
   return [{
     // mood
-    I: (0, _i18n["default"])("indicative", "", "grammar"),
-    M: (0, _i18n["default"])("imperative", "", "grammar"),
-    S: (0, _i18n["default"])("subjunctive", "", "grammar"),
-    O: (0, _i18n["default"])("optative", "", "grammar"),
-    N: (0, _i18n["default"])("infinitive", "", "grammar"),
-    P: (0, _i18n["default"])("participle", "", "grammar")
+    I: (0, _i18n["default"])("indicative", "", "original-languages"),
+    M: (0, _i18n["default"])("imperative", "", "original-languages"),
+    S: (0, _i18n["default"])("subjunctive", "", "original-languages"),
+    O: (0, _i18n["default"])("optative", "", "original-languages"),
+    N: (0, _i18n["default"])("infinitive", "", "original-languages"),
+    P: (0, _i18n["default"])("participle", "", "original-languages")
   }, {
     // aspect
-    P: (0, _i18n["default"])("present", "", "grammar"),
-    I: (0, _i18n["default"])("imperfect", "", "grammar"),
-    F: (0, _i18n["default"])("future", "", "grammar"),
-    A: (0, _i18n["default"])("aorist", "", "grammar"),
-    E: (0, _i18n["default"])("perfect", "", "grammar"),
-    L: (0, _i18n["default"])("pluperfect", "", "grammar")
+    P: (0, _i18n["default"])("present", "", "original-languages"),
+    I: (0, _i18n["default"])("imperfect", "", "original-languages"),
+    F: (0, _i18n["default"])("future", "", "original-languages"),
+    A: (0, _i18n["default"])("aorist", "", "original-languages"),
+    E: (0, _i18n["default"])("perfect", "", "original-languages"),
+    L: (0, _i18n["default"])("pluperfect", "", "original-languages")
   }, {
     // voice
-    A: (0, _i18n["default"])("active", "", "grammar"),
-    M: (0, _i18n["default"])("middle", "", "grammar"),
-    P: (0, _i18n["default"])("passive", "", "grammar")
+    A: (0, _i18n["default"])("active", "", "original-languages"),
+    M: (0, _i18n["default"])("middle", "", "original-languages"),
+    P: (0, _i18n["default"])("passive", "", "original-languages")
   }, {
     // person
-    1: (0, _i18n["default"])("1st", "", "grammar"),
-    2: (0, _i18n["default"])("2nd", "", "grammar"),
-    3: (0, _i18n["default"])("3rd", "", "grammar")
+    1: (0, _i18n["default"])("1st", "", "original-languages"),
+    2: (0, _i18n["default"])("2nd", "", "original-languages"),
+    3: (0, _i18n["default"])("3rd", "", "original-languages")
   }, {
     // case
-    N: (0, _i18n["default"])("nominative", "", "grammar"),
-    G: (0, _i18n["default"])("genitive", "", "grammar"),
-    D: (0, _i18n["default"])("dative", "", "grammar"),
-    A: (0, _i18n["default"])("accusative", "", "grammar"),
-    V: (0, _i18n["default"])("vocative", "", "grammar")
+    N: (0, _i18n["default"])("nominative", "", "original-languages"),
+    G: (0, _i18n["default"])("genitive", "", "original-languages"),
+    D: (0, _i18n["default"])("dative", "", "original-languages"),
+    A: (0, _i18n["default"])("accusative", "", "original-languages"),
+    V: (0, _i18n["default"])("vocative", "", "original-languages")
   }, {
     // gender
-    M: (0, _i18n["default"])("masculine", "", "grammar"),
-    F: (0, _i18n["default"])("feminine", "", "grammar"),
-    N: (0, _i18n["default"])("neuter", "", "grammar")
+    M: (0, _i18n["default"])("masculine", "", "original-languages"),
+    F: (0, _i18n["default"])("feminine", "", "original-languages"),
+    N: (0, _i18n["default"])("neuter", "", "original-languages")
   }, {
     // number
-    S: (0, _i18n["default"])("singular", "", "grammar"),
-    P: (0, _i18n["default"])("plural", "", "grammar")
+    S: (0, _i18n["default"])("singular", "", "original-languages"),
+    P: (0, _i18n["default"])("plural", "", "original-languages")
   }, {
     // other
-    C: (0, _i18n["default"])("comparative", "", "grammar"),
-    S: (0, _i18n["default"])("superlatives", "", "grammar"),
-    D: (0, _i18n["default"])("diminutive", "", "grammar"),
-    I: (0, _i18n["default"])("indeclinable", "", "grammar")
+    C: (0, _i18n["default"])("comparative", "", "original-languages"),
+    S: (0, _i18n["default"])("superlatives", "", "original-languages"),
+    D: (0, _i18n["default"])("diminutive", "", "original-languages"),
+    I: (0, _i18n["default"])("indeclinable", "", "original-languages")
   }];
 };
 
