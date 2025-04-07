@@ -2,109 +2,109 @@ import i18n from './i18n'
 
 const getPosTerm = code => {
   switch(code) {
-    case 'N': return i18n("noun", "", "grammar")
-    case 'A': return i18n("adjective", "", "grammar")
-    case 'NS': return i18n("adjective", "", "grammar")  // better categorized as an adjective
-    case 'NP': return i18n("adjective", "", "grammar")  // better categorized as an adjective
-    case 'E': return i18n("determiner", "", "grammar")
-    case 'R': return i18n("pronoun", "", "grammar")
-    case 'V': return i18n("verb", "", "grammar")
-    case 'I': return i18n("interjection", "", "grammar")
-    case 'P': return i18n("preposition", "", "grammar")
-    case 'D': return i18n("adverb", "", "grammar")
-    case 'PI': return i18n("adverb", "", "grammar")  // better categorized as an adverb
-    case 'C': return i18n("conjunction", "", "grammar")
-    case 'T': return i18n("particle", "", "grammar")
-    case 'TF': return i18n("foreign", "", "grammar")  // better in its own category
+    case 'N': return i18n("noun", "", "original-languages")
+    case 'A': return i18n("adjective", "", "original-languages")
+    case 'NS': return i18n("adjective", "", "original-languages")  // better categorized as an adjective
+    case 'NP': return i18n("adjective", "", "original-languages")  // better categorized as an adjective
+    case 'E': return i18n("determiner", "", "original-languages")
+    case 'R': return i18n("pronoun", "", "original-languages")
+    case 'V': return i18n("verb", "", "original-languages")
+    case 'I': return i18n("interjection", "", "original-languages")
+    case 'P': return i18n("preposition", "", "original-languages")
+    case 'D': return i18n("adverb", "", "original-languages")
+    case 'PI': return i18n("adverb", "", "original-languages")  // better categorized as an adverb
+    case 'C': return i18n("conjunction", "", "original-languages")
+    case 'T': return i18n("particle", "", "original-languages")
+    case 'TF': return i18n("foreign", "", "original-languages")  // better in its own category
   }
 }
 
 const getPosTypeTerm = code => {
   switch(code) {
-    case 'NS': return i18n("substantive", "", "grammar")
-    case 'NP': return i18n("predicate", "", "grammar")
-    case 'AA': return i18n("ascriptive", "", "grammar")
-    case 'AR': return i18n("restrictive", "", "grammar")
-    case 'EA': return i18n("article", "", "grammar")
-    case 'ED': return i18n("demonstrative", "", "grammar")
-    case 'EF': return i18n("differential", "", "grammar")
-    case 'EP': return i18n("possessive", "", "grammar")
-    case 'EQ': return i18n("quantifier", "", "grammar")
-    case 'EN': return i18n("number", "", "grammar")
-    case 'EO': return i18n("ordinal", "", "grammar")
-    case 'ER': return i18n("relative", "", "grammar")
-    case 'ET': return i18n("interrogative", "", "grammar")
-    case 'RD': return i18n("demonstrative", "", "grammar")
-    case 'RP': return i18n("personal", "", "grammar")
-    case 'RE': return i18n("reflexive", "", "grammar")
-    case 'RC': return i18n("reciprocal", "", "grammar")
-    case 'RI': return i18n("indefinite", "", "grammar")
-    case 'RR': return i18n("relative", "", "grammar")
-    case 'RT': return i18n("interrogative", "", "grammar")
-    // case 'VT': return i18n("transitive", "", "grammar")
-    // case 'VI': return i18n("intransitive", "", "grammar")
-    // case 'VL': return i18n("linking", "", "grammar")
-    // case 'VM': return i18n("modal", "", "grammar")
-    // case 'VP': return i18n("periphrastic", "", "grammar")
-    case 'IE': return i18n("exclamation", "", "grammar")
-    case 'ID': return i18n("directive", "", "grammar")
-    case 'IR': return i18n("response", "", "grammar")
-    case 'PI': return i18n("improper-preposition", "", "grammar")
-    case 'DO': return i18n("correlative", "", "grammar")
-    case 'CC': return i18n("coordinating", "", "grammar")
-    case 'CS': return i18n("subordinating", "", "grammar")
-    case 'CO': return i18n("correlative", "", "grammar")
+    case 'NS': return i18n("substantive", "", "original-languages")
+    case 'NP': return i18n("predicate", "", "original-languages")
+    case 'AA': return i18n("ascriptive", "", "original-languages")
+    case 'AR': return i18n("restrictive", "", "original-languages")
+    case 'EA': return i18n("article", "", "original-languages")
+    case 'ED': return i18n("demonstrative", "", "original-languages")
+    case 'EF': return i18n("differential", "", "original-languages")
+    case 'EP': return i18n("possessive", "", "original-languages")
+    case 'EQ': return i18n("quantifier", "", "original-languages")
+    case 'EN': return i18n("number", "", "original-languages")
+    case 'EO': return i18n("ordinal", "", "original-languages")
+    case 'ER': return i18n("relative", "", "original-languages")
+    case 'ET': return i18n("interrogative", "", "original-languages")
+    case 'RD': return i18n("demonstrative", "", "original-languages")
+    case 'RP': return i18n("personal", "", "original-languages")
+    case 'RE': return i18n("reflexive", "", "original-languages")
+    case 'RC': return i18n("reciprocal", "", "original-languages")
+    case 'RI': return i18n("indefinite", "", "original-languages")
+    case 'RR': return i18n("relative", "", "original-languages")
+    case 'RT': return i18n("interrogative", "", "original-languages")
+    // case 'VT': return i18n("transitive", "", "original-languages")
+    // case 'VI': return i18n("intransitive", "", "original-languages")
+    // case 'VL': return i18n("linking", "", "original-languages")
+    // case 'VM': return i18n("modal", "", "original-languages")
+    // case 'VP': return i18n("periphrastic", "", "original-languages")
+    case 'IE': return i18n("exclamation", "", "original-languages")
+    case 'ID': return i18n("directive", "", "original-languages")
+    case 'IR': return i18n("response", "", "original-languages")
+    case 'PI': return i18n("improper-preposition", "", "original-languages")
+    case 'DO': return i18n("correlative", "", "original-languages")
+    case 'CC': return i18n("coordinating", "", "original-languages")
+    case 'CS': return i18n("subordinating", "", "original-languages")
+    case 'CO': return i18n("correlative", "", "original-languages")
   }
 }
 
 const getMorphTerms = () => ([
   { // mood
-    I: i18n("indicative", "", "grammar"),
-    M: i18n("imperative", "", "grammar"),
-    S: i18n("subjunctive", "", "grammar"),
-    O: i18n("optative", "", "grammar"),
-    N: i18n("infinitive", "", "grammar"),
-    P: i18n("participle", "", "grammar"),
+    I: i18n("indicative", "", "original-languages"),
+    M: i18n("imperative", "", "original-languages"),
+    S: i18n("subjunctive", "", "original-languages"),
+    O: i18n("optative", "", "original-languages"),
+    N: i18n("infinitive", "", "original-languages"),
+    P: i18n("participle", "", "original-languages"),
   },
   { // aspect
-    P: i18n("present", "", "grammar"),
-    I: i18n("imperfect", "", "grammar"),
-    F: i18n("future", "", "grammar"),
-    A: i18n("aorist", "", "grammar"),
-    E: i18n("perfect", "", "grammar"),
-    L: i18n("pluperfect", "", "grammar"),
+    P: i18n("present", "", "original-languages"),
+    I: i18n("imperfect", "", "original-languages"),
+    F: i18n("future", "", "original-languages"),
+    A: i18n("aorist", "", "original-languages"),
+    E: i18n("perfect", "", "original-languages"),
+    L: i18n("pluperfect", "", "original-languages"),
   },
   { // voice
-    A: i18n("active", "", "grammar"),
-    M: i18n("middle", "", "grammar"),
-    P: i18n("passive", "", "grammar"),
+    A: i18n("active", "", "original-languages"),
+    M: i18n("middle", "", "original-languages"),
+    P: i18n("passive", "", "original-languages"),
   },
   { // person
-    1: i18n("1st", "", "grammar"),
-    2: i18n("2nd", "", "grammar"),
-    3: i18n("3rd", "", "grammar"),
+    1: i18n("1st", "", "original-languages"),
+    2: i18n("2nd", "", "original-languages"),
+    3: i18n("3rd", "", "original-languages"),
   },
   { // case
-    N: i18n("nominative", "", "grammar"),
-    G: i18n("genitive", "", "grammar"),
-    D: i18n("dative", "", "grammar"),
-    A: i18n("accusative", "", "grammar"),
-    V: i18n("vocative", "", "grammar"),
+    N: i18n("nominative", "", "original-languages"),
+    G: i18n("genitive", "", "original-languages"),
+    D: i18n("dative", "", "original-languages"),
+    A: i18n("accusative", "", "original-languages"),
+    V: i18n("vocative", "", "original-languages"),
   },
   { // gender
-    M: i18n("masculine", "", "grammar"),
-    F: i18n("feminine", "", "grammar"),
-    N: i18n("neuter", "", "grammar"),
+    M: i18n("masculine", "", "original-languages"),
+    F: i18n("feminine", "", "original-languages"),
+    N: i18n("neuter", "", "original-languages"),
   },
   { // number
-    S: i18n("singular", "", "grammar"),
-    P: i18n("plural", "", "grammar"),
+    S: i18n("singular", "", "original-languages"),
+    P: i18n("plural", "", "original-languages"),
   },
   { // other
-    C: i18n("comparative", "", "grammar"),
-    S: i18n("superlatives", "", "grammar"),
-    D: i18n("diminutive", "", "grammar"),
-    I: i18n("indeclinable", "", "grammar"),
+    C: i18n("comparative", "", "original-languages"),
+    S: i18n("superlatives", "", "original-languages"),
+    D: i18n("diminutive", "", "original-languages"),
+    I: i18n("indeclinable", "", "original-languages"),
   },
 ])
 

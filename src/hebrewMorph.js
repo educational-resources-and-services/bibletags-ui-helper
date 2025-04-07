@@ -2,14 +2,14 @@ import i18n from './i18n'
 
 const getPosTerm = code => {
   switch(code) {
-    case 'A': return i18n("adjective", "", "grammar")
-    case 'C': return i18n("conjunction", "", "grammar")
-    case 'D': return i18n("adverb", "", "grammar")
-    case 'N': return i18n("noun", "", "grammar")
-    case 'P': return i18n("pronoun", "", "grammar")
-    case 'R': return i18n("preposition", "", "grammar")
-    case 'T': return i18n("particle", "", "grammar")
-    case 'V': return i18n("verb", "", "grammar")
+    case 'A': return i18n("adjective", "", "original-languages")
+    case 'C': return i18n("conjunction", "", "original-languages")
+    case 'D': return i18n("adverb", "", "original-languages")
+    case 'N': return i18n("noun", "", "original-languages")
+    case 'P': return i18n("pronoun", "", "original-languages")
+    case 'R': return i18n("preposition", "", "original-languages")
+    case 'T': return i18n("particle", "", "original-languages")
+    case 'V': return i18n("verb", "", "original-languages")
   }
 }
 
@@ -25,130 +25,130 @@ const getGrammarTerms = code => {
       D: getPosTerm('D'),
     }
     case 'person': return {
-      1: i18n("1st", "", "grammar"),
-      2: i18n("2nd", "", "grammar"),
-      3: i18n("3rd", "", "grammar"),
+      1: i18n("1st", "", "original-languages"),
+      2: i18n("2nd", "", "original-languages"),
+      3: i18n("3rd", "", "original-languages"),
     }
     case 'gender': return {
-      m: i18n("masculine", "", "grammar"),
-      f: i18n("feminine", "", "grammar"),
-      b: i18n("gender-both", "", "grammar"),
-      c: i18n("common", "", "grammar"),
+      m: i18n("masculine", "", "original-languages"),
+      f: i18n("feminine", "", "original-languages"),
+      b: i18n("gender-both", "", "original-languages"),
+      c: i18n("common", "", "original-languages"),
     }
     case 'number': return {
-      s: i18n("singular", "", "grammar"),
-      p: i18n("plural", "", "grammar"),
-      d: i18n("dual", "", "grammar"),
+      s: i18n("singular", "", "original-languages"),
+      p: i18n("plural", "", "original-languages"),
+      d: i18n("dual", "", "original-languages"),
     }
     case 'state': return {
-      a: i18n("absolute", "", "grammar"),
-      c: i18n("construct", "", "grammar"),
-      d: i18n("determined", "", "grammar"),
+      a: i18n("absolute", "", "original-languages"),
+      c: i18n("construct", "", "original-languages"),
+      d: i18n("determined", "", "original-languages"),
     }
     case 'adjType': return {
-      c: i18n("cardinal-number", "", "grammar"),
-      o: i18n("ordinal-number", "", "grammar"),
+      c: i18n("cardinal-number", "", "original-languages"),
+      o: i18n("ordinal-number", "", "original-languages"),
     }
     case 'nounType': return {
-      g: i18n("gentilic", "", "grammar"),
-      p: i18n("proper-name", "", "grammar"),
+      g: i18n("gentilic", "", "original-languages"),
+      p: i18n("proper-name", "", "original-languages"),
     }
     case 'pronounType': return {
-      d: i18n("demonstrative", "", "grammar"),
-      f: i18n("indefinite", "", "grammar"),
-      i: i18n("interrogative", "", "grammar"),
-      p: i18n("personal", "", "grammar"),
-      r: i18n("relative", "", "grammar"),
+      d: i18n("demonstrative", "", "original-languages"),
+      f: i18n("indefinite", "", "original-languages"),
+      i: i18n("interrogative", "", "original-languages"),
+      p: i18n("personal", "", "original-languages"),
+      r: i18n("relative", "", "original-languages"),
     }
     case 'prepType': return {
-      d: i18n("definite-article", "", "grammar"),
+      d: i18n("definite-article", "", "original-languages"),
     }
     case 'suffixType': return {
-      d: i18n("directional", "", "grammar"),
-      h: i18n("paragogic", "", "grammar"),
-      n: i18n("paragogic", "", "grammar"),
+      d: i18n("directional", "", "original-languages"),
+      h: i18n("paragogic", "", "original-languages"),
+      n: i18n("paragogic", "", "original-languages"),
     }
     case 'particleType': return {
-      a: i18n("affirmation", "", "grammar"),
-      d: i18n("definite-article", "", "grammar"),
-      e: i18n("exhortation", "", "grammar"),
-      i: i18n("interrogative", "", "grammar"),
-      j: i18n("interjection", "", "grammar"),
-      m: i18n("demonstrative", "", "grammar"),
-      n: i18n("negative", "", "grammar"),
-      o: i18n("direct-object-marker", "", "grammar"),
-      r: i18n("relative", "", "grammar"),
+      a: i18n("affirmation", "", "original-languages"),
+      d: i18n("definite-article", "", "original-languages"),
+      e: i18n("exhortation", "", "original-languages"),
+      i: i18n("interrogative", "", "original-languages"),
+      j: i18n("interjection", "", "original-languages"),
+      m: i18n("demonstrative", "", "original-languages"),
+      n: i18n("negative", "", "original-languages"),
+      o: i18n("direct-object-marker", "", "original-languages"),
+      r: i18n("relative", "", "original-languages"),
     }
     case 'stemHe': return {
-      q: i18n("qal", "", "grammar"),
-      N: i18n("niphal", "", "grammar"),
-      p: i18n("piel", "", "grammar"),
-      P: i18n("pual", "", "grammar"),
-      h: i18n("hiphil", "", "grammar"),
-      H: i18n("hophal", "", "grammar"),
-      t: i18n("hithpael", "", "grammar"),
-      o: i18n("polel", "", "grammar"),
-      O: i18n("polal", "", "grammar"),
-      r: i18n("hithpolel", "", "grammar"),
-      m: i18n("poel", "", "grammar"),
-      M: i18n("poal", "", "grammar"),
-      k: i18n("palel", "", "grammar"),
-      K: i18n("pulal", "", "grammar"),
-      Q: i18n("qal-passive", "", "grammar"),
-      l: i18n("pilpel", "", "grammar"),
-      L: i18n("polpal", "", "grammar"),
-      f: i18n("hithpalpel", "", "grammar"),
-      D: i18n("nithpael", "", "grammar"),
-      j: i18n("pealal", "", "grammar"),
-      i: i18n("pilel", "", "grammar"),
-      u: i18n("hothpaal", "", "grammar"),
-      c: i18n("tiphil", "", "grammar"),
-      v: i18n("hishtaphel", "", "grammar"),
-      w: i18n("nithpalel", "", "grammar"),
-      y: i18n("nithpoel", "", "grammar"),
-      z: i18n("hithpoel", "", "grammar"),
+      q: i18n("qal", "", "original-languages"),
+      N: i18n("niphal", "", "original-languages"),
+      p: i18n("piel", "", "original-languages"),
+      P: i18n("pual", "", "original-languages"),
+      h: i18n("hiphil", "", "original-languages"),
+      H: i18n("hophal", "", "original-languages"),
+      t: i18n("hithpael", "", "original-languages"),
+      o: i18n("polel", "", "original-languages"),
+      O: i18n("polal", "", "original-languages"),
+      r: i18n("hithpolel", "", "original-languages"),
+      m: i18n("poel", "", "original-languages"),
+      M: i18n("poal", "", "original-languages"),
+      k: i18n("palel", "", "original-languages"),
+      K: i18n("pulal", "", "original-languages"),
+      Q: i18n("qal-passive", "", "original-languages"),
+      l: i18n("pilpel", "", "original-languages"),
+      L: i18n("polpal", "", "original-languages"),
+      f: i18n("hithpalpel", "", "original-languages"),
+      D: i18n("nithpael", "", "original-languages"),
+      j: i18n("pealal", "", "original-languages"),
+      i: i18n("pilel", "", "original-languages"),
+      u: i18n("hothpaal", "", "original-languages"),
+      c: i18n("tiphil", "", "original-languages"),
+      v: i18n("hishtaphel", "", "original-languages"),
+      w: i18n("nithpalel", "", "original-languages"),
+      y: i18n("nithpoel", "", "original-languages"),
+      z: i18n("hithpoel", "", "original-languages"),
     }
     case 'stemAr': return {
-      q: i18n("peal", "", "grammar"),
-      Q: i18n("peil", "", "grammar"),
-      u: i18n("hithpeel", "", "grammar"),
-      N: i18n("niphal", "", "grammar"),
-      p: i18n("pael", "", "grammar"),
-      P: i18n("ithpaal", "", "grammar"),
-      M: i18n("hithpaal", "", "grammar"),
-      a: i18n("aphel", "", "grammar"),
-      h: i18n("haphel", "", "grammar"),
-      s: i18n("saphel", "", "grammar"),
-      e: i18n("shaphel", "", "grammar"),
-      H: i18n("hophal", "", "grammar"),
-      i: i18n("ithpeel", "", "grammar"),
-      t: i18n("hishtaphel", "", "grammar"),
-      v: i18n("ishtaphel", "", "grammar"),
-      w: i18n("hithaphel", "", "grammar"),
-      o: i18n("polel", "", "grammar"),
-      z: i18n("ithpoel", "", "grammar"),
-      r: i18n("hithpolel", "", "grammar"),
-      f: i18n("hithpalpel", "", "grammar"),
-      b: i18n("hephal", "", "grammar"),
-      c: i18n("tiphel", "", "grammar"),
-      m: i18n("poel", "", "grammar"),
-      l: i18n("palpel", "", "grammar"),
-      L: i18n("ithpalpel", "", "grammar"),
-      O: i18n("ithpolel", "", "grammar"),
-      G: i18n("ittaphal", "", "grammar"),
+      q: i18n("peal", "", "original-languages"),
+      Q: i18n("peil", "", "original-languages"),
+      u: i18n("hithpeel", "", "original-languages"),
+      N: i18n("niphal", "", "original-languages"),
+      p: i18n("pael", "", "original-languages"),
+      P: i18n("ithpaal", "", "original-languages"),
+      M: i18n("hithpaal", "", "original-languages"),
+      a: i18n("aphel", "", "original-languages"),
+      h: i18n("haphel", "", "original-languages"),
+      s: i18n("saphel", "", "original-languages"),
+      e: i18n("shaphel", "", "original-languages"),
+      H: i18n("hophal", "", "original-languages"),
+      i: i18n("ithpeel", "", "original-languages"),
+      t: i18n("hishtaphel", "", "original-languages"),
+      v: i18n("ishtaphel", "", "original-languages"),
+      w: i18n("hithaphel", "", "original-languages"),
+      o: i18n("polel", "", "original-languages"),
+      z: i18n("ithpoel", "", "original-languages"),
+      r: i18n("hithpolel", "", "original-languages"),
+      f: i18n("hithpalpel", "", "original-languages"),
+      b: i18n("hephal", "", "original-languages"),
+      c: i18n("tiphel", "", "original-languages"),
+      m: i18n("poel", "", "original-languages"),
+      l: i18n("palpel", "", "original-languages"),
+      L: i18n("ithpalpel", "", "original-languages"),
+      O: i18n("ithpolel", "", "original-languages"),
+      G: i18n("ittaphal", "", "original-languages"),
     }
     case 'aspect': return {
-      p: i18n("perfect", "", "grammar"),
-      q: i18n("sequential-perfect", "", "grammar"),
-      i: i18n("imperfect", "", "grammar"),
-      w: i18n("sequential-imperfect", "", "grammar"),
-      h: i18n("cohortative", "", "grammar"),
-      j: i18n("jussive", "", "grammar"),
-      v: i18n("imperative", "", "grammar"),
-      r: i18n("participle", "", "grammar"),
-      s: i18n("passive-participle", "", "grammar"),
-      a: i18n("infinitive-absolute", "", "grammar"),
-      c: i18n("infinitive-construct", "", "grammar"),
+      p: i18n("perfect", "", "original-languages"),
+      q: i18n("sequential-perfect", "", "original-languages"),
+      i: i18n("imperfect", "", "original-languages"),
+      w: i18n("sequential-imperfect", "", "original-languages"),
+      h: i18n("cohortative", "", "original-languages"),
+      j: i18n("jussive", "", "original-languages"),
+      v: i18n("imperative", "", "original-languages"),
+      r: i18n("participle", "", "original-languages"),
+      s: i18n("passive-participle", "", "original-languages"),
+      a: i18n("infinitive-absolute", "", "original-languages"),
+      c: i18n("infinitive-construct", "", "original-languages"),
     }
   }
 }
@@ -216,7 +216,7 @@ export const getHebrewMorphPartDisplayInfo = ({ morphLang, morphPart, isPrefixOr
       pushTerm({ morphStrs, term: getGrammarTerms('suffixType')[morphPartLetters[1]] })
       if(morphPartLetters[1] === 'p') {
         pushPersonGenderNumber({ morphStrs, morphPartLetters: morphPartLetters.slice(2,5) })
-        pushTerm({ morphStrs, term: i18n("suffix", "", "grammar") })
+        pushTerm({ morphStrs, term: i18n("suffix", "", "original-languages") })
       }
       break
 
