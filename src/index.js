@@ -219,11 +219,11 @@ export const getBookSuggestionOptions = () => {
         .filter(Boolean)
     ),
     {
-      suggestedQuery: i18n("Psalm", "", "book"),
+      suggestedQuery: i18n("Psalm", "Often used instead of “Psalms” when referencing a single chapter.", "book"),
       bookId: 19,
     },
     {
-      suggestedQuery: i18n("Song of Solomon", "", "book"),
+      suggestedQuery: i18n("Song of Solomon", "Alternative name of Song of Songs", "book"),
       bookId: 22,
     },
   ]
