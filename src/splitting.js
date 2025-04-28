@@ -770,7 +770,7 @@ const getFlattenedJsUsfm = jsUsfm => {
 const removeInvalidNewlines = unitObjs => {
   unitObjs.forEach(unitObj => {
     if(typeof unitObj.text === 'string') {
-      unitObj.text = unitObj.text.replace(/\n/g, '')
+      unitObj.text = unitObj.text.replace(/^\n([([{“‘«])/g, ` $1`).replace(/\n/g, '')
     }
     if(typeof unitObj.content === 'string') {
       unitObj.content = unitObj.content.replace(/\n/g, '')

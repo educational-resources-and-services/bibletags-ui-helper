@@ -441,10 +441,10 @@ var getBookSuggestionOptions = function getBookSuggestionOptions() {
       bookId: bookId
     } : null;
   }).filter(Boolean)), [{
-    suggestedQuery: (0, _i18n["default"])("Psalm", "", "book"),
+    suggestedQuery: (0, _i18n["default"])("Psalm", "Often used instead of “Psalms” when referencing a single chapter.", "book"),
     bookId: 19
   }, {
-    suggestedQuery: (0, _i18n["default"])("Song of Solomon", "", "book"),
+    suggestedQuery: (0, _i18n["default"])("Song of Solomon", "Alternative name of Song of Songs", "book"),
     bookId: 22
   }]);
   return bookSuggestionOptions;

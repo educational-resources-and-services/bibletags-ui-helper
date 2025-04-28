@@ -652,7 +652,7 @@ var getFlattenedJsUsfm = function getFlattenedJsUsfm(jsUsfm) {
 var removeInvalidNewlines = function removeInvalidNewlines(unitObjs) {
   unitObjs.forEach(function (unitObj) {
     if (typeof unitObj.text === 'string') {
-      unitObj.text = unitObj.text.replace(/\n/g, '');
+      unitObj.text = unitObj.text.replace(/^\n([([{“‘«])/g, " $1").replace(/\n/g, '');
     }
 
     if (typeof unitObj.content === 'string') {
